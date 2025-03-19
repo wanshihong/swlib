@@ -23,7 +23,7 @@ readonly class TwigResponse implements ResponseInterface
         } catch (Throwable $e) {
             $html = 'server error';
             Log::saveException($e, 'admin');
-            if (ConfigEnum::APP_DEV !== APP_ENV_PROD) {
+            if (ConfigEnum::APP_PROD === false) {
                 $html = $e->getMessage() . "\n" . $e->getTraceAsString();
             }
         }

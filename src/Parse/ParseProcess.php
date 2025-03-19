@@ -21,6 +21,7 @@ class ParseProcess
 
         $items = [];
         foreach ($files as $file) {
+            $file = str_replace(SWLIB_DIR, 'Swlib\\', $file);
             $className = str_replace([ROOT_DIR, '.php'], '', $file);
             $className = str_replace("/", '\\', $className);
 

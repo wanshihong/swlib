@@ -13,7 +13,7 @@ class Log
 
     private static function mkdir(string $logModule = 'default'): string
     {
-        $dir = dirname(__DIR__, 2) . "/runtime/log/$logModule/";
+        $dir = RUNTIME_DIR. "log/$logModule/";
 
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);

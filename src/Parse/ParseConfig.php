@@ -10,7 +10,7 @@ class ParseConfig
     public array $data = [];
 
 
-    public function __construct(string $dev)
+    public function __construct()
     {
 
         $lockFile = RUNTIME_DIR . 'server_id.lock';
@@ -21,11 +21,15 @@ class ParseConfig
             file_put_contents($lockFile, $serverId);
         }
 
-
-        $envFile = $dev == APP_ENV_DEV ? ROOT_DIR . '.env' : ROOT_DIR . '.env.prod';
+        $prodEnv = ROOT_DIR . '.env.prod';
+        $devEnv = ROOT_DIR . '.env';
+        if (is_file($prodEnv)) {
+            $envFile = $prodEnv;
+        } else {
+            $envFile = $devEnv;
+        }
 
         $config = $this->parse($envFile);
-        $config['APP_DEV'] = $dev;
         $config['SERVER_ID'] = $serverId;
         $config['PROJECT_UNIQUE'] = md5(json_encode($config));
 

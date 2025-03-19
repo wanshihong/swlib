@@ -41,7 +41,7 @@ readonly class ProtobufResponse implements ResponseInterface
     public static function error(Throwable $e): static
     {
         $ret = "server error";
-        if (ConfigEnum::APP_DEV === APP_ENV_DEV) {
+        if (ConfigEnum::APP_PROD === false) {
             $ret = Log::getTraceMsg($e);
         } else {
             if ($e instanceof AppException) {

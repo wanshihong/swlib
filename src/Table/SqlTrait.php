@@ -257,7 +257,7 @@ trait SqlTrait
      */
     public function addWhereRaw(string $sql, array $bindParams = []): static
     {
-        if (ConfigEnum::APP_DEV === APP_ENV_DEV && empty($bindParams)) {
+        if (ConfigEnum::APP_PROD === false && empty($bindParams)) {
             echo '警告：使用addWhereRaw方法未提供参数绑定，可能存在SQL注入风险' . PHP_EOL;
         }
         $this->_where .= " $sql ";

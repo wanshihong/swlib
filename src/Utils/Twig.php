@@ -31,14 +31,14 @@ class Twig
             SWLIB_DIR . '/Admin/Templates/',
             ROOT_DIR . 'templates'
         ]);
-        $env = ConfigEnum::APP_DEV;
+        
         $this->twig = new Environment($loader, [
             'cache' => $runtimeDir,
             // 不是生产环境 才开启 debug
-            'debug' => $env != APP_ENV_PROD
+            'debug' => ConfigEnum::APP_PROD === false
         ]);
 
-        if ($env != APP_ENV_PROD) {
+        if (ConfigEnum::APP_PROD === false) {
             // 不是生产环境 才开启 debug
             $this->twig->addExtension(new DebugExtension());
         }

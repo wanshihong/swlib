@@ -27,7 +27,7 @@ class Server
         /**@var \Swoole\Server $server */
         $server = CtxEnum::Server->get();
         if (empty($server)) {
-            if (ConfigEnum::APP_DEV === APP_ENV_DEV) {
+            if (ConfigEnum::APP_PROD === false) {
                 echo "协程上下文中没有 server ,请检查运行环境 ";
                 echo "文件: " . __FILE__ . ", 行号: " . __LINE__ . PHP_EOL;
                 var_dump($runnable);
