@@ -1,0 +1,24 @@
+.upload-action {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    justify-content: start;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.image-item {
+    cursor: zoom-in;
+    transition: all .3s;
+    background-color: rgba(0,0,0,.3);
+}
+
+.image-item:hover {
+    transform: scale(1.1);
+}
+
+.prev-image {
+    max-width: 96vw;
+    max-height: 96vh;
+}

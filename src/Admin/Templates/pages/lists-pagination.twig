@@ -1,0 +1,49 @@
+<nav>
+    <ul class="pagination pagination-sm justify-content-end ">
+        <li class="page-item disabled page-cus ">
+            <a class="page-link text-nowrap" href="javascript:">
+                {{ lang("共") }} {{ total }} {{ lang('条数据') }}
+            </a>
+        </li>
+        <li class="page-item disabled page-cus ">
+            <a class="page-link text-nowrap" href="javascript:">
+                {{ page }}/{{ totalPage }}
+            </a>
+        </li>
+        <li class="page-item  select-page-size ">
+            {% set sizes = [1,3,5,10,12,15,30,50,100,200,500,1000] %}
+            <select id="select-page-size" class="form-select form-select-sm rounded-0" aria-label="{{ lang('请选择每页显示数量') }}">
+                {% for s in sizes %}
+                    <option {% if querySize==s %}selected{% endif %} value="{{ url('lists',{"page":1,"size":s}) }}">
+                        {{ s }}
+                    </option>
+                {% endfor %}
+            </select>
+        </li>
+        <li class="page-item {% if page==1 %}disabled{% endif %}">
+            <a class="page-link text-nowrap" href="{{ url('lists',{"page":page-1}) }}">
+                {{ lang('上一页') }}
+            </a>
+        </li>
+        {% set lastIndex = 0 %}
+        {% for i in 1..totalPage %}
+            {% if i==1 or i==totalPage or (i>=page-pageShowSize and i<=page+pageShowSize) %}
+                {% if i-lastIndex>1 %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="javascript:">...</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item {% if i==page %}active shadow{% endif %}">
+                    <a class="page-link" href="{{ url('lists',{"page":i}) }}">{{ i }}</a>
+                </li>
+                {% set lastIndex = i %}
+            {% endif %}
+        {% endfor %}
+        <li class="page-item {% if page==totalPage %}disabled{% endif %}">
+            <a class="page-link rounded-0 text-nowrap" href="{{ url('lists',{"page":page+1}) }}">
+                {{ lang('下一页') }}
+            </a>
+        </li>
+    </ul>
+</nav>

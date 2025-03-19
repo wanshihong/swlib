@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>无权限</title>
+    <link href="/admin/bootstrap-5.3.3-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/admin/bootstrap-icons-1.11.3/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .main {
+            margin-top: 8%;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main d-flex flex-column justify-content-center align-items-center">
+    <div class="alert alert-danger" role="alert">
+        {{ msg }}
+    </div>
+
+    <a href="{{ loginUrl }}">{{ loginText }}</a>
+    
+</div>
+
+<script src="/admin/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

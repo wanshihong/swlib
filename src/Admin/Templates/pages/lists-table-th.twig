@@ -1,0 +1,33 @@
+<div class="table-th">
+    <div>{{ row.label }}</div>
+    <div class="order-sort-box">
+        {% set isFindOrder = false %}
+
+        {% if row.field == orderField %}
+            {% set isFindOrder = true %}
+            {% if orderType=='asc' %}
+                <a href="javascript:" class="curr sort-up bi bi-caret-up-fill">
+                </a>
+                <a href="{{ url("lists",{'order-field':row.field,'order-type':'desc'}) }}"
+                   class="sort-down bi bi-caret-down">
+                </a>
+            {% else %}
+                <a href="{{ url("lists",{'order-field':row.field,'order-type':'asc'}) }}"
+                   class="sort-up bi bi-caret-up">
+                </a>
+                <a href="javascript:" class="curr sort-down bi bi-caret-down-fill">
+                </a>
+            {% endif %}
+        {% endif %}
+
+
+        {% if isFindOrder==false %}
+            <a href="{{ url("lists",{'order-field':row.field,'order-type':'asc'}) }}"
+               class="sort-up bi bi-caret-up">
+            </a>
+            <a href="{{ url("lists",{'order-field':row.field,'order-type':'desc'}) }}"
+               class="sort-down bi bi-caret-down">
+            </a>
+        {% endif %}
+    </div>
+</div>

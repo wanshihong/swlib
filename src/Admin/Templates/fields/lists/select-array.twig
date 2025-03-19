@@ -1,0 +1,27 @@
+{% if value is empty %}
+    <span class="badge user-select-none rounded-0">未赋值</span>
+{% else %}
+    {% for item in field.showTexts %}
+        {% if field.relationUrl %}
+            <a class="d-inline-block text-truncate {% for class in field.classes %}{{ class }}{% endfor %}"
+               style="max-width: {{ field.listMaxWidth }}px;"
+               data-bs-toggle="tooltip" {% if item.text %}data-bs-title={{ item.text }}{% endif %}
+               href="{{ field.relationUrl }}?{{ field.idFieldOriginalName }}={{ item.id }}"
+               data-value="{{ item.id }}"
+               {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+            >
+                {{ item.text }}
+            </a>
+        {% else %}
+            <span class="d-inline-block text-truncate {% for class in field.classes %}{{ class }}{% endfor %}"
+                  style="max-width: {{ field.listMaxWidth }}px;"
+                  data-value="{{ item.id }}"
+                  {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+              data-bs-toggle="tooltip" {% if item.text %}data-bs-title={{ item.text }}{% endif %}
+                  {% if item.text %}onclick="copyText('{{ item.text }}')"{% endif %}
+        >
+            {{ item.text }}
+        </span>
+        {% endif %}
+    {% endfor %}
+{% endif %}

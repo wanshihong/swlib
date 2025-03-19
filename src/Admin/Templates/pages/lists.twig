@@ -1,0 +1,24 @@
+{% extends "layout/layout.twig" %}
+
+{% block pageTitle %}{{ pageConfig.pageName|striptags }}{% endblock %}
+
+{% block content %}
+    <form class="row">
+
+        {% include 'pages/lists-filters.twig' %}
+
+        <div class="col-auto d-flex flex-fill justify-content-end mb-2">
+            {% include 'action/action.twig' with {'firstAction': firstAction ,'lastActions':lastActions} %}
+        </div>
+    </form>
+
+
+    <div class="table-responsive list-table">
+        {% include 'pages/lists-table.twig' %}
+    </div>
+
+    <div class="lists-pagination pt-4">
+        {% include 'pages/lists-pagination.twig' %}
+    </div>
+
+{% endblock %}

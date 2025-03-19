@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block pageTitle %}{% endblock %} {{ adminLayout().title }}</title>
+    <link href="/admin/bootstrap-5.3.3-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/admin/bootstrap-icons-1.11.3/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="/admin/css/admin.css" rel="stylesheet">
+    {% block style %}{% endblock %}
+    {% for css in pageConfig.cssFiles %}
+        <link href="{{ css }}" rel="stylesheet">
+    {% endfor %}
+    <script>
+        const pageConfig = {};
+    </script>
+    {% block headScript %}{% endblock %}
+    <script src="/admin/vue3.5.12.js"></script>
+</head>
+<body>
+<div class="layout">
+    <div class="layout-left border-end border-light min-vh-100 p-0 d-none d-md-block">
+        <a href="{{ adminLayout().adminIndexUrl }}" class="btn admin-title rounded-0 ">
+            {{ adminLayout().getTitle() }}
+        </a>
+
+        {% include 'layout/menu.twig' %}
+    </div>
+
+
+    {#  小屏幕弹窗显示菜单，默认隐藏 start  #}
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sm-menu" aria-labelledby="sm-menu-lab">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sm-menu-lab">{{ adminLayout().getTitle() }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            {% include 'layout/menu.twig' %}
+        </div>
+    </div>
+    {#  小屏幕弹窗显示菜单，默认隐藏 end  #}
+
+    <div class="layout-right ps-4 pe-4 pt-2 pb-2 position-relative">
+        {% include 'layout/userinfo.twig' %}
+        {% include 'layout/page-title.twig' %}
+        {% block content %}{% endblock %}
+    </div>
+</div>
+<script src="/admin/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/clipboard-polyfill.promise.js"></script>
+<script src="/admin/js/admin.js"></script>
+{% block bodyScript %}{% endblock %}
+{% for jsFile in pageConfig.jsFiles %}
+    <script src="{{ jsFile }}"></script>
+{% endfor %}
+</body>
+</html>

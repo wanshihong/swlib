@@ -1,0 +1,75 @@
+<div class="row mb-3">
+    <label for="{{ field.elemId }}"
+           class="col-sm-2 col-form-label text-end {% for class in field.classes %}{{ class }}{% endfor %}"
+           {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}>
+        {{ field.label }}</label>
+    <div class="col-sm-10 select-lists" id="{{ field.elemId }}">
+        {#  options就是下拉列表的数据源  如果设置了 options，则不会发送请求，直接显示下拉列表， 否则发送请求，显示下拉列表  #}
+
+        {% for item in field.showTexts %}
+            <div class="select-list-row d-flex align-items-start mb-2">
+                <div class="select-box flex-fill  pe-2">
+                    <input type="text"
+                           class="form-control rounded-0 dropdown-toggle select-input"
+                            {% if field.options is not empty %}
+                                readonly
+                            {% else %}
+                                onkeyup="handleInputOnKeyup(this)"
+                                onclick="handleInputOnClick(this)"
+                            {% endif %}
+                           autocomplete="off"
+                           data-bs-toggle="dropdown"
+                           data-field="{{ field.field }}"
+                           data-url="{{ url('get-select-list') }}"
+                            {% if field.required %}required{% endif %}
+                            {% if field.disabled %}disabled{% endif %}
+                           placeholder="{{ lang('请输入') }}{{ field.label }}"
+                           aria-label="{{ field.label }}"
+                           value="{{ item.text }}">
+
+                    {% if field.options is not empty %}
+                        {# 直接显示下拉菜单就可以了 #}
+                        <i class="icon icon-down bi bi-chevron-down" data-bs-toggle="dropdown"></i>
+                    {% else %}
+                        {# 绑定事件获取远程数据 #}
+                        <i class="icon icon-down bi bi-chevron-down" data-bs-toggle="dropdown"
+                           onclick="handleOnClick(this)"></i>
+                    {% endif %}
+
+                    <i class="icon icon-close bi bi-x" onclick="clearSelectValue(this)"></i>
+
+
+                    <input type="text" class="form-control visually-hidden" {% if field.required %}required{% endif %}
+                           name="{{ field.field }}[]" value="{{ item.id }}"
+                           aria-label="{{ field.label }}">
+
+                    <div class="invalid-feedback">
+                        请选择{{ field.label }}
+                    </div>
+
+
+                    <ul class="dropdown-menu">
+                        {% for item in field.options %}
+                            <li onclick="selectDropdownMenuItem(this,'{{ item.id }}','{{ item.text }}')">
+                                <a class="dropdown-item" href="javascript:">
+                                    {{ item.text }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-primary rounded-0"
+                        data-placeholder="{{ lang('请输入') }}{{ field.label }}"
+                        data-label="{{ field.label }}"
+                        data-required="{{ field.required }}"
+                        data-disabled="{{ field.disabled }}"
+                        data-field="{{ field.field }}"
+                        data-url="{{ url('get-select-list') }}"
+                        onclick="addSelectArrayItem(this)">
+                    <i class="bi bi-plus"></i>
+                </button>
+            </div>
+        {% endfor %}
+
+    </div>
+</div>

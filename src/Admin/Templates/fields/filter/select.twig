@@ -1,0 +1,44 @@
+<div class="col-auto mb-2 position-relative select-box select-box-filter">
+    <input type="text"
+           class="form-control form-control-sm rounded-0 dropdown-toggle"
+            {% if filter.options is not empty %}
+                readonly
+            {% else %}
+                onkeyup="handleInputOnKeyup(this)"
+                onclick="handleInputOnClick(this)"
+            {% endif %}
+           autocomplete="off"
+           data-bs-toggle="dropdown"
+           id="{{ filter.elemId }}"
+           aria-label="{{ filter.label }}"
+           data-field="{{ filter.field }}"
+           data-url="{{ url('get-select-list') }}"
+           data-target="datalistOptions{{ filter.elemId }}"
+           data-input="data-input-hide-{{ filter.elemId }}"
+           data-id="{{ filter.elemId }}"
+           placeholder="{{ lang('请输入') }} {{ filter.label }}"
+           value="{{ filter.showText }}">
+
+    {% if filter.options is not empty %}
+        {# 直接显示下拉菜单就可以了 #}
+        <i class="icon icon-down bi bi-chevron-down" data-bs-toggle="dropdown"></i>
+    {% else %}
+        {# 绑定事件获取远程数据 #}
+        <i class="icon icon-down bi bi-chevron-down" data-bs-toggle="dropdown" onclick="handleOnClick(this)"></i>
+    {% endif %}
+
+    <input type="text" class="form-control visually-hidden" name="{{ filter.field }}" value="{{ filter.value }}"
+           aria-label="{{ filter.label }}">
+
+    <ul class="dropdown-menu">
+        {% for item in filter.options %}
+            <li onclick="selectDropdownMenuItem(this,'{{ item.id }}','{{ item.text }}')">
+                <a class="dropdown-item" href="javascript:">
+                    {{ item.text }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+
+</div>

@@ -1,0 +1,43 @@
+.select-box {
+    position: relative;
+}
+
+.select-box .form-control {
+    cursor: pointer;
+}
+
+.select-box .icon {
+    position: absolute;
+    right: 42px;
+    top: 8px;
+    cursor: pointer;
+    transition: all .5s;
+    font-weight: 900;
+}
+.select-box.select-box-filter .icon {
+    position: absolute;
+    right: 14px;
+    top: 4px;
+    background: #ffffff;
+    width: 24px;
+    text-align: center;
+}
+
+.select-box .icon.icon-close {
+    right: 60px;
+    top: 5px;
+    font-size: 20px;
+    display: none;
+}
+
+.select-box .icon.icon-close:hover {
+    transform: rotate(90deg);
+}
+
+.select-box .icon.icon-down {
+    user-select: none;
+}
+
+.select-box .icon.icon-down:hover {
+    transform: scale(1.2);
+}

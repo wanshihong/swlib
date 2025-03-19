@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>登录</title>
+    <link href="/admin/bootstrap-5.3.3-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/admin/bootstrap-icons-1.11.3/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="/admin/css/admin.css" rel="stylesheet">
+    <style>
+        .login-card {
+            margin-top: 8%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .login-card .input-box .form-control:focus {
+            outline: none;
+            box-shadow: none;
+            border-width: 0 !important;
+            border-color: #ffffff !important;
+        }
+
+        .input-box {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #999999;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container-fluid">
+
+    <div class="row">
+
+        <div class="card login-card border-0 rounded-0 shadow col-12  col-md-5 col-lg-3 ">
+            <div class="card-body">
+                <h5 class="card-title mb-5 ">{{ lang('用户') }}{{ title }}</h5>
+
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% if type=='login' or type=='register' %}
+                        <div class="mb-4 border-bottom border-primary-subtle input-box">
+                            <i class="input-icon bi bi-person-fill"></i>
+                            <div class="form-floating">
+                                <input type="text" class="form-control  rounded-0 border-0" name="username"
+                                       required
+                                       id="username"
+                                       placeholder="username">
+                                <label for="username">{{ lang('请输入用户名') }}</label>
+                                <div class="invalid-feedback">
+                                    {{ lang('请输入用户名') }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+
+                    <div class="mb-4 border-bottom border-primary-subtle input-box">
+                        <i class="input-icon bi bi-lock-fill"></i>
+                        <div class="form-floating">
+                            <input type="password" class="form-control  rounded-0 border-0"
+                                   name="password" required
+                                   id="password"
+                                   placeholder="password">
+                            <label for="password">{{ lang('请输入密码') }}</label>
+                            <div class="invalid-feedback">
+                                {{ lang('请输入密码') }}
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {% if type=='register' or  type=='changePassword' %}
+                        <div class="mb-4 border-bottom border-primary-subtle input-box">
+                            <i class="input-icon bi bi-lock-fill"></i>
+                            <div class="form-floating">
+                                <input type="password" class="form-control  rounded-0 border-0"
+                                       name="password2" required
+                                       id="password2"
+                                       placeholder="password">
+                                <label for="password2">{{ lang('请确认密码') }}</label>
+                                <div class="invalid-feedback">
+                                    {{ lang('请确认密码') }}
+                                </div>
+                            </div>
+                        </div>
+
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between align-items-center mt-5 ">
+
+                        {% if type=='login' %}
+                            <button type="submit" class="btn btn-primary rounded-0 ">{{ lang('登录') }}</button>
+                            <a href="{{ url('register') }}" class="card-link">{{ lang('前往注册') }}</a>
+                        {% elseif type=="changePassword" %}
+                            <button type="submit" class="btn btn-primary rounded-0 ">{{ lang('修改密码') }}</button>
+                            <a href="javascript:history.back();" class="card-link">{{ lang('不改了') }}</a>
+                        {% else %}
+                            <button type="submit" class="btn btn-primary rounded-0 ">{{ lang('注册') }}</button>
+                            <a href="{{ url('login') }}" class="card-link">{{ lang('返回登录') }}</a>
+                        {% endif %}
+
+                    </div>
+
+
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/admin/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+<script src="/admin/js/admin.js"></script>
+<script>
+    (() => {
+        'use strict'
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+
+            form.addEventListener('submit', event => {
+                event.preventDefault()
+                event.stopPropagation()
+
+                // 检查表单有效性
+                if (form.checkValidity()) {
+                    // 验证通过，移除之前的视觉反馈类并发送请求
+                    form.classList.remove('was-validated');
+
+                    // 使用 fetch 发送请求
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: {
+                            'Accept': 'application/json, text/plain, */*'
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json(); // 假设服务器返回 JSON 格式的数据
+                        })
+                        .then(res => {
+                            if (res.errno !== 0) {
+                                showToast(res.msg)
+                            } else {
+                                showToast('{{ successMsg }}')
+
+                                // 跳转，加个临时请求参数，防止重定向缓存
+                                let successToUrl = decodeURIComponent("{{ successToUrl }}")
+                                if (successToUrl.indexOf('?') === -1) {
+                                    successToUrl += '?ver=' + Math.random();
+                                } else {
+                                    successToUrl += '&ver=' + Math.random();
+                                }
+                                window.location.href = successToUrl
+                            }
+                        })
+                        .catch(error => {
+                            showToast(error)
+                        });
+                } else {
+                    // 验证未通过，添加视觉反馈类
+                    form.classList.add('was-validated');
+                }
+            }, false)
+        })
+    })()
+</script>
+</body>
+</html>

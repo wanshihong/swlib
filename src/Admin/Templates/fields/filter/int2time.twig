@@ -1,0 +1,26 @@
+{% if filter.filterRange %}
+    <div class="col-auto mb-2 position-relative d-flex border p-0"  id="filter-{{ filter.elemId }}">
+        <input type="date"
+               class="form-control form-control-sm rounded-0 border-0"
+               name="{{ filter.field }}[]"
+               value="{{ filter.value[0] }}"
+               placeholder="{{ filter.label }}" aria-label="{{ filter.label }}">
+        <span class="ps-2 pe-2 mt-1 mb-1 bg-secondary-subtle text-light-emphasis">-</span>
+        <input type="date"
+               class="form-control form-control-sm rounded-0 border-0"
+               name="{{ filter.field }}[]"
+               value="{{ filter.value[1] }}"
+               placeholder="{{ filter.label }}" aria-label="{{ filter.label }}">
+    </div>
+{% else %}
+
+    <div class="col-auto mb-2 position-relative">
+        <input type="date"
+               class="form-control form-control-sm rounded-0"
+               id="filter-{{ filter.elemId }}"
+               name="{{ filter.field }}"
+               value="{{ filter.value }}"
+               placeholder="{{ filter.label }}" aria-label="{{ filter.label }}">
+    </div>
+
+{% endif %}

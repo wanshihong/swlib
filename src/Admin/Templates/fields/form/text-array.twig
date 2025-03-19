@@ -1,0 +1,41 @@
+<div class="row mb-3">
+    <label for="{{ field.elemId }}"
+           class="col-sm-2 col-form-label text-end {% for class in field.classes %}{{ class }}{% endfor %}"
+           {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+    >
+        {{ field.label }}</label>
+
+
+    <div class="col-sm-10">
+
+        <div class="inputs">
+            {% for index,input in field.value %}
+                <div class="d-flex mb-2 textArrayItem">
+                    <input type="text" class="form-control rounded-0 me-2"
+                           name="{{ field.field }}[]"
+                           value="{{ input }}"
+                           {% if field.required %}required{% endif %}
+                           placeholder="{{ lang('请输入') }}{{ field.label }}" aria-label="{{ field.label }}"
+                    >
+                    <div class="invalid-feedback">
+                        {{ lang('请输入') }}{{ field.label }}
+                    </div>
+                    {% if index==0 %}
+                        <button type="button" class="btn btn-primary rounded-0"
+                                data-placeholder="{{ lang('请输入') }}{{ field.label }}"
+                                data-name="{{ field.field }}"
+                                data-label="{{ field.label }}"
+                                data-required="{{ field.required }}"
+                                onclick="addTextInput(this)">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn btn-danger rounded-0" onclick="textArrayDelItem(this)">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

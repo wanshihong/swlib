@@ -1,0 +1,19 @@
+<div class="form-check form-switch {% for class in field.classes %}{{ class }}{% endfor %}"
+     {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+>
+    <label>
+        <input class="form-check-input list-switch-input" {% if field.disabled %}disabled{% endif %} type="checkbox"
+               id="switch-{{ field.field }}"
+               data-id="switch-{{ field.field }}"
+               data-url="{{ field.url }}"
+               data-field="{{ field.field }}"
+               data-enable="{{ field.enableValue }}"
+               data-disabled="{{ field.disabledValue }}"
+               data-priFieldValue="{{ row.priFieldValue }}"
+               data-priFieldName="{{ row.priFieldName }}"
+               value="{{ value }}"
+                {% if value==field.enableValue %}checked{% endif %}
+               role="switch"
+        >
+    </label>
+</div>
