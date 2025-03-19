@@ -1,5 +1,5 @@
 {
-  "name": "wansh/Swlib",
+  "name": "wansh/swlib",
   "description": "Swlib库 - 基于Swoole的PHP简易框架",
   "type": "project",
   "license": "MIT",
