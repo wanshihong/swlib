@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Swlib;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
 use Exception;
 use Generate\ConfigEnum;
 use Swlib\Connect\PoolMysql;

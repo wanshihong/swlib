@@ -4,11 +4,7 @@
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "App\\": "App/",
-      "Generate\\": "runtime/Generate",
-      "Swlib\\": "Swlib/src",
-      "GPBMetadata\\": "runtime/Protobuf/GPBMetadata/",
-      "Protobuf\\": "runtime/Protobuf/Protobuf/"
+      "Swlib\\": "src/"
     }
   },
   "require": {
