@@ -21,9 +21,9 @@ class EditorField extends AbstractField
         parent::__construct($field, $label);
         $this->url = AdminManager::getInstance()->uploadUrl;
         $this->hideOnFilter();
-        $this->addCssFile("/admin/wangeditor/style.css");
+        $this->addCssFile("https://cdn.staticfile.net/wangeditor5/5.1.23/css/style.min.css");
         $this->addCssFile("/admin/css/form-editor.css");
-        $this->addJsFile("/admin/wangeditor/index.js");
+        $this->addJsFile("https://cdn.staticfile.net/wangeditor5/5.1.23/index.min.js");
         $this->addJsFile("/admin/js/field-editor.js");
     }
 

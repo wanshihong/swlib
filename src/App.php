@@ -9,6 +9,18 @@ use Swlib\Connect\PoolMysql;
 use Swlib\Connect\PoolRedis;
 use Swlib\Parse\ParseEvent;
 use Swlib\Parse\TableBack;
+use Swlib\Process\Process;
+use Swlib\ServerEvents\OnCloseEvent;
+use Swlib\ServerEvents\OnFinishEvent;
+use Swlib\ServerEvents\OnMessageEvent;
+use Swlib\ServerEvents\OnOpenEvent;
+use Swlib\ServerEvents\OnPipeMessageEvent;
+use Swlib\ServerEvents\OnReceiveEvent;
+use Swlib\ServerEvents\OnRequestEvent;
+use Swlib\ServerEvents\OnStartEvent;
+use Swlib\ServerEvents\OnTaskEvent;
+use Swlib\ServerEvents\OnWorkerStartEvent;
+use Swlib\ServerEvents\OnWorkerStopEvent;
 use Swlib\Parse\ParseAdminConfig;
 use Swlib\Parse\ParseConfig;
 use Swlib\Parse\ParseLanguage;
@@ -31,6 +43,10 @@ class App
                 mkdir($path, 0777, true);
             }
         }, [PUBLIC_DIR, RUNTIME_DIR, RUNTIME_DIR . 'log/']);
+
+        if (ConfigEnum::APP_PROD === false) {
+            File::delDirectory(RUNTIME_DIR . 'twig');
+        }
 
     }
 

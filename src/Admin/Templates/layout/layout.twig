@@ -6,8 +6,8 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block pageTitle %}{% endblock %} {{ adminLayout().title }}</title>
-    <link href="/admin/bootstrap-5.3.3-dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/admin/bootstrap-icons-1.11.3/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.net/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.net/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="/admin/css/admin.css" rel="stylesheet">
     {% block style %}{% endblock %}
     {% for css in pageConfig.cssFiles %}
@@ -17,7 +17,7 @@
         const pageConfig = {};
     </script>
     {% block headScript %}{% endblock %}
-    <script src="/admin/vue3.5.12.js"></script>
+    <script src="https://cdn.staticfile.net/vue/3.3.4/vue.global.min.js"></script>
 </head>
 <body>
 <div class="layout">
@@ -48,8 +48,8 @@
         {% block content %}{% endblock %}
     </div>
 </div>
-<script src="/admin/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
-<script src="/admin/clipboard-polyfill.promise.js"></script>
+<script src="https://cdn.staticfile.net/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.staticfile.net/clipboard-polyfill/3.0.0/main/clipboard-polyfill.min.js"></script>
 <script src="/admin/js/admin.js"></script>
 {% block bodyScript %}{% endblock %}
 {% for jsFile in pageConfig.jsFiles %}
