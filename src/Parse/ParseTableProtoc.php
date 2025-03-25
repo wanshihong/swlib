@@ -113,7 +113,7 @@ class ParseTableProtoc
     private function createItemMessage(array $fields, string $tableName): void
     {
         $fieldMapsFileDir = self::saveDirMaps . "/" . $this->dbName;
-        $fieldMapsFileName = $fieldMapsFileDir. "/$tableName.json";
+        $fieldMapsFileName = $fieldMapsFileDir . "/$tableName.json";
         if (!is_dir($fieldMapsFileDir)) {
             mkdir($fieldMapsFileDir, 0777, true);
         }
@@ -144,7 +144,7 @@ class ParseTableProtoc
             $arr = $this->genItem($dbType, $fieldName, $comment, $tableName);
 
             foreach ($arr as $value) {
-                $index = $fieldMaps[$value] ?? count($fieldMaps) + 1;
+                $index = $fieldMaps[$value] ?? ($fieldMaps ? count($fieldMaps) : 0) + 1;
                 $str .= "    $value = $index;" . PHP_EOL;
                 $fieldMaps[$value] = $index;
             }
