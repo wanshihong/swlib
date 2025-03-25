@@ -34,6 +34,7 @@ class ParseTableProtoc
 {
 
     const string saveDir = ROOT_DIR . "protos/";
+    const string saveDirMaps = ROOT_DIR . "protos/field_maps";
 
     private array $protobufMessage;
     private array $importFiles = [];
@@ -111,7 +112,16 @@ class ParseTableProtoc
 
     private function createItemMessage(array $fields, string $tableName): void
     {
-        $index = 1;
+        $fieldMapsFileDir = self::saveDirMaps . "/" . $this->dbName;
+        $fieldMapsFileName = $fieldMapsFileDir. "/$tableName.json";
+        if (!is_dir($fieldMapsFileDir)) {
+            mkdir($fieldMapsFileDir, 0777, true);
+        }
+        $fieldMaps = [];
+        if (is_file($fieldMapsFileName)) {
+            $fieldMaps = json_decode(file_get_contents($fieldMapsFileName), true);
+        }
+
         $fields[] = ['Field' => 'query_page_no', 'Type' => 'int'];
         $fields[] = ['Field' => 'query_page_size', 'Type' => 'int'];
         $fields[] = ['Field' => 'query_sort_field', 'Type' => 'string'];
@@ -123,6 +133,8 @@ class ParseTableProtoc
         $fields = array_merge($fields, $ext);
 
         $str = "message {$tableName}Proto {" . PHP_EOL;
+
+
         foreach ($fields as $item) {
             $field = $item['Field'];
             $dbType = $item['Type'];
@@ -132,12 +144,14 @@ class ParseTableProtoc
             $arr = $this->genItem($dbType, $fieldName, $comment, $tableName);
 
             foreach ($arr as $value) {
+                $index = $fieldMaps[$value] ?? count($fieldMaps) + 1;
                 $str .= "    $value = $index;" . PHP_EOL;
-                $index++;
+                $fieldMaps[$value] = $index;
             }
         }
         $str .= "}";
         $this->protobufMessage[] = $str;
+        file_put_contents(filename: $fieldMapsFileName, data: json_encode($fieldMaps));
     }
 
     private function getExtField(array $fields, string $pos, string $tableName): array
