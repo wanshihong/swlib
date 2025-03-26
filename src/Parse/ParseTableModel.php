@@ -30,6 +30,7 @@ class ParseTableModel
         $this->saveModelStr[] = '';
         $this->saveModelStr[] = 'use Throwable;';
         $this->saveModelStr[] = 'use Swlib\Exception\AppException;';
+        $this->saveModelStr[] = 'use Swlib\Enum\CtxEnum;';
         $this->saveModelStr[] = 'use Google\Protobuf\Internal\RepeatedField;';
         $this->saveModelStr[] = "use Generate\Tables\\$this->database\\{$this->tableName}Table;";
         $this->saveModelStr[] = 'use Protobuf\\' . $this->database . '\\' . $this->tableName . '\\' . $this->tableName . 'Proto;';
@@ -49,6 +50,7 @@ class ParseTableModel
         $this->createModelEnumMap();
         $this->createRequestData();
         $this->createFormatItem();
+        $this->createCountByField();
 
     }
 
@@ -202,6 +204,36 @@ class ParseTableModel
 
         }
         $this->saveModelStr[] = '        return $proto;';
+        $this->saveModelStr[] = '    }';
+    }
+
+    private function createCountByField(): void
+    {
+        $this->saveModelStr[] = '';
+        $this->saveModelStr[] = '    /**';
+        $this->saveModelStr[] = '    * 统计某个字段下的具体数量';
+        $this->saveModelStr[] = '    * @throws Throwable';
+        $this->saveModelStr[] = '    */';
+        $this->saveModelStr[] = '    public static function countByField(int $id, string $field, array $ids, array $where = []): int';
+        $this->saveModelStr[] = '    {';
+        $this->saveModelStr[] = '         if (!in_array($id, $ids)) {';
+        $this->saveModelStr[] = '             throw new AppException("id 需要包含在 ids 中");';
+        $this->saveModelStr[] = '         }';
+        $this->saveModelStr[] = '         $key = md5($field . json_encode($ids));';
+        $this->saveModelStr[] = '         $ret =  CtxEnum::Data->getSetData($key, function () use ($field, $ids, $where) {';
+        $this->saveModelStr[] = '             $where[] = [$field, \'in\', $ids];';
+        $this->saveModelStr[] = '             $all = new ' . $this->tableName . 'Table()->field([$field, ' . $this->tableName . 'Table::PRI_KEY])->where($where)->selectAll();';
+        $this->saveModelStr[] = '             $ret = [];';
+        $this->saveModelStr[] = '             foreach ($all as $table) {';
+        $this->saveModelStr[] = '                 $fieldValue = $table->getByField($field);';
+        $this->saveModelStr[] = '                 if (!array_key_exists($fieldValue, $ret)) {';
+        $this->saveModelStr[] = '                     $ret[$fieldValue] = 0;';
+        $this->saveModelStr[] = '                 }';
+        $this->saveModelStr[] = '                 $ret[$fieldValue]++;';
+        $this->saveModelStr[] = '             }';
+        $this->saveModelStr[] = '             return $ret;';
+        $this->saveModelStr[] = '         });';
+        $this->saveModelStr[] = '         return $ret[$id] ?? 0;';
         $this->saveModelStr[] = '    }';
     }
 
