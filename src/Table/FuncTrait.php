@@ -199,6 +199,7 @@ trait FuncTrait
     }
 
     /**
+     * 获取某个字段的值
      * @throws Throwable
      */
     public function selectField(string $field, $default = null): mixed
@@ -206,6 +207,18 @@ trait FuncTrait
         $this->field($field);
         $res = $this->find();
         return $res ? $res[$field] : $default;
+    }
+
+    /**
+     * 判断某个条件下是否存在
+     * @return bool
+     * @throws Throwable
+     */
+    public function exists(): bool
+    {
+        $this->field(static::PRI_KEY);
+        $res = $this->find();
+        return $res ? true : false;
     }
 
 
@@ -325,7 +338,7 @@ trait FuncTrait
             throw new AppException("id 需要包含在 ids 中");
         }
         $key = md5($field . json_encode($ids));
-        $ret =  CtxEnum::Data->getSetData($key, function () use ($field, $ids, $where) {
+        $ret = CtxEnum::Data->getSetData($key, function () use ($field, $ids, $where) {
             $where[] = [$field, 'in', $ids];
             $all = new static()->field([$field, static::PRI_KEY])->where($where)->selectAll();
             $ret = [];
