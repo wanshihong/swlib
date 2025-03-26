@@ -126,6 +126,9 @@ class ParseTableProtoc
         $fields[] = ['Field' => 'query_page_size', 'Type' => 'int'];
         $fields[] = ['Field' => 'query_sort_field', 'Type' => 'string'];
         $fields[] = ['Field' => 'query_sort_type', 'Type' => 'string'];
+        $fields[] = ['Field' => 'query_count', 'Type' => 'int'];
+        $fields[] = ['Field' => 'ext_int', 'Type' => 'int'];
+        $fields[] = ['Field' => 'ext_str', 'Type' => 'string'];
 
 
         // 查询是否需要生成额外的字段
@@ -222,6 +225,9 @@ class ParseTableProtoc
     private function createListsMessage(string $tableName, array $fields): void
     {
         $ret[] = ['Field' => 'lists', 'Type' => "repeated {$tableName}Proto"];
+        $ret[] = ['Field' => 'total', 'Type' => "int32"];
+        $ret[] = ['Field' => 'curr_page', 'Type' => "int32"];
+        $ret[] = ['Field' => 'total_page', 'Type' => "int32"];
 
         // 循环字段 查看注释中是否有定义 protobuf:lists: 配置，如果有就添加到列表中
         foreach ($fields as $item) {
