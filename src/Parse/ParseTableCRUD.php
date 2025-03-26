@@ -41,7 +41,7 @@ class ParseTableCRUD
         $this->saveStr[] = '';
         $this->saveStr[] = '';
         $this->saveStr[] = '#[Router(method: \'POST\')]';
-        $this->saveStr[] = "class $this->tableName extends AbstractController{
+        $this->saveStr[] = "class {$this->tableName}Api extends AbstractController{
                 ";
 
 
@@ -60,7 +60,7 @@ class ParseTableCRUD
     public function __destruct()
     {
         $this->saveStr[] = '}';
-        file_put_contents(self::saveDir . "$this->database/$this->tableName.php", implode(PHP_EOL, $this->saveStr));
+        file_put_contents(self::saveDir . "$this->database/{$this->tableName}Api.php", implode(PHP_EOL, $this->saveStr));
     }
 
 
