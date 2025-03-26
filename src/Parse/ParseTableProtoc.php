@@ -17,6 +17,8 @@ use Swlib\Utils\Func;
  *           "item:isFocus:bool",
  *           "item:isFocus:bool",
  *           "item:focusCount:int32",
+ *            // 位置 ：字段 ：命名空间.proto.类名
+ *           "item:content:repeated Protobuf.Wenyuehui.UserAddresses.UserAddressesProto",
  *           "lists:counts:repeated string"
  *            // $self 指向自己
  *           "lists:counts:$self"
@@ -200,7 +202,9 @@ class ParseTableProtoc
     private function importFile($type, $tableName): void
     {
         $tempTableName = str_replace('ListsProto', '', $tableName);
+
         $typeArr = explode('.', $type);
+
         /**
          * 定义成这样的 类型
          * 第一项是 Protobuf
@@ -208,7 +212,7 @@ class ParseTableProtoc
          * 才需要引入第三项
          * "lists:userAddress:Protobuf.Wenyuehui.UserAddresses.UserAddressesProto",
          */
-        if (count($typeArr) < 3 || $typeArr[0] !== 'Protobuf' || $typeArr[1] !== $this->dbName) {
+        if (count($typeArr) < 3 || !in_array($typeArr[0], ['Protobuf', 'repeated Protobuf']) || $typeArr[1] !== $this->dbName) {
             return;
         }
 
