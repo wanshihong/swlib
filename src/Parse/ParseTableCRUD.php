@@ -18,7 +18,7 @@ class ParseTableCRUD
     /**
      * @throws Exception
      */
-    public function __construct(public $database, public string $tableName, public array $fields)
+    public function __construct(public $database, public string $tableName, public array $fields, public string $tableComment)
     {
 
 
@@ -39,7 +39,9 @@ class ParseTableCRUD
         $this->saveStr[] = 'use Throwable;';
         $this->saveStr[] = '';
         $this->saveStr[] = '';
-        $this->saveStr[] = '';
+        $this->saveStr[] = "/*";
+        $this->saveStr[] = "* $tableComment";
+        $this->saveStr[] = "*/";
         $this->saveStr[] = '#[Router(method: \'POST\')]';
         $this->saveStr[] = "class {$this->tableName}Api extends AbstractController{
                 ";
@@ -71,7 +73,7 @@ class ParseTableCRUD
         $this->saveStr[] = '    /**';
         $this->saveStr[] = '    * @throws Throwable';
         $this->saveStr[] = '    */';
-        $this->saveStr[] = '    #[Router(errorTitle: \'保存数据失败\')]';
+        $this->saveStr[] = '    #[Router(errorTitle: \'保存' . $this->tableComment . '失败\')]';
         $this->saveStr[] = '    public function save(' . $this->tableName . 'Proto $request): Success';
         $this->saveStr[] = '    {';
         $this->saveStr[] = '        $table = ' . $this->tableName . 'Model::request($request);';
@@ -109,7 +111,7 @@ class ParseTableCRUD
         $this->saveStr[] = '    /**';
         $this->saveStr[] = '    * @throws Throwable';
         $this->saveStr[] = '    */';
-        $this->saveStr[] = '    #[Router(errorTitle: \'获取列表数据失败\')]';
+        $this->saveStr[] = '    #[Router(errorTitle: \'获取' . $this->tableComment . '列表数据失败\')]';
         $this->saveStr[] = '    public function lists(' . $this->tableName . 'Proto $request): ' . $this->tableName . 'ListsProto';
         $this->saveStr[] = '    {';
         $this->saveStr[] = '        $page = $request->getQueryPageNo() ?: 1;';
@@ -139,7 +141,7 @@ class ParseTableCRUD
         $this->saveStr[] = '    /**';
         $this->saveStr[] = '    * @throws Throwable';
         $this->saveStr[] = '    */';
-        $this->saveStr[] = '    #[Router(errorTitle: \'查看详情失败\')]';
+        $this->saveStr[] = '    #[Router(errorTitle: \'查看' . $this->tableComment . '详情失败\')]';
         $this->saveStr[] = '    public function detail(' . $this->tableName . 'Proto $request): ' . $this->tableName . 'Proto';
         $this->saveStr[] = '    {';
         $this->saveStr[] = '        $id = $request->getId();';
@@ -164,7 +166,7 @@ class ParseTableCRUD
         $this->saveStr[] = '    /**';
         $this->saveStr[] = '    * @throws Throwable';
         $this->saveStr[] = '    */';
-        $this->saveStr[] = '    #[Router(errorTitle: \'删除数据失败\')]';
+        $this->saveStr[] = '    #[Router(errorTitle: \'删除' . $this->tableComment . '失败\')]';
         $this->saveStr[] = '    public function delete(' . $this->tableName . 'Proto $request): Success';
         $this->saveStr[] = '    {';
         $this->saveStr[] = '        $id = $request->getId();';

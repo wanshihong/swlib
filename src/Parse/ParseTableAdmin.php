@@ -18,7 +18,7 @@ class ParseTableAdmin
     /**
      * @throws Exception
      */
-    public function __construct(public string $database, public string $tableName, public array $fields)
+    public function __construct(public string $database, public string $tableName, public array $fields, public string $tableComment)
     {
         $this->tableName = Func::underscoreToCamelCase($this->tableName);
 
@@ -36,7 +36,9 @@ class ParseTableAdmin
         $this->saveStr[] = 'use Throwable;';
         $this->saveStr[] = '';
         $this->saveStr[] = '';
-        $this->saveStr[] = '';
+        $this->saveStr[] = "/*";
+        $this->saveStr[] = "* $tableComment";
+        $this->saveStr[] = "*/";
         $this->saveStr[] = "class {$this->tableName}Admin extends AbstractAdmin{";
 
 
@@ -55,7 +57,7 @@ class ParseTableAdmin
     {
         $this->saveStr[] = '    protected function configPage(PageConfig $config): void';
         $this->saveStr[] = '    {';
-        $this->saveStr[] = '        $config->pageName = "xxxxx";';
+        $this->saveStr[] = "        \$config->pageName = '$this->tableComment';";
         $this->saveStr[] = "        \$config->tableName = {$this->tableName}Table::class;";
         $this->saveStr[] = '    }';
     }

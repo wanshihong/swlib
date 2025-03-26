@@ -137,6 +137,7 @@ class ParseTable
                 $tableName = $item[0];
                 $lastCount = count($tables);
                 $fields = PoolMysql::query("SHOW FULL COLUMNS FROM `" . $tableName . "`", $dbName)->fetch_all(MYSQLI_ASSOC);
+                $tableComment = PoolMysql::query("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '$tableName';", $dbName)->fetch_column();
 
                 foreach ($fields as $key => $item) {
                     $fields[$key]['Field'] = $this->renameReservedFields($item['Field']);
@@ -150,9 +151,9 @@ class ParseTable
                 $parseTableMap->createMap($dbName, $tableName, $fields, $lastCount);
 
 
-                new ParseTableCRUD($database, $tableName, $fields);
-                new ParseTableAdmin($database, $tableName, $fields);
-                new ParseTableModel($database, $tableName, $fields);
+                new ParseTableCRUD($database, $tableName, $fields,$tableComment);
+                new ParseTableAdmin($database, $tableName, $fields,$tableComment);
+                new ParseTableModel($database, $tableName, $fields,$tableComment);
             }
         });
     }

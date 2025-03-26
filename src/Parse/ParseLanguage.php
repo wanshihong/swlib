@@ -85,7 +85,17 @@ class ParseLanguage
                 foreach ($regs as $reg) {
                     preg_match_all($reg, $content, $matches);
                     if (!empty($matches[1])) {
-                        $strings = array_merge($strings, $matches[1]);
+                        foreach ($matches[1] as $str) {
+                            // 过滤掉变量
+                            if (str_starts_with($str, '$')) {
+                                continue;
+                            }
+                            // 过滤掉字符串拼接变量
+                            if (str_starts_with($str, '{$')) {
+                                continue;
+                            }
+                            $strings[] = $str;
+                        }
                     }
                 }
             }
@@ -93,7 +103,6 @@ class ParseLanguage
 
 
         $strings = array_filter(array_unique($strings));
-
 
         $languageTableInfo = PoolMysql::query("DESCRIBE  language")->fetch_all(MYSQLI_ASSOC);
         foreach ($languageTableInfo as $index => $item) {

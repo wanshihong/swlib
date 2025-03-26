@@ -19,7 +19,7 @@ class ParseTableModel
     /**
      * @throws Exception
      */
-    public function __construct(public string $database, public string $tableName, public array $fields)
+    public function __construct(public string $database, public string $tableName, public array $fields, public string $tableComment)
     {
         $this->tableName = Func::underscoreToCamelCase($this->tableName);
 
@@ -42,7 +42,9 @@ class ParseTableModel
 
 
         $this->saveModelStr[] = '';
-        $this->saveModelStr[] = '';
+        $this->saveModelStr[] = "/*";
+        $this->saveModelStr[] = "* $tableComment";
+        $this->saveModelStr[] = "*/";
         $this->saveModelStr[] = 'class ' . $this->tableName . 'Model{';
         $this->createModelEnumMap();
         $this->createRequestData();
