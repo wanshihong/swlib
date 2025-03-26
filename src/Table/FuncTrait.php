@@ -8,6 +8,7 @@ use Generator;
 use InvalidArgumentException;
 use Swlib\Connect\PoolRedis;
 use Redis;
+use Swlib\Enum\CtxEnum;
 use Throwable;
 
 trait FuncTrait
@@ -312,6 +313,32 @@ trait FuncTrait
         }
 
         return $tables;
+    }
+
+    /**
+     * 统计某个字段下的具体数量
+     * @throws Throwable
+     */
+    public static function countByField(int $id, string $field, array $ids, array $where = []): int
+    {
+        if (!in_array($id, $ids)) {
+            throw new AppException("id 需要包含在 ids 中");
+        }
+        $key = md5($field . json_encode($ids));
+        $ret =  CtxEnum::Data->getSetData($key, function () use ($field, $ids, $where) {
+            $where[] = [$field, 'in', $ids];
+            $all = new static()->field([$field, static::PRI_KEY])->where($where)->selectAll();
+            $ret = [];
+            foreach ($all as $table) {
+                $fieldValue = $table->getByField($field);
+                if (!array_key_exists($fieldValue, $ret)) {
+                    $ret[$fieldValue] = 0;
+                }
+                $ret[$fieldValue]++;
+            }
+            return $ret;
+        });
+        return $ret[$id] ?? 0;
     }
 
     public function setDebugSql(): static
