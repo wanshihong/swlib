@@ -1,0 +1,10 @@
+{% if value is empty or value==0 %}
+    <span class="badge user-select-none rounded-0">未赋值</span>
+{% else %}
+    <span class="td-color {% for class in field.classes %}{{ class }}{% endfor %}"
+          style="background-color: {{ value }}"
+          {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+    >
+         {{ value }}
+    </span>
+{% endif %}

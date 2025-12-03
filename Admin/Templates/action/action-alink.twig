@@ -1,0 +1,10 @@
+<a type="button"
+   class="btn btn-primary btn-sm rounded-0 {% for class in action.classes %}{{ class }}{% endfor %}" target="{{ action.target }}"
+   href="{{ url(action.url,action.params,['page','order-field','order-type'],true) }}"
+   {% for attrKey,attrValue in action.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+>
+    {% if action.icon %}
+        <i class="{{ action.icon }}"></i>
+    {% endif %}
+    {{ action.label }}
+</a>

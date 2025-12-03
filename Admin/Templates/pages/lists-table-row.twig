@@ -1,0 +1,16 @@
+<tr id="tr-{{ row.priFieldValue }}">
+    {% for field in row.fields %}
+        {% if field.templateList %}
+            <td id="td-{{ field.elemId }}" class="text-nowrap">
+                {% include field.templateList  with {'row':row,value:field.value} %}
+            </td>
+        {% endif %}
+    {% endfor %}
+
+    {% if row.firstAction %}
+        <td class="text-end th-action" >
+            {% include 'action/action.twig' with {'firstAction': row.firstAction ,'lastActions':row.lastActions} %}
+        </td>
+    {% endif %}
+
+</tr>

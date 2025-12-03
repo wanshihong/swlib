@@ -1,0 +1,70 @@
+<div class="row mb-3">
+    <label for="{{ field.elemId }}"
+           class="col-sm-2 col-form-label text-end {% for class in field.classes %}{{ class }}{% endfor %}"
+    >
+        {{ field.label }}</label>
+    <div class="col-sm-10 select-box" id="{{ field.elemId }}">
+        {# 输入模式的元素 #}
+        <input type="text"
+               class="form-control rounded-0 dropdown-toggle select-input"
+               autocomplete="off"
+               data-bs-toggle="dropdown"
+               id="{{ field.elemId }}_input"
+               data-field="{{ field.field }}"
+               data-url="{{ url('get-select-list') }}"
+                {% if field.options is not empty %}
+                    readonly
+                {% else %}
+                    onfocus="handleInputOnFocus(this)"
+                    onkeyup="handleInputOnKeyup(this)"
+                {% endif %}
+               {% if field.required %}required{% endif %}
+               {% if field.disabled %}disabled{% endif %}
+               {% for attrKey,attrValue in field.attributes %}{{ attrKey }}="{{ attrValue }}"{% endfor %}
+               placeholder="{{ lang('请输入') }}{{ field.label }}"
+               aria-label="{{ field.label }}"
+               value="{{ field.showText }}"
+               {% if field.value is not empty %}style="display: none;"{% endif %}>
+               
+        {# 输入框右侧下拉图标 #}
+        <i class="bi bi-chevron-down select-dropdown-icon" data-bs-toggle="dropdown" {% if field.value is not empty %}style="display: none;"{% endif %}></i>
+               
+        {# 选中值容器 - 当有值被选中时显示 #}
+        <div class="selected-value-container form-control {% if field.disabled %}disabled{% endif %}" {% if field.value is empty %}style="display: none;"{% else %}style="display: flex;"{% endif %}>
+            <span class="selected-text">{{ field.showText }}</span>
+            <button type="button" class="btn-clear" {% if field.disabled %}disabled{% endif %} onclick="clearSelectValue(this)">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+
+        {# 隐藏的实际表单值 #}
+        <input type="text" class="form-control visually-hidden" {% if field.required %}required{% endif %}
+               name="{{ field.field }}" value="{{ field.value }}"
+               aria-label="{{ field.label }}">
+
+        <div class="invalid-feedback">
+            请选择{{ field.label }}
+        </div>
+
+        {# 下拉菜单 #}
+        <ul class="dropdown-menu">
+            {# 下拉菜单头部 - 关闭按钮 #}
+            <li class="dropdown-menu-header">
+                <span class="dropdown-menu-title">{{ lang('选择') }} {{ field.label }}</span>
+                <button type="button" class="btn-close-dropdown" onclick="closeDropdown(this)">
+                    <i class="bi bi-x"></i>
+                </button>
+            </li>
+            
+            {% if field.options is not empty %}
+                {% for item in field.options %}
+                    <li onclick="selectDropdownMenuItem(this,'{{ item.id }}','{{ item.text }}')">
+                        <a class="dropdown-item" href="javascript:">
+                            {{ item.text }}
+                        </a>
+                    </li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+</div>

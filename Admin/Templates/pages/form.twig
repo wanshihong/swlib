@@ -1,0 +1,22 @@
+{% extends "layout/layout.twig" %}
+
+{% block pageTitle %}{{ pageConfig.pageName|striptags }}{% endblock %}
+
+{% block content %}
+    <form class="p-4 needs-validation" novalidate method="post">
+        {% for field in fields %}
+            {% include field.templateForm with {'field': field} %}
+        {% endfor %}
+
+        <div class="row mt-5">
+            <label class="col-sm-2 col-form-label text-end"></label>
+            <div class="col-sm-10">
+                {% include 'action/action.twig' with {'firstAction': firstAction ,'lastActions':lastActions} %}
+            </div>
+        </div>
+
+        {% if referer is not empty %}
+            <input type="hidden" name="_referer" value="{{ referer }}"/>
+        {% endif %}
+    </form>
+{% endblock %}

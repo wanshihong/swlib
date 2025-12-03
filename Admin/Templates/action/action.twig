@@ -1,0 +1,24 @@
+
+
+{% if firstAction %}
+
+    <div class="btn-group btn-group-sm shadow">
+
+        {% include firstAction.template with {'action':firstAction} %}
+
+        {% if lastActions %}
+            <button type="button" class="btn rounded-0 btn-primary dropdown-toggle dropdown-toggle-split"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu rounded-0">
+                {% for action in lastActions %}
+                    <li class="dropdown-item text-center">
+                        {% include action.template with {'action':action} %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endif %}

@@ -1,0 +1,56 @@
+<div class="col-auto mb-2 position-relative select-box select-box-filter">
+    {# 输入模式的元素 #}
+    <input type="text"
+           class="form-control form-control-sm rounded-0 dropdown-toggle select-input"
+           autocomplete="off"
+           data-bs-toggle="dropdown"
+           id="{{ filter.elemId }}"
+           aria-label="{{ filter.label }}"
+           data-field="{{ filter.field }}"
+           data-url="{{ url('get-select-list') }}"
+            {% if filter.options is not empty %}
+                readonly
+            {% else %}
+                onfocus="handleInputOnFocus(this)"
+                onkeyup="handleInputOnKeyup(this)"
+            {% endif %}
+           placeholder="{{ lang('请输入') }} {{ filter.label }}"
+           value="{{ filter.showText }}"
+           {% if filter.value is not empty %}style="display: none;"{% endif %}>
+           
+    {# 输入框右侧下拉图标 #}
+    <i class="bi bi-chevron-down select-dropdown-icon" data-bs-toggle="dropdown" {% if filter.value is not empty %}style="display: none;"{% endif %}></i>
+    
+    {# 选中值容器 - 当有值被选中时显示 #}
+    <div class="selected-value-container form-control form-control-sm" {% if filter.value is empty %}style="display: none;"{% else %}style="display: flex;"{% endif %}>
+        <span class="selected-text">{{ filter.showText }}</span>
+        <button type="button" class="btn-clear" onclick="clearSelectValue(this)">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+
+    {# 隐藏的实际表单值 #}
+    <input type="text" class="form-control visually-hidden" name="{{ filter.field }}" value="{{ filter.value }}"
+           aria-label="{{ filter.label }}">
+
+    {# 下拉菜单 #}
+    <ul class="dropdown-menu">
+        {# 下拉菜单头部 - 关闭按钮 #}
+        <li class="dropdown-menu-header">
+            <span class="dropdown-menu-title">{{ lang('选择') }} {{ filter.label }}</span>
+            <button type="button" class="btn-close-dropdown" onclick="closeDropdown(this)">
+                <i class="bi bi-x"></i>
+            </button>
+        </li>
+        
+        {% if filter.options is not empty %}
+            {% for item in filter.options %}
+                <li onclick="selectDropdownMenuItem(this,'{{ item.id }}','{{ item.text }}')">
+                    <a class="dropdown-item" href="javascript:">
+                        {{ item.text }}
+                    </a>
+                </li>
+            {% endfor %}
+        {% endif %}
+    </ul>
+</div> 

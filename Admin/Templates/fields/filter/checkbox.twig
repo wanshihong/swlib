@@ -1,0 +1,10 @@
+<div class="col-auto mb-2 position-relative">
+    <select class="form-select form-select-sm rounded-0"
+            id="filter-{{ filter.elemId }}" name="{{ filter.field }}"
+            aria-label="{{ filter.label }}"
+    >
+        {% for opt in filter.options %}
+            <option value="{{ opt.id }}" {% if opt.id==value %}selected{% endif %}>{{ opt.text }}</option>
+        {% endfor %}
+    </select>
+</div>

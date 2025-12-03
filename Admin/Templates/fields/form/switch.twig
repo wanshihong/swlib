@@ -1,0 +1,20 @@
+<div class="row mb-3">
+    <label for="{{ field.elemId }}"
+           class="col-sm-2 col-form-label text-end {% for class in field.classes %}{{ class }}{% endfor %}"
+           {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+    >
+        {{ field.label }}
+    </label>
+    <div class="col-sm-10 d-flex align-items-center">
+        <div class="form-check form-switch mb-0">
+            <input class="form-check-input list-switch-input" type="checkbox"
+                   id="{{ field.elemId }}"
+                   name="{{ field.field }}"
+                   value="{{ field.enableValue }}"
+                   {% if field.value==field.enableValue %}checked{% endif %}
+                    {% if field.disabled %}disabled{% endif %}
+                   role="switch"
+            >
+        </div>
+    </div>
+</div>

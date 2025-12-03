@@ -1,0 +1,25 @@
+{
+    "name": "wansh/swlib",
+    "description": "SWLib 是一个基于 PHP 8.0+ 和 Swoole 的高性能 Web 开发框架",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "wansh",
+            "email": "your-email@example.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.4",
+        "ext-swoole": ">=6.0.0",
+        "ext-mysqli": "*",
+        "ext-redis": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Swlib\\": ""
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

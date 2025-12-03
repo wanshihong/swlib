@@ -1,0 +1,11 @@
+{% if value is empty %}
+    <span class="badge user-select-none rounded-0">未赋值</span>
+{% else %}
+    <span
+            class="{% for class in field.classes %}{{ class }}{% endfor %}"
+            {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+            onclick="copyText('{{ value }}')"
+    >
+        {{ value }}
+    </span>
+{% endif %}
