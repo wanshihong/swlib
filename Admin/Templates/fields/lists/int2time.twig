@@ -1,0 +1,10 @@
+{% if value is empty or value==0 %}
+    <span class="badge user-select-none rounded-0">未赋值</span>
+{% else %}
+    <span class="td-int2time {% for class in field.classes %}{{ class }}{% endfor %}"
+        {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+         onclick="copyText('{{ value|date('Y-m-d H:i:s') }}')"
+    >
+         {{ value|date('Y-m-d H:i:s') }}
+    </span>
+{% endif %}

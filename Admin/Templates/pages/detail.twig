@@ -1,0 +1,26 @@
+{% extends "layout/layout.twig" %}
+
+{% block pageTitle %}{{ lang('查看')}} - {{ pageConfig.pageName|striptags }}{% endblock %}
+
+{% block content %}
+    <table class="table table-hover table-responsive border-light">
+        <thead>
+        <tr>
+            <th scope="col" style="width: 160px">{{ lang('字段') }}</th>
+            <th scope="col">{{ lang('值') }}</th>
+        </tr>
+
+        </thead>
+        <tbody>
+        {% for field in rowManager.fields %}
+            <tr>
+                <td>{{ field.label }}</td>
+                <td>{% include field.templateList with {'row':rowManager,value:field.value} %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    {% include 'action/action.twig' with {'firstAction': rowManager.firstAction ,'lastActions':rowManager.lastActions} %}
+{% endblock %}

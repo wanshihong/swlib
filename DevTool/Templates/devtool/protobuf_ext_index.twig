@@ -1,0 +1,103 @@
+{% extends "devtool/layout.twig" %}
+
+{% block content %}
+<div class="devtool-doc">
+    <h1>Proto 扩展编辑器</h1>
+
+    <div class="doc-section">
+        <h3>📋 工具说明</h3>
+        <p>
+            本框架采用 <strong>Protobuf 驱动</strong>，自动将数据库表结构转换为 Proto 消息定义。
+            基础字段直接来自数据库表的列定义，无需额外配置。
+        </p>
+        <p>
+            当前端交互需求超出数据库表结构范围，且不便添加新数据库字段时，
+            可使用本工具对 Proto 消息进行 <strong>字段扩展</strong>，灵活满足业务需求。
+        </p>
+    </div>
+
+    <div class="doc-section">
+        <h3>🎯 使用场景</h3>
+        <ul>
+            <li><strong>计算字段：</strong> 添加由其他字段派生的虚拟字段（如 <code>age</code> 由 <code>birth_date</code> 计算）</li>
+            <li><strong>关联数据：</strong> 嵌入关联表的数据而无需修改数据库结构</li>
+            <li><strong>业务扩展：</strong> 临时添加前端所需的额外字段，无需数据库迁移</li>
+            <li><strong>兼容性：</strong> 为旧版本 API 补充新字段，保持向后兼容</li>
+        </ul>
+    </div>
+
+    <div class="doc-section">
+        <h3>⚙️ 工作原理</h3>
+        <p>
+            扩展字段配置存储在数据库表的 <code>id</code> 列注释中，格式为 JSON 数组：
+        </p>
+        <pre><code>protobuf:ext:json:["位置:字段名:字段类型", ...]</code></pre>
+        <p>
+            <strong>位置：</strong> <code>item</code>（单条记录）或 <code>lists</code>（列表记录）<br>
+            <strong>字段类型：</strong> 支持基础类型（<code>int32</code>、<code>string</code> 等）、
+            <code>$self</code>（自引用）、其他 Proto 消息类型，以及 <code>repeated</code> 变体
+        </p>
+    </div>
+
+    <div class="doc-section">
+        <h3>📝 快速开始</h3>
+        <p>
+            下方选择要扩展的数据库和表，点击"编辑扩展"即可添加或修改 Proto 字段。
+            所有修改实时保存到数据库表注释，生成器下次运行时自动应用。
+        </p>
+    </div>
+</div>
+
+<h2>选择表格进行扩展</h2>
+
+<div class="search-row">
+    <label for="table-search">搜索表名：</label>
+    <input type="text" id="table-search" placeholder="输入表名关键字自动过滤">
+</div>
+
+{% for dbName, tables in dbTables %}
+    <h2>数据库: {{ dbName }}</h2>
+    <ul class="table-list" data-db="{{ dbName }}">
+        {% for table in tables %}
+            <li data-table-name="{{ table }}">
+                {{ table }} -
+                <a href="/dev-tool/protobuf-ext-editor/edit?db={{ dbName|url_encode }}&table={{ table|url_encode }}">编辑扩展</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+
+<script>
+    (function () {
+        var input = document.getElementById('table-search');
+        if (!input) return;
+
+        input.addEventListener('input', function () {
+            var keyword = this.value.toLowerCase();
+            var lists = document.querySelectorAll('ul.table-list');
+
+            lists.forEach(function (ul) {
+                var hasVisible = false;
+                ul.querySelectorAll('li[data-table-name]').forEach(function (li) {
+                    var name = (li.getAttribute('data-table-name') || '').toLowerCase();
+                    var match = !keyword || name.indexOf(keyword) !== -1;
+                    li.style.display = match ? '' : 'none';
+                    if (match) {
+                        hasVisible = true;
+                    }
+                });
+
+                var prev = ul.previousElementSibling;
+                while (prev && prev.tagName !== 'H2') {
+                    prev = prev.previousElementSibling;
+                }
+                if (prev && prev.tagName === 'H2') {
+                    prev.style.display = hasVisible ? '' : 'none';
+                }
+            });
+        });
+    })();
+</script>
+
+{% endblock %}
+

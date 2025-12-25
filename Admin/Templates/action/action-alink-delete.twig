@@ -1,0 +1,11 @@
+<a type="button"
+   class="btn btn-danger btn-sm rounded-0 {% for class in action.classes %}{{ class }}{% endfor %}"
+   href="javascript:"
+   {% for attrKey,attrValue in action.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+   onclick="deleteConfirm('{{ url(action.url,action.params) }}')"
+>
+    {% if action.icon %}
+        <i data-href="{{ url(action.url,action.params) }}" class="{{ action.icon }}"></i>
+    {% endif %}
+    {{ action.label }}
+</a>

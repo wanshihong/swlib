@@ -1,0 +1,12 @@
+.editor—wrapper {
+    border: 1px solid #dee2e6;
+    z-index: 100;
+}
+
+.toolbar-container {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.editor-container {
+    height: 300px;
+}

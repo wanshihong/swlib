@@ -1,0 +1,239 @@
+{% extends "devtool/layout.twig" %}
+
+{% block content %}
+<h1>Proto 扩展编辑器 - {{ db }}.{{ table }}</h1>
+
+<form method="post" action="/dev-tool/protobuf-ext-editor/save">
+    <input type="hidden" name="db" value="{{ db }}">
+    <input type="hidden" name="table" value="{{ table }}">
+
+    <table id="ext-table" class="table table-bordered">
+        <thead>
+        <tr>
+            <th width="80">位置 (item/lists)</th>
+            <th width="120">字段名</th>
+            <th  width="60">是否 repeated</th>
+            <th>类型</th>
+            <th width="120">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div class="mt-3">
+        <button type="button" class="btn btn-secondary" onclick="addRow()">新增一行</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+        <a href="/dev-tool/protobuf-ext-editor/index" class="btn btn-link">返回列表</a>
+    </div>
+</form>
+
+<script>
+    const baseTypes = {{ baseTypes|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }};
+    const protoTypes = {{ protoTypes|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }};
+    const initRows = {{ rows|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }};
+
+    function buildTypeSelect(repeated, value) {
+        const select = document.createElement('select');
+
+        const groupBase = document.createElement('optgroup');
+        groupBase.label = '基础类型';
+        baseTypes.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = repeated ? ('repeated ' + t) : t;
+            opt.textContent = repeated ? ('repeated ' + t) : t;
+            groupBase.appendChild(opt);
+        });
+
+        const optSelf = document.createElement('option');
+        optSelf.value = repeated ? 'repeated $self' : '$self';
+        optSelf.textContent = optSelf.value;
+        groupBase.appendChild(optSelf);
+
+        select.appendChild(groupBase);
+
+        const groupProto = document.createElement('optgroup');
+        groupProto.label = 'Proto 类型';
+        protoTypes.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = repeated ? ('repeated ' + t) : t;
+            opt.textContent = opt.value;
+            groupProto.appendChild(opt);
+        });
+        select.appendChild(groupProto);
+
+        if (value) {
+            select.value = value;
+        }
+
+        return select;
+    }
+
+    function addRow(row) {
+        const tbody = document.querySelector('#ext-table tbody');
+        const tr = document.createElement('tr');
+
+        const tdPos = document.createElement('td');
+        const selPos = document.createElement('select');
+        selPos.name = 'pos[]';
+        ['item', 'lists'].forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.textContent = p;
+            selPos.appendChild(opt);
+        });
+        if (row && row.pos) selPos.value = row.pos;
+        tdPos.appendChild(selPos);
+
+        const tdField = document.createElement('td');
+        const inputField = document.createElement('input');
+        inputField.type = 'text';
+        inputField.name = 'field[]';
+        inputField.value = row && row.field ? row.field : '';
+        tdField.appendChild(inputField);
+
+        const tdRep = document.createElement('td');
+        const selRep = document.createElement('select');
+        selRep.name = 'repeated[]';
+        [['0','否'],['1','是']].forEach(([val, text]) => {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.textContent = text;
+            selRep.appendChild(opt);
+        });
+        let isRep = false;
+        if (row && row.type && row.type.startsWith('repeated ')) {
+            isRep = true;
+            selRep.value = '1';
+        }
+        tdRep.appendChild(selRep);
+
+        const tdType = document.createElement('td');
+        let initTypeVal = row ? row.type : '';
+
+        let typeSelect = buildTypeSelect(isRep, initTypeVal);
+        typeSelect.style.display = 'none';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'type-select-wrapper';
+
+        const typeInput = document.createElement('input');
+        typeInput.type = 'text';
+        typeInput.placeholder = '选择 / 搜索类型';
+        typeInput.className = 'type-input';
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'type-dropdown';
+
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'type[]';
+
+        function syncDisplayByValue(value) {
+            hiddenInput.value = value || '';
+            let displayText = value || '';
+            Array.prototype.forEach.call(typeSelect.options, function (opt) {
+                if (opt.value === value) {
+                    displayText = opt.textContent || opt.innerText || opt.value;
+                }
+            });
+            typeInput.value = displayText;
+        }
+
+        function rebuildDropdown(filterKeyword) {
+            const keyword = (filterKeyword || '').toLowerCase();
+            dropdown.innerHTML = '';
+            Array.prototype.forEach.call(typeSelect.options, function (opt) {
+                if (!opt.value) return;
+                const text = opt.textContent || opt.innerText || opt.value;
+                if (keyword && text.toLowerCase().indexOf(keyword) === -1) {
+                    return;
+                }
+                const item = document.createElement('div');
+                item.className = 'type-option';
+                item.textContent = text;
+                item.dataset.value = opt.value;
+                item.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    syncDisplayByValue(this.dataset.value);
+                    dropdown.style.display = 'none';
+                });
+                dropdown.appendChild(item);
+            });
+            dropdown.style.display = dropdown.childElementCount ? 'block' : 'none';
+        }
+
+        if (initTypeVal) {
+            syncDisplayByValue(initTypeVal);
+        }
+
+        typeInput.addEventListener('focus', function () {
+            rebuildDropdown(typeInput.value);
+        });
+        typeInput.addEventListener('input', function () {
+            rebuildDropdown(typeInput.value);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!wrapper.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        wrapper.appendChild(typeInput);
+        wrapper.appendChild(dropdown);
+        wrapper.appendChild(hiddenInput);
+        tdType.appendChild(wrapper);
+        tdType.appendChild(typeSelect);
+
+        selRep.addEventListener('change', function() {
+            const repeated = this.value === '1';
+            const currentVal = hiddenInput.value || '';
+            const baseMatch = currentVal.replace(/^repeated\s+/, '');
+            let nextVal = '';
+            if (repeated) {
+                if (baseTypes.includes(baseMatch) || baseMatch === '$self' || protoTypes.includes(baseMatch)) {
+                    nextVal = 'repeated ' + baseMatch;
+                } else {
+                    nextVal = 'repeated int32';
+                }
+            } else {
+                nextVal = baseMatch;
+            }
+            const newSelect = buildTypeSelect(repeated, nextVal);
+            newSelect.style.display = 'none';
+            tdType.replaceChild(newSelect, typeSelect);
+            typeSelect = newSelect;
+            syncDisplayByValue(nextVal);
+        });
+
+	        const tdOp = document.createElement('td');
+	        const btnDel = document.createElement('button');
+	        btnDel.type = 'button';
+	        btnDel.textContent = '删除';
+	        btnDel.onclick = function() {
+	            if (confirm('确认删除这一行扩展配置吗？')) {
+	                tr.remove();
+	            }
+	        };
+	        tdOp.appendChild(btnDel);
+
+        tr.appendChild(tdPos);
+        tr.appendChild(tdField);
+        tr.appendChild(tdRep);
+        tr.appendChild(tdType);
+        tr.appendChild(tdOp);
+        tbody.appendChild(tr);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (Array.isArray(initRows) && initRows.length) {
+            initRows.forEach(r => addRow(r));
+        } else {
+            addRow();
+        }
+    });
+</script>
+
+{% endblock %}
+

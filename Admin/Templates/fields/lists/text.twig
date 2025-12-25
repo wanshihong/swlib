@@ -1,0 +1,18 @@
+{% if value is empty %}
+    <span class="badge user-select-none rounded-0">未赋值</span>
+{% else %}
+    {% if field.tooltip is empty %}
+        <pre style="max-width: 60vw;">{{ value }}</pre>
+    {% else %}
+        <span class="d-inline-block text-truncate {% for class in field.classes %}{{ class }}{% endfor %}"
+              onclick="copyText('{{ value }}')" style="max-width: {{ field.listMaxWidth }}px;"
+              data-bs-toggle="tooltip" data-bs-title='{{ value }}'
+              {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+         >
+
+        {{ value|raw }}
+    </span>
+    {% endif %}
+
+{% endif %}
+

@@ -1,0 +1,20 @@
+<div class="row mb-3">
+    <label for="{{ field.elemId }}"
+           class="col-sm-2 col-form-label text-end {% for class in field.classes %}{{ class }}{% endfor %}"
+    >
+        {{ field.label }}</label>
+    <div class="col-sm-10">
+    <textarea type="text" class="form-control rounded-0"
+              id="{{ field.elemId }}"
+              name="{{ field.field }}"
+              {% if field.required %}required{% endif %}
+            {% if field.disabled %}disabled{% endif %}
+            {% if field.readonly %}readonly{% endif %}
+            {% for attrKey,attrValue in field.attributes %}{{ attrKey }}="{{ attrValue }}"{% endfor %}
+           placeholder="{{ lang('请输入') }}{{ field.label }}"
+    >{{ field.value }}</textarea>
+        <div class="invalid-feedback">
+            {{ lang('请输入') }}{{ field.label }}
+        </div>
+    </div>
+</div>

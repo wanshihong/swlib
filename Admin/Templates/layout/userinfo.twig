@@ -1,0 +1,46 @@
+<div class="position-absolute top-0 end-0">
+
+    <div class="d-flex">
+
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle rounded-0" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="bi bi-globe"></i>
+                {{ adminLayout().getLang() }}
+            </button>
+            <ul class="dropdown-menu rounded-0">
+                {% for langId,langText in adminLayout().languages %}
+                <li>
+                    <a class="dropdown-item" href="{{ adminLayout().setLanguageUrl }}?language={{ langId }}">
+                        {{ langText }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle rounded-0" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="bi bi-person-gear"></i>
+                {{ adminUser().getUsername() }}
+            </button>
+            <ul class="dropdown-menu rounded-0">
+                <li>
+                    <a class="dropdown-item" href="{{ adminLayout().changePasswordUrl }}">
+                        <i class="bi bi-pencil"></i>
+                        修改密码
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{{ adminLayout().logoutUrl }}">
+                        <i class="bi bi-power"></i>
+                        退出登录
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+</div>

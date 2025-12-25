@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>操作已禁用</title>
+    <link href="/admin/bootstrap-5.3.3-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/admin/bootstrap-icons-1.11.3/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .main {
+            margin-top: 8%;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 400px;
+        }
+        .icon-warning {
+            font-size: 48px;
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main d-flex flex-column justify-content-center align-items-center">
+    <i class="bi bi-exclamation-triangle-fill icon-warning mb-3"></i>
+    <div class="alert alert-warning text-center" role="alert">
+        {{ msg }}
+    </div>
+
+    <a href="{{ backUrl }}" class="btn btn-primary">
+        <i class="bi bi-arrow-left"></i> {{ backText }}
+    </a>
+</div>
+
+<script src="/admin/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

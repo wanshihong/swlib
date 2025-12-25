@@ -1,0 +1,3 @@
+<input type="hidden" id="{{ field.elemId }}" name="{{ field.field }}" value="{{ field.value }}"
+       class="{% for class in field.classes %}{{ class }}{% endfor %}"
+       {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %} />

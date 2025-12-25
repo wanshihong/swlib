@@ -1,0 +1,21 @@
+<tr id="tr-{{ row.priFieldValue }}">
+    {% if batchActions|length > 0 %}
+        <td class="text-nowrap">
+            <input type="checkbox" class="form-check-input batch-row-checkbox" value="{{ row.priFieldValue }}" data-pri-field-name="{{ row.priFieldName }}">
+        </td>
+    {% endif %}
+    {% for field in row.fields %}
+        {% if field.templateList %}
+            <td id="td-{{ field.elemId }}" class="text-nowrap">
+                {% include field.templateList  with {'row':row,value:field.value} %}
+            </td>
+        {% endif %}
+    {% endfor %}
+
+    {% if row.firstAction %}
+        <td class="text-end th-action" >
+            {% include 'action/action.twig' with {'firstAction': row.firstAction ,'lastActions':row.lastActions} %}
+        </td>
+    {% endif %}
+
+</tr>

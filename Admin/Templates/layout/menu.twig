@@ -1,0 +1,56 @@
+<div class="accordion accordion-flush" id="accordionMenu">
+    {% for index,group in adminLayout().getMenus() %}
+        {% if group.menus and group.menus|length > 0 %}
+            <div class="accordion-item border-light">
+                <h2 class="accordion-header">
+                    <button class="accordion-button  p-2 {% if group.isActive %}{% else %}collapsed{% endif %}"
+                            type="button" data-bs-toggle="collapse"
+                            data-bs-target="#menu{{ index }}"
+                            aria-expanded="{% if group.isActive %}trye{% else %}false{% endif %}"
+                            aria-controls="menu{{ index }}">
+                        {% if group.icon %}
+                            <i class="{{ group.icon }}"></i>&nbsp;
+                        {% endif %}
+                        {{ group.label }}
+                    </button>
+                </h2>
+                <div id="menu{{ index }}"
+                     class="accordion-collapse {% if group.isActive %}show{% else %}collapse{% endif %}"
+                     data-bs-parent="#accordionMenu">
+                    <div class="accordion-body">
+                        <ul class="nav nav-pills  flex-column ">
+                            {% for childMenu in group.menus %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if childMenu.isActive %}active{% endif %}"
+                                       href="{{ childMenu.url }}">
+                                        {% if childMenu.icon %}
+                                            <i class="{{ childMenu.icon }}"></i>&nbsp;
+                                        {% endif %}
+                                        {{ childMenu.label }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+
+            <div class="accordion-item border-light">
+                <h2 class="accordion-header">
+                    <a class="accordion-button link-underline link-underline-opacity-0 p-2 {% if group.isActive %}{% else %}collapsed{% endif %}"
+                       href="{{ group.url }}"
+                    >
+                        {% if group.icon %}
+                            <i class="{{ group.icon }}"></i>&nbsp;
+                        {% endif %}
+                        {{ group.label }}
+                    </a>
+                </h2>
+            </div>
+
+
+        {% endif %}
+
+    {% endfor %}
+</div>

@@ -1,0 +1,33 @@
+{% if lists|length > 0 %}
+    <table class="table table-hover table-sm border-light">
+        <thead>
+        <tr>
+            {% if batchActions|length > 0 %}
+                <th scope="col" class="text-nowrap" style="width: 40px;">
+                    <input type="checkbox" class="form-check-input" id="batch-select-all" title="全选/取消全选">
+                </th>
+            {% endif %}
+            {% for row in lists[0].fields %}
+                {% if row.templateList %}
+                    <th scope="col" class="text-nowrap">
+                        {% include 'pages/lists-table-th.twig' %}
+                    </th>
+                {% endif %}
+            {% endfor %}
+
+            {% if lists[0].firstAction %}
+                <th class="text-end th-action" scope="col">操作</th>
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody class="table-group-divider">
+        {% for index,row in lists %}
+            {% include 'pages/lists-table-row.twig' with {'row': row, 'index': index, 'batchActions': batchActions} %}
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-info">
+        {{ lang("没有数据") }}
+    </div>
+{% endif %}

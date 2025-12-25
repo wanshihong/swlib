@@ -1,0 +1,14 @@
+<div class="col-auto mb-2 position-relative">
+
+    <select
+            class="form-select form-select-sm filter-select form-control-sm rounded-0"
+            id="filter-{{ filter.elemId }}"
+            name="{{ filter.field }}"
+            aria-label="{{ filter.label }}"
+            data-value="{{ filter.value }}"
+    >
+        <option value="">请选择{{ filter.label }}</option>
+        <option value="{{ filter.enableValue }}">{{ filter.enableText }}</option>
+        <option value="{{ filter.disabledValue }}">{{ filter.disabledText }}</option>
+    </select>
+</div>

@@ -1,0 +1,20 @@
+{# 批量操作组件 - 用于列表页面的批量操作功能 #}
+{% if batchActions|length > 0 %}
+    <div class="batch-action-area">
+        <div class="input-group input-group-sm">
+            <span class="input-group-text" id="batch-selected-count">{{ lang('已选') }} 0 {{ lang('条') }}</span>
+            <select class="form-select form-select-sm" id="batch-action-select" style="min-width: 120px;">
+                <option value="">{{ lang('批量操作') }}</option>
+                {% for action in batchActions %}
+                    <option value="{{ url(action.url,action.params) }}" data-confirm="{{ action.confirmMessage }}" data-icon="{{ action.icon }}">
+                        {{ action.label }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="batch-action-submit" disabled>
+                <i class="bi bi-check2-circle"></i> {{ lang('执行') }}
+            </button>
+        </div>
+    </div>
+{% endif %}
+

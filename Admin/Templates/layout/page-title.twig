@@ -1,0 +1,15 @@
+<div class="page-name fs-4  pb-4">
+    {#  小屏幕弹窗显示菜单，默认隐藏 start  #}
+    <button class="btn btn-light d-inline d-sm-none" type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#sm-menu"
+            aria-controls="sm-menu">
+        <i class="bi bi-list-ul"></i>
+    </button>
+    {#  小屏幕弹窗显示菜单，默认隐藏 start  #}
+
+    {{ pageConfig.getPageName()|raw }}
+    {% if pri_value %}
+        <span class="fs-5">#{{ pri_value }}</span>
+    {% endif %}
+</div>

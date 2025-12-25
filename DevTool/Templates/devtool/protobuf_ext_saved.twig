@@ -1,0 +1,9 @@
+{% extends "devtool/layout.twig" %}
+
+{% block content %}
+<h1>Proto 扩展编辑器</h1>
+<p>已保存表 <strong>{{ db }}.{{ table }}</strong> 的扩展配置。</p>
+<p><a class="btn btn-primary" href="/dev-tool/protobuf-ext-editor/edit?db={{ db|url_encode }}&table={{ table|url_encode }}">返回编辑页</a>
+   <a class="btn btn-link" href="/dev-tool/protobuf-ext-editor/index">返回列表</a></p>
+{% endblock %}
+
