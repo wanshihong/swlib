@@ -3,9 +3,9 @@
 namespace Swlib\Utils;
 
 use Generate\ConfigEnum;
+use RuntimeException;
 use Swlib\Admin\Manager\AdminManager;
 use Swlib\Admin\Manager\AdminUserManager;
-use Swlib\Admin\Utils\Func;
 use Swlib\Table\Db;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
@@ -20,6 +20,8 @@ class Twig
 
     public Environment $twig;
 
+    public array $templatesDir = [];
+
     // 私有化构造函数
     private function __construct()
     {
@@ -28,18 +30,20 @@ class Twig
             mkdir($runtimeDir, 0777, true);
         }
 
+        $this->addDir(SWLIB_DIR . '/Admin/Templates/');
+        $this->addDir(ROOT_DIR . 'templates');
 
-        $templatesDir = [
-            SWLIB_DIR . '/Admin/Templates/',
-            ROOT_DIR . 'templates'
-        ];
 
         if (ConfigEnum::APP_PROD === false) {
             // 不是生产环境 增加 DevTool 目录
-            $templatesDir[] = SWLIB_DIR . 'DevTool/Templates/';
+            $this->addDir(SWLIB_DIR . 'DevTool/Templates/');
         }
 
-        $loader = new FilesystemLoader($templatesDir);
+        if (empty($this->templatesDir)) {
+            throw new RuntimeException('未配置模板目录');
+        }
+
+        $loader = new FilesystemLoader($this->templatesDir);
 
         $this->twig = new Environment($loader, [
             'cache' => $runtimeDir,
@@ -64,6 +68,13 @@ class Twig
         });
     }
 
+
+    private function addDir($dir): void
+    {
+        if (is_dir($dir)) {
+            $this->templatesDir[] = $dir;
+        }
+    }
 
     private function __clone()
     {

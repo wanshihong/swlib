@@ -5,6 +5,7 @@ namespace Swlib\Response;
 use Generate\ConfigEnum;
 use Swlib\Enum\CtxEnum;
 use Swlib\Exception\AppException;
+use Swlib\Exception\TokenExpiredException;
 use Swlib\Exception\UnauthorizedException;
 use Swlib\Utils\Log;
 use stdClass;
@@ -45,12 +46,22 @@ readonly class JsonResponse implements ResponseInterface
         if (ConfigEnum::APP_PROD === false) {
             $ret = Log::getTraceMsg($e);
         } else {
-            if ($e instanceof AppException) {
+            if ($e instanceof AppException || $e instanceof UnauthorizedException || $e instanceof TokenExpiredException) {
                 $ret = $e->getMessage();
             }
         }
         Log::saveException($e, 'request');
 
+        // Token 过期，需要刷新（返回 419）
+        if ($e instanceof TokenExpiredException) {
+            return new static(json_encode([
+                'errno' => 1,
+                'msg' => $ret,
+                'data' => new stdClass(),
+            ], JSON_UNESCAPED_UNICODE), 419);
+        }
+
+        // 未登录或登录失效（返回 401）
         if ($e instanceof UnauthorizedException) {
             return new static(json_encode([
                 'errno' => 1,

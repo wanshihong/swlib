@@ -8,6 +8,8 @@ use Exception;
 use Generate\RouterPath;
 use Google\Protobuf\Internal\Message;
 use InvalidArgumentException;
+use Redis;
+use Swlib\Connect\PoolRedis;
 use Swlib\Controller\AbstractController;
 use Swlib\DataManager\ReflectionManager;
 use Swlib\Exception\AppException;
@@ -164,11 +166,10 @@ class Router
         $random = $request->header['random'] ?? '';
         $time = $request->header['time'] ?? '';
         $token = $request->header['token'] ?? '';
-        $myToken = md5("$url.$random.$time");
 
-
+        // 1. 检查必填参数
         if (empty($random) || empty($token) || empty($time)) {
-            Log::error('Refuse to process the request', [
+            Log::error('签名参数缺失', [
                 'random' => $random,
                 'token' => $token,
                 'time' => $time,
@@ -177,16 +178,66 @@ class Router
             return false;
         }
 
-        $res = $myToken === $token;
-        if (!$res) {
-            Log::error('Refuse to process the request!', [
+        // 2. 时间校验：前后不能超过 5 秒
+        // 5 秒是合理的时间窗口，考虑到：
+        // - 网络延迟（1-2秒）
+        // - 客户端与服务器时间差（1-2秒）
+        // - 请求处理时间（1秒）
+        $currentTime = time();
+        $timeDiff = abs($currentTime - (int)$time);
+        if ($timeDiff > 5) {
+            Log::error('请求时间戳超出允许范围', [
+                'client_time' => $time,
+                'server_time' => $currentTime,
+                'diff' => $timeDiff,
+                'url' => $url,
+            ], 'sign_error');
+            return false;
+        }
+
+        // 3. 验证签名
+        $myToken = md5("$url.$random.$time");
+        if ($myToken !== $token) {
+            Log::error('签名验证失败', [
                 'random' => $random,
                 'token' => $token,
+                'expected_token' => $myToken,
                 'time' => $time,
                 'url' => $url,
             ], 'sign_error');
+            return false;
         }
-        return $res;
+
+        // 4. 防重放攻击：检查 token 是否已使用过
+        // 使用 Redis 存储已使用的 token，过期时间为 10 秒（时间窗口的 2 倍）
+        try {
+            $redisKey = "api_token:$token";
+            $exists = PoolRedis::call(function (Redis $redis) use ($redisKey) {
+                // 使用 SET NX（不存在才设置）来实现原子性检查和设置
+                // 返回 true 表示设置成功（token 未使用过）
+                // 返回 false 表示 key 已存在（token 已使用过）
+                return $redis->set($redisKey, '1', ['NX', 'EX' => 10]);
+            });
+
+            if (!$exists) {
+                Log::error('检测到重放攻击', [
+                    'token' => $token,
+                    'url' => $url,
+                    'time' => $time,
+                ], 'replay_attack');
+                return false;
+            }
+        } catch (Throwable $e) {
+            // Redis 异常不应该阻止正常请求，记录日志后继续
+            Log::error('Redis 防重放检查失败', [
+                'error' => $e->getMessage(),
+                'token' => $token,
+                'url' => $url,
+            ], 'redis_error');
+            // 继续执行，不因为 Redis 故障而拒绝请求
+        }
+
+        return true;
     }
 
 

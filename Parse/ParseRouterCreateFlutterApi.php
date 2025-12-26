@@ -25,13 +25,15 @@ trait ParseRouterCreateFlutterApi
             $dbName = $dbName[0];
         }
         $dbNameUpper = strtoupper($dbName);
+        // 转换数据库名为配置变量名：mi_yao_bi_ji -> miYaoBiJiUrl
+        $configVarName = $this->convertDbNameToConfigVar($dbName);
 
         // Flutter API 模板
         $apiTemplate = <<<'DART'
   /// {$desc}
   static Future<{$responseType}> {$name}({$params}) async {
     return ApiClient.instance.request<{$responseType}>(
-      '{$url}',
+      '${AppConfig.{$configVar}}/{$url}',
       requestData: {$paramsMap},
       fromProto: (bytes) => {$responseType}.fromBuffer(bytes),
       toProto: {$toProtoFunc},
@@ -130,8 +132,8 @@ DART;
 
             // 替换模板变量
             $saveString[$savePath] .= str_replace(
-                ['{$url}', '{$name}', '{$request}', '{$response}', '{$responseType}', '{$params}', '{$paramsMap}', '{$toProtoFunc}', '{$cache}', '{$title}', '{$desc}', '{$dbNameUpper}'],
-                [$item->url, $name, $request ?: 'null', $response, $responseType, $params, $paramsMap, $toProtoFunc, $cacheTime, $item->errorTitle, str_replace('失败', '', $item->errorTitle), $dbNameUpper],
+                ['{$url}', '{$name}', '{$request}', '{$response}', '{$responseType}', '{$params}', '{$paramsMap}', '{$toProtoFunc}', '{$cache}', '{$title}', '{$desc}', '{$dbNameUpper}', '{$configVar}'],
+                [$item->url, $name, $request ?: 'null', $response, $responseType, $params, $paramsMap, $toProtoFunc, $cacheTime, $item->errorTitle, str_replace('失败', '', $item->errorTitle), $dbNameUpper, $configVarName],
                 $template
             );
         }
@@ -271,6 +273,7 @@ DART;
 // Generated at: {$this->getCurrentDateTime()}
 
 import 'package:mi_yao_bi_ji/core/network/api_client.dart';
+import 'package:mi_yao_bi_ji/core/config/app_config.dart';
 import 'package:mi_yao_bi_ji/proto/generated/proto.dart';
 
 /// $className
@@ -286,6 +289,21 @@ DART;
     private function getCurrentDateTime(): string
     {
         return date('Y-m-d H:i:s');
+    }
+
+    /**
+     * 将数据库名转换为配置变量名
+     * 例如：mi_yao_bi_ji -> miYaoBiJiUrl
+     *       common_api -> commonApiUrl
+     * @param string $dbName
+     * @return string
+     */
+    private function convertDbNameToConfigVar(string $dbName): string
+    {
+        // 转换为小驼峰命名（首字母小写）
+        $camelCase = StringConverter::underscoreToCamelCase($dbName, '_', false);
+        // 添加 Url 后缀
+        return $camelCase . 'Url';
     }
 
 }

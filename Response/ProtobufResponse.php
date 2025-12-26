@@ -7,6 +7,7 @@ use Google\Protobuf\Internal\Message;
 use Swlib\DataManager\WorkerManager;
 use Swlib\Enum\CtxEnum;
 use Swlib\Exception\AppException;
+use Swlib\Exception\TokenExpiredException;
 use Swlib\Exception\UnauthorizedException;
 use Swlib\Utils\Log;
 use Protobuf\Common\Response;
@@ -65,8 +66,8 @@ class ProtobufResponse implements ResponseInterface
         if (ConfigEnum::APP_PROD === false) {
             $ret = Log::getTraceMsg($e);
         } else {
-            // 生产环境下，AppException 和 UnauthorizedException 都返回具体消息
-            if ($e instanceof AppException || $e instanceof UnauthorizedException) {
+            // 生产环境下，AppException、UnauthorizedException 和 TokenExpiredException 都返回具体消息
+            if ($e instanceof AppException || $e instanceof UnauthorizedException || $e instanceof TokenExpiredException) {
                 $ret = $e->getMessage();
             }
         }
@@ -80,16 +81,31 @@ class ProtobufResponse implements ResponseInterface
             $responseMessage->setErrno(1);
             $responseMessage->setPath(self::getUri());
             $responseMessage->setMsg($ret);
+
+            // Token 过期，需要刷新（返回 419）
+            if ($e instanceof TokenExpiredException) {
+                return new static($responseMessage, 419);
+            }
+
+            // 未登录或登录失效（返回 401）
             if ($e instanceof UnauthorizedException) {
-                // http 请求通过 请求状态码 401，前端收到后自动刷新 Token
                 return new static($responseMessage, 401);
             }
         } else {
             // websocket 请求
-            // websocket 通过 错误码 通知前台 刷新 用户 token
-            $responseMessage->setErrno(401);
-            $responseMessage->setMsg('please-refresh-token');
-            return new static($responseMessage, 401);
+            // websocket 通过 错误码 通知前台
+            if ($e instanceof TokenExpiredException) {
+                // Token 过期，需要刷新
+                $responseMessage->setErrno(419);
+                $responseMessage->setMsg('token-expired-please-refresh');
+                return new static($responseMessage, 419);
+            }
+            if ($e instanceof UnauthorizedException) {
+                // 未登录，需要登录
+                $responseMessage->setErrno(401);
+                $responseMessage->setMsg('please-login');
+                return new static($responseMessage, 401);
+            }
         }
 
 
