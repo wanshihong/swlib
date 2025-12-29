@@ -25,6 +25,7 @@ class ParseDevTool
         $files = [
             'SyncApi.php' => $this->generateSyncApiContent(),
             'ProtobufExtEditor.php' => $this->generateProtobufExtEditorContent(),
+            'DevSslCert.php' => $this->generateDevSslCertContent(),
         ];
 
         // 创建文件
@@ -75,5 +76,24 @@ class ProtobufExtEditor extends BaseProtobufExtEditor
 }
 PHP;
     }
-}
 
+    /**
+     * 生成 DevSslCert.php 内容
+     */
+    private function generateDevSslCertContent(): string
+    {
+        return <<<'PHP'
+<?php
+
+namespace App\DevTool;
+
+use Swlib\DevTool\Ctrls\DevSslCert as BaseDevSslCert;
+
+class DevSslCert extends BaseDevSslCert
+{
+    // 继承自 Swlib\DevTool\Ctrrs\DevSslCert
+    // 可在此添加项目特定的自定义逻辑
+}
+PHP;
+    }
+}

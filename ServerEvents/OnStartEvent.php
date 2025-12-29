@@ -5,6 +5,7 @@ namespace Swlib\ServerEvents;
 
 use Generate\ConfigEnum;
 use ReflectionException;
+use Swlib\App;
 use Swlib\DataManager\ReflectionManager;
 use Swlib\Event\EventEnum;
 use Swlib\Utils\ConsoleColor;
@@ -27,28 +28,24 @@ class OnStartEvent
         ]);
 
         // 输出可访问的地址信息
-        $reflection = ReflectionManager::getClass(ConfigEnum::class);
-        $useHttps = $reflection->hasConstant('HTTPS') && $reflection->getConstant('HTTPS');
+        $useHttps = ConfigEnum::get('HTTPS');
         $port = ConfigEnum::PORT;
         $protocol = $useHttps ? 'https' : 'http';
-        $localIP = $this->getLocalIP();
+        $localIP = App::getLocalIP();
         ConsoleColor::writeSuccessHighlight('✔ 服务器启动成功');
+
+        $toolURL = "$protocol://$localIP:$port";
+
         echo "$protocol://127.0.0.1:$port" . PHP_EOL;
-        echo "$protocol://$localIP:$port" . PHP_EOL;
-        echo "扩展 protobuf 字段工具: $protocol://127.0.0.1:$port/dev-tool/protobuf-ext-editor/index" . PHP_EOL;
+        echo $toolURL . PHP_EOL;
+
+
+        echo "扩展 protobuf 字段工具: $toolURL/dev-tool/protobuf-ext-editor/index" . PHP_EOL;
+        if (ConfigEnum::get('HTTPS')) {
+            echo "IOS HTTPS 证书安装信任: $toolURL/dev-tool/dev-ssl-cert/ios" . PHP_EOL;
+        }
 
     }
 
-    private function getLocalIP(): string
-    {
-        // 创建一个UDP socket
-        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-        // 连接到一个外部地址（这里用的是Google的公共DNS）
-        @socket_connect($socket, '8.8.8.8', 80);
-        // 获取socket连接的本机地址
-        socket_getsockname($socket, $addr);
-        socket_close($socket);
-        return $addr;
-    }
 
 }
