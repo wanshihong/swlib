@@ -5,8 +5,8 @@ namespace Swlib\Parse\Router;
 
 use ReflectionException;
 use Swlib\Event\EventEnum;
-use Swlib\Parse\Router\GenApi\ParseRouterCreateApi;
-use Swlib\Parse\Router\GenApi\ParseRouterCreateFlutterApi;
+use Swlib\Parse\Router\GenApi\FlutterApiGenerator;
+use Swlib\Parse\Router\GenApi\TsApiGenerator;
 use Swlib\Utils\File;
 use Throwable;
 
@@ -15,8 +15,6 @@ class ParseRouter
 {
 
     use ParseRouterRouter;
-    use ParseRouterCreateApi;
-    use ParseRouterCreateFlutterApi;
 
     /**
      * @throws ReflectionException
@@ -41,10 +39,16 @@ class ParseRouter
         $attributes = $this->createByPathRouter($files);
 
         // 创建 TS API
-        $this->createTsApi($attributes);
+        $tsGenerator = new TsApiGenerator();
+        if (!$tsGenerator->generate($attributes)) {
+            return; // 生成失败，终止流程
+        }
 
         // 创建 Flutter API
-        $this->createFlutterApi($attributes);
+        $flutterGenerator = new FlutterApiGenerator();
+        if (!$flutterGenerator->generate($attributes)) {
+            return; // 生成失败，终止流程
+        }
 
         $this->saveRouter();
 
