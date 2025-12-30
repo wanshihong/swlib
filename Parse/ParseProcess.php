@@ -5,8 +5,8 @@ namespace Swlib\Parse;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Process\Attribute\ProcessAttribute;
-use Swlib\Utils\ConsoleColor;
 use Swlib\Utils\DataConverter;
 use Swlib\Utils\File;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace Swlib\Parse;
+namespace Swlib\Parse\Table;
 
 use DateTime;
 use Swlib\Connect\PoolMysql;
-use Swlib\Utils\ConsoleColor;
+use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Utils\File;
 use Swlib\Utils\Log;
 use Throwable;

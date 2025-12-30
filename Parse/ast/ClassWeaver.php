@@ -15,8 +15,8 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use RuntimeException;
+use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Proxy\Interface\ProxyAttributeInterface;
-use Swlib\Utils\ConsoleColor;
 use Swlib\Utils\File;
 
 /**

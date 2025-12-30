@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Parse;
+namespace Swlib\Parse\Helper;
 
 /**
  * 字段默认值处理辅助类

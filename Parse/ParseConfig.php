@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Swlib\Parse;
 
 
-use Swlib\Utils\ConsoleColor;
+use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Utils\File;
 
 class ParseConfig

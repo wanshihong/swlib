@@ -5,9 +5,9 @@ namespace Swlib\Connect;
 
 use Generate\ConfigEnum;
 use RuntimeException;
-use Swoole\Coroutine;
-use Swlib\Utils\ConsoleColor;
+use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Utils\Log;
+use Swoole\Coroutine;
 
 /**
  * 连接池公共功能 Trait

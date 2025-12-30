@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Utils;
+namespace Swlib\Parse\Helper;
 
 use Throwable;
 

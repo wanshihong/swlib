@@ -6,7 +6,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use Swlib\Crontab\Attribute\CrontabAttribute;
-use Swlib\Utils\ConsoleColor;
+use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Utils\DataConverter;
 use Swlib\Utils\File;
 

@@ -5,7 +5,7 @@ namespace Swlib\Parse\ast;
 
 use PhpParser\ParserFactory;
 use ReflectionClass;
-use Swlib\Utils\ConsoleColor;
+use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Utils\DataConverter;
 use Swlib\Utils\File;
 use Throwable;

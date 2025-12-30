@@ -1,13 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Parse;
+namespace Swlib\Parse\Table;
 
 
 use mysqli;
 use RuntimeException;
 use Swlib\Connect\PoolMysql;
-use Swlib\Utils\ConsoleColor;
+use Swlib\Parse\Helper\ConsoleColor;
+use Swlib\Parse\Helper\FieldConflictDetector;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
 use Swoole\Database\MysqliProxy;

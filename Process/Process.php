@@ -3,7 +3,7 @@
 namespace Swlib\Process;
 
 use Generate\ProcessMap;
-use Swlib\Utils\ConsoleColor;
+use Swlib\Parse\Helper\ConsoleColor;
 use Swoole\Coroutine\System;
 
 class Process

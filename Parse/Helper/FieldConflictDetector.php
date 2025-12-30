@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Parse;
+namespace Swlib\Parse\Helper;
 
 use ReflectionClass;
 use ReflectionException;
@@ -9,9 +9,9 @@ use ReflectionMethod;
 use Swlib\Table\Trait\FuncTrait;
 use Swlib\Table\Trait\RawQueryTrait;
 use Swlib\Table\Trait\SqlTrait;
-use Swlib\Table\Trait\TableEventTrait;
-use Swlib\Table\Trait\TableDtoTrait;
 use Swlib\Table\Trait\TableDataListsTrait;
+use Swlib\Table\Trait\TableDtoTrait;
+use Swlib\Table\Trait\TableEventTrait;
 use Swlib\Utils\StringConverter;
 
 /**

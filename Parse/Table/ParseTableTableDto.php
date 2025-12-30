@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Parse;
+namespace Swlib\Parse\Table;
 
 
 use Exception;
+use Swlib\Parse\Helper\FieldDefaultValueHelper;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
 

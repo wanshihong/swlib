@@ -5,7 +5,7 @@ namespace Swlib\Parse;
 use ReflectionClass;
 use ReflectionException;
 use Swlib\Event\Attribute\Event;
-use Swlib\Utils\ConsoleColor;
+use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Utils\DataConverter;
 use Swlib\Utils\File;
 
