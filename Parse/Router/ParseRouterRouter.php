@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Parse;
+namespace Swlib\Parse\Router;
 
 use Generate\RouterPath;
 use mysqli;

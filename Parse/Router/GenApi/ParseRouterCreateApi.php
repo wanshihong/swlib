@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Parse;
+namespace Swlib\Parse\Router\GenApi;
 
 use Generate\ConfigEnum;
 use Swlib\Router\Router;

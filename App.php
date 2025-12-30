@@ -19,7 +19,7 @@ use Swlib\Parse\ParseDevTool;
 use Swlib\Parse\ParseEvent;
 use Swlib\Parse\ParseLanguage;
 use Swlib\Parse\ParseProcess;
-use Swlib\Parse\ParseRouter;
+use Swlib\Parse\Router\ParseRouter;
 use Swlib\Parse\Table\ParseTable;
 use Swlib\Parse\Table\TableBack;
 use Swlib\Process\Process;
