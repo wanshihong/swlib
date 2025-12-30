@@ -93,11 +93,11 @@ class Language
             return $redis->get($key);
         });
         if (empty($ret)) {
-            $find = PoolMysql::query("select id,$lang from `language` where `key`='$str'")->fetch_assoc();
+            $find = PoolMysql::query("select id,$lang from `language` where `zh`='$str'")->fetch_assoc();
             $time = time();
             if (empty($find)) {
-                PoolMysql::query("insert into `language` (`key`,`zh`,`use_time`) values ('$str','$str',$time)");
-                $find = PoolMysql::query("select id,$lang from `language` where `key`='$str'")->fetch_assoc();
+                PoolMysql::query("insert into `language` (`zh`,`use_time`) values ('$str',$time)");
+                $find = PoolMysql::query("select id,$lang from `language` where `zh`='$str'")->fetch_assoc();
             }
 
             $ret = $find[$lang];
