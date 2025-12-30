@@ -50,7 +50,6 @@ class ParseTableTableDto
         $this->saveStr[] = '    use TableDataListsTrait;';
         $this->saveStr[] = '    const string TABLE_CLASS = ' . $this->tableName . 'Table::class;';
         $this->createFieldGetSet();
-        $this->createFunc();
         $this->saveStr[] = '';
 
 
@@ -65,22 +64,6 @@ class ParseTableTableDto
     public static function createDir(): void
     {
         ParseTable::createDir(self::saveDir, false);
-    }
-
-
-    public function createFunc(): void
-    {
-        $this->saveStr[] = '';
-        $this->saveStr[] = '';
-        $this->saveStr[] = '    /**';
-        $this->saveStr[] = '    * @return Generator<int,static>';
-        $this->saveStr[] = '    */';
-        $this->saveStr[] = '    public function getIterator(): Generator';
-        $this->saveStr[] = '    {';
-        $this->saveStr[] = '        foreach ($this->getRows() as $index => $item) {';
-        $this->saveStr[] = '            yield $index => $item;';
-        $this->saveStr[] = '        }';
-        $this->saveStr[] = '     }';
     }
 
 

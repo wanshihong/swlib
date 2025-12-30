@@ -98,13 +98,16 @@ class ApiGeneratorHelper
      * 获取 API 方法名称
      * 规则：
      * 1. 去掉类名通用后缀（Api、Controller、Service）
-     * 2. 如果去后缀的类名以上级目录名开头，不加目录前缀；否则加目录前缀
-     * 3. 拼接方法名（首字母大写）
+     * 2. 忽略通用模块目录（Api、Apis、Controller、Controllers 等）
+     * 3. 如果去后缀的类名以上级目录名开头，不加目录前缀；否则加目录前缀
+     * 4. 拼接方法名（首字母大写）
      *
      * 示例：
      * - App\Api\Ad\AdConfigApi + lists → AdConfigLists
      * - App\Api\User\ProfileApi + update → UserProfileUpdate
      * - App\Apis\Notes\TagApi + delete → NotesTagDelete
+     * - App\Apis\Language + saveAndUse → LanguageSaveAndUse
+     * - Swlib\Controller\LanguageController + saveAndUse → LanguageSaveAndUse
      *
      * @param string $class 完整类名（含命名空间）
      * @param string $method 方法名
@@ -115,14 +118,24 @@ class ApiGeneratorHelper
         // 常见后缀列表
         $suffixes = ['Api', 'Controller', 'Service', 'Ctrl'];
 
+        // 通用模块目录（不作为前缀）
+        $ignoredDirs = ['Api', 'Apis', 'Controller', 'Controllers', 'Service', 'Services', 'App', 'Swlib', 'Ctrl'];
+
         // 分割命名空间
         $parts = explode('\\', $class);
 
         // 获取类名（最后一段）
         $className = array_pop($parts);
 
-        // 获取上级目录名（倒数第二段）
-        $parentDir = !empty($parts) ? array_pop($parts) : '';
+        // 获取有效的上级目录名（跳过通用模块目录）
+        $parentDir = '';
+        while (!empty($parts)) {
+            $dir = array_pop($parts);
+            if (!in_array($dir, $ignoredDirs, true)) {
+                $parentDir = $dir;
+                break;
+            }
+        }
 
         // 去掉类名的通用后缀
         $cleanClassName = $className;

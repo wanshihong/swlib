@@ -26,7 +26,6 @@ class ParseLanguage
     {
         // 收集
         $this->collectLanguage();
-        $this->output();
     }
 
 
@@ -107,51 +106,27 @@ class ParseLanguage
             $strings[] = $item['Field'];
         }
 
-        $keys = PoolMysql::query("select `key` FROM `language`")->fetch_all(MYSQLI_ASSOC);
-        $keys = array_column($keys, 'key');
+        $zhs = PoolMysql::query("select `zh` FROM `language`")->fetch_all(MYSQLI_ASSOC);
+        $zhs = array_column($zhs, 'zh');
 
         $saveStrings = [];
         foreach ($strings as $str) {
             $s = trim($str);
-            if (in_array($s, $keys)) {
+            if (in_array($s, $zhs)) {
                 continue;
             }
             $saveStrings[] = [
-                'key' => $s,
                 'zh' => $s,
             ];
         }
 
         if (!empty($saveStrings)) {
-            PoolMysql::query("INSERT INTO language (`key`,zh) VALUES " . implode(',', array_map(function ($item) {
-                    return "('{$item['key']}','{$item['zh']}')";
+            PoolMysql::query("INSERT INTO language (`zh`) VALUES " . implode(',', array_map(function ($item) {
+                    return "('{$item['zh']}')";
                 }, $saveStrings)));
         }
 
     }
 
-    /**
-     * @throws Throwable
-     */
-    private function output(): void
-    {
-        $all = PoolMysql::query("select * FROM `language`")->fetch_all(MYSQLI_ASSOC);
-        $lang = [];
-        foreach ($all[0] as $key => $item) {
-            if (in_array($key, ['id', 'use_time', 'key'])) {
-                continue;
-            }
-            $lang[] = $key;
-        }
-        $ret = [];
-        foreach ($all as $item) {
-            foreach ($lang as $l) {
-                $ret[$item['key']][$l] = $item[$l];
-            }
-        }
-        if ($ret) {
-            File::save(RUNTIME_DIR . '/codes/ts/language.json', json_encode($ret, JSON_UNESCAPED_UNICODE));
-        }
-    }
 
 }
