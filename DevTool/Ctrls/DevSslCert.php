@@ -5,6 +5,7 @@ namespace Swlib\DevTool\Ctrls;
 use Generate\ConfigEnum;
 use Swlib\Controller\AbstractController;
 use Swlib\Router\Router;
+use Swlib\Utils\DevSslCert as DevSslCertUtil;
 
 /**
  * 开发环境 SSL 证书下载控制器
@@ -31,8 +32,7 @@ class DevSslCert extends AbstractController
             return;
         }
 
-        $sslSaveDir = RUNTIME_DIR . 'ssl/';
-        $sslIosCertFile = $sslSaveDir . 'cert_ios.cer';
+        $sslIosCertFile = DevSslCertUtil::getIosCertFile();
 
         if (!file_exists($sslIosCertFile)) {
             $this->response->status(404);
@@ -50,7 +50,7 @@ class DevSslCert extends AbstractController
         }
 
         $this->response->header('Content-Type', 'application/x-x509-ca-cert');
-        $this->response->header('Content-Disposition', 'attachment; filename="mi_yao_bi_ji_dev_ios.cer"');
+        $this->response->header('Content-Disposition', 'attachment; filename="swlib_dev_ios.cer"');
         $this->response->header('Content-Length', (string)strlen($certContent));
         $this->response->end($certContent);
     }

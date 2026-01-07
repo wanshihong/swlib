@@ -42,7 +42,7 @@ class AdminUserManager
                 if (empty($user)) {
                     return null;
                 }
-                return $dtoReflection->newInstance()->__fromArray($user);
+                return $dtoReflection->newInstance()->fromArray($user);
             });
 
             if ($user) {
@@ -66,7 +66,7 @@ class AdminUserManager
 
             PoolRedis::call(function (Redis $redis) use ($token, $find) {
                 $key = "admin_user:$token";
-                $redis->hMSet($key, $find->__toArray());
+                $redis->hMSet($key, $find->toArray());
                 $redis->expire($key, 3600);
             });
 

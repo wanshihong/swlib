@@ -24,6 +24,7 @@ use Swlib\Parse\Table\ParseTable;
 use Swlib\Parse\Table\TableBack;
 use Swlib\Process\Process;
 use Swlib\ServerEvents\ServerEventManager;
+use Swlib\Utils\DevSslCert;
 use Swlib\Utils\File;
 use Swoole\WebSocket\Server;
 use Throwable;
@@ -76,53 +77,7 @@ class App
      */
     public function generateDevSSL(array $config): array
     {
-        // 证书文件路径
-        $sslSaveDir = RUNTIME_DIR . 'ssl/';
-        $sslCertFile = $sslSaveDir . 'cert.pem';
-        $sslKeyFile = $sslSaveDir . 'key.pem';
-        // 为 iOS 安装准备的证书文件（DER 格式，方便通过浏览器直接安装）
-        $sslIosCertFile = $sslSaveDir . 'cert_ios.cer';
-
-        // 检查证书文件是否存在
-        if (!file_exists($sslCertFile) || !file_exists($sslKeyFile)) {
-            // 确保 ssl 目录存在
-            if (!is_dir($sslSaveDir)) {
-                mkdir($sslSaveDir, 0777, true);
-            }
-
-            $localIP = App::getLocalIP();
-
-            // 生成自签名证书
-            $command = "openssl req -x509 -newkey rsa:2048 -keyout $sslKeyFile -out $sslCertFile -days 365 -nodes -subj '/CN=$localIP'";
-            exec($command, $output, $returnVar);
-
-            if ($returnVar !== 0) {
-                throw new Exception("Failed to generate SSL certificate. \n 请手动执行 \n $command");
-            }
-
-            echo "SSL certificate generated successfully.\n";
-
-            // 生成提供给 iOS 安装的 DER 格式证书文件
-            $iosCommand = "openssl x509 -in $sslCertFile -outform der -out $sslIosCertFile";
-            exec($iosCommand, $iosOutput, $iosReturnVar);
-
-            if ($iosReturnVar !== 0) {
-                throw new Exception("Failed to generate iOS SSL certificate. \n 请手动执行 \n $iosCommand");
-            }
-        } elseif (!file_exists($sslIosCertFile) && file_exists($sslCertFile)) {
-            // 如果已经存在 PEM 证书但缺少 iOS 证书文件，则根据现有证书补充生成
-            $iosCommand = "openssl x509 -in $sslCertFile -outform der -out $sslIosCertFile";
-            exec($iosCommand, $iosOutput, $iosReturnVar);
-
-            if ($iosReturnVar !== 0) {
-                throw new Exception("Failed to generate iOS SSL certificate. \n 请手动执行 \n $iosCommand");
-            }
-        }
-
-        // 配置 Swoole 服务器
-        $config['ssl_cert_file'] = $sslCertFile;
-        $config['ssl_key_file'] = $sslKeyFile;
-        return $config;
+        return DevSslCert::generateAndGetConfig($config);
     }
 
     public static function getLocalIP(): string
@@ -136,7 +91,6 @@ class App
         socket_close($socket);
         return $addr;
     }
-
 
     /**
      * 在独立进程中执行解析操作
