@@ -58,6 +58,18 @@ class LanguageController extends AbstractController
     public function saveAndUse(LanguageProto $request): Success
     {
         $zh = $request->getZh();
+
+        $msg = new Success();
+        $msg->setSuccess(true);
+        if (empty($zh)) {
+            return $msg;
+        }
+
+        // 太长了,可能是错误信息 也不必理会
+        if (strlen($zh) > 120) {
+            return $msg;
+        }
+
         $id = new LanguageTable()->where([
             LanguageTable::ZH => $zh,
         ])->selectField(LanguageTable::ID);
@@ -75,8 +87,7 @@ class LanguageController extends AbstractController
             ]);
         }
 
-        $msg = new Success();
-        $msg->setSuccess(true);
+
         return $msg;
 
     }
