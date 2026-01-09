@@ -5,20 +5,19 @@ namespace Swlib\ServerEvents;
 
 use Generate\ConfigEnum;
 use Generate\RouterPath;
-use ReflectionException;
 use Swlib\App;
 use Swlib\Event\EventEnum;
+use Swlib\Parse\Helper\AdminAccountHelper;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swoole\Server;
+use Throwable;
 
 
 class OnStartEvent
 {
     public Server $server;
 
-    /**
-     * @throws ReflectionException
-     */
+
     public function handle(Server $server): void
     {
         $this->server = $server;
@@ -50,7 +49,16 @@ class OnStartEvent
             echo "管理后台地址: $toolURL$dashboardPath" . PHP_EOL;
         }
 
+        if (!ConfigEnum::get('APP_PROD')) {
+            // 确保超级管理员存在并输出账号信息
+            try {
+                AdminAccountHelper::ensureSuperAdminExists();
+                AdminAccountHelper::displayAdminAccount();
+            } catch (Throwable $e) {
+                error_log('Failed to ensure super admin: ' . $e->getMessage());
+            }
+        } else {
+            AdminAccountHelper::delAccountFile();
+        }
     }
-
-
 }

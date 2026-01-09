@@ -220,8 +220,26 @@ class QueryWhereBuild
                 $jsonParts = [];
                 foreach ($value as $v) {
                     $jsonParts[] = "JSON_CONTAINS($field, ?, ?)";
-                    // 修复：确保正确的 JSON 编码
-                    $this->bindParams[] = strval($v);
+                    // 确保正确的 JSON 编码
+                    // 如果是字符串，使用 json_encode 确保生成有效的 JSON 格式
+                    // 如果是数组或对象，也使用 json_encode 转换
+                    if (is_string($v)) {
+                        // 字符串值会被 json_encode 自动加上双引号
+                        $jsonValue = json_encode($v, JSON_UNESCAPED_UNICODE);
+                    } elseif (is_array($v) || is_object($v)) {
+                        // 数组和对象转换为 JSON 格式
+                        $jsonValue = json_encode($v, JSON_UNESCAPED_UNICODE);
+                    } elseif (is_bool($v)) {
+                        // 布尔值转换为 JSON 格式
+                        $jsonValue = json_encode($v);
+                    } elseif (is_null($v)) {
+                        // null 转换为 JSON 格式
+                        $jsonValue = 'null';
+                    } else {
+                        // 数字等其他类型直接转换
+                        $jsonValue = json_encode($v);
+                    }
+                    $this->bindParams[] = $jsonValue;
                     $this->bindParams[] = $node;
                 }
                 return '(' . implode(' OR ', $jsonParts) . ')';

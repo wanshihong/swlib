@@ -8,11 +8,11 @@ use Generate\ConfigEnum;
 use Swlib\Connect\PoolMysql;
 use Swlib\Connect\PoolRedis;
 use Swlib\Crontab\CrontabScheduler;
+use Swlib\Parse\Admin\ParseAdminScaffold;
 use Swlib\Parse\ast\AstCompiler;
 use Swlib\Parse\ConfigValidator;
 use Swlib\Parse\CopyProtoFile;
 use Swlib\Parse\Helper\ConsoleColor;
-use Swlib\Parse\ParseAdminConfig;
 use Swlib\Parse\ParseConfig;
 use Swlib\Parse\ParseCrontab;
 use Swlib\Parse\ParseDevTool;
@@ -104,7 +104,7 @@ class App
         $parseSteps = [
             ['name' => '删除模板缓存文件', 'action' => static fn() => File::delDirectory(RUNTIME_DIR . 'twig')],
             ['name' => '删除编译文件', 'action' => static fn() => File::delDirectory(RUNTIME_DIR . 'Proxy')],
-            ['name' => '解析后台配置', 'action' => static fn() => new ParseAdminConfig()],
+            ['name' => '解析后台配置', 'action' => static fn() => new ParseAdminScaffold()],
             ['name' => '解析表格字段', 'action' => static fn() => new ParseTable()],
             ['name' => '解析开发工具路由', 'action' => static fn() => new ParseDevTool()],
             ['name' => '解析项目路由', 'action' => static fn() => new ParseRouter()],

@@ -17,7 +17,7 @@ class AdminUserManager
 {
 
     // 需要有这个权限才可以登录
-    const string DEFAULT_LOGIN_ROLE = 'ROLE_ADMIN';
+    const array DEFAULT_LOGIN_ROLE = ['ROLE_ADMIN', 'ROLE_SUPPER_ADMIN'];
 
     const string ADMIN_SESSION_KEY = 'admin_session';
 
@@ -126,10 +126,9 @@ class AdminUserManager
      */
     public static function hasShowAdminPermissions(): RedirectResponse|true
     {
-        $role = self::DEFAULT_LOGIN_ROLE;
         // 判断是否有权限
         try {
-            if (self::hasPermissions($role) === false) {
+            if (self::hasPermissions(self::DEFAULT_LOGIN_ROLE) === false) {
                 // 没有权限则重定向到无权限页面
                 return RedirectResponse::url(AdminManager::getInstance()->noAccessUrl);
             }

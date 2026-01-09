@@ -121,3 +121,36 @@ CREATE TABLE IF NOT EXISTS `admin_manager`
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_bin COMMENT ='后台管理员';
+
+
+CREATE TABLE IF NOT EXISTS `config`
+(
+    `id`          int unsigned NOT NULL AUTO_INCREMENT,
+    `key`         varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '配置key',
+    `value`       varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '配置value',
+    `desc`        varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '配置说明',
+    `is_enable`   tinyint unsigned                                              DEFAULT '1',
+    `allow_query` tinyint unsigned                                              DEFAULT '0' COMMENT '允许通过接口查询',
+    `value_type`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  DEFAULT 'txt' COMMENT '值的配置格式',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 220
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  ROW_FORMAT = DYNAMIC;
+
+CREATE TABLE IF NOT EXISTS `article`
+(
+    `id`        int unsigned NOT NULL AUTO_INCREMENT,
+    `title`     varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '标题',
+    `sub_title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '副标题',
+    `content`   longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '内容',
+    `is_enable` tinyint                                                       DEFAULT '1' COMMENT '启用',
+    `cover`     varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '封面',
+    `group_pos` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  DEFAULT '' COMMENT '分组位置标识 同一个分组位置可以一次性查询出来',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 12
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  ROW_FORMAT = DYNAMIC COMMENT ='文章信息表';

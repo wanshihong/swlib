@@ -182,7 +182,6 @@ trait SqlTrait
     protected function select(): array
     {
         $sql = $this->queryBuild->select();
-        var_dump($sql);
         $db = new Db(Db::ACTION_GET_RESULT, $sql, $this->queryBuild->bindParams, $this->debugSql, self::DATABASES);
         if ($this->cacheTime > 0) {
             $result = $db->getCacheResult($this->cacheTime, $this->cacheKey);
@@ -229,6 +228,18 @@ trait SqlTrait
         }
 
         return $res ? $res[0] : [];
+    }
+
+
+    /**
+     * @throws Throwable
+     */
+    public function dumpSql(): string
+    {
+        $sql = $this->queryBuild->select();
+        echo $sql . PHP_EOL;
+        var_dump($this->queryBuild->bindParams);
+        return $sql;
     }
 
 

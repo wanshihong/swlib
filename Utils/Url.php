@@ -2,6 +2,7 @@
 
 namespace Swlib\Utils;
 
+use Generate\ConfigEnum;
 use InvalidArgumentException;
 use Swlib\Enum\CtxEnum;
 use Swlib\Router\Router;
@@ -126,7 +127,7 @@ class Url
         }
 
         $request = CtxEnum::Request->get();
-        
+
         // 1. query 模式：完全复刻旧逻辑，保证兼容
         if ($mode === self::MODE_QUERY) {
             $pathInfo = $request->server['path_info'] ?? '';
@@ -145,7 +146,7 @@ class Url
                 // 去除可能存在的 query（保险处理）
                 $uriPath = explode('?', $uri, 2)[0];
                 try {
-                    [$routeConfig, $baseUri, ] = Router::parse($uriPath);
+                    [$routeConfig, $baseUri,] = Router::parse($uriPath);
                     if ($routeConfig !== null && $baseUri !== null && $baseUri !== '') {
                         $baseSegments = explode('/', $baseUri);
                     }
@@ -173,6 +174,7 @@ class Url
 
         return '/' . implode('/', $baseSegments);
     }
+
     /**
      * 将参数数组编码为 PathInfo 形式并拼接到基础路径后
      *
@@ -210,6 +212,14 @@ class Url
         }
 
         return $basePath;
+    }
+
+    public static function isAdmin(string $uri): bool
+    {
+        // 后台的路由不记录
+        $adminNamespace = ConfigEnum::get('ADMIN_NAMESPACE');
+        $adminNamespace = StringConverter::camelCaseToUnderscore($adminNamespace, '-');
+        return array_any(explode('\\', $adminNamespace), fn($value) => str_starts_with(ltrim($uri, '/'), $value));
     }
 
 }

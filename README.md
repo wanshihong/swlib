@@ -1098,7 +1098,7 @@ class Dashboard extends \Swlib\Admin\Controller\Dashboard
 
 namespace App\AdminXsom756;
 
-class Login extends \Swlib\Admin\Controller\Login
+class Login extends \Swlib\Admin\Controller\LoginAdmin
 {
     // 继承基础 Login 类即可
     // 包含登录、注册、修改密码、退出登录等功能
@@ -1119,9 +1119,9 @@ class Login extends \Swlib\Admin\Controller\Login
 ```php
 <?php
 
-namespace App\AdminXsom756\User;
+namespace App\AdminXsom756\Controller\User;
 
-use App\AdminXsom756\AdminConfig;use Generate\Models\Wenyuehui\UserModel;use Generate\Tables\Wenyuehui\UserTable;use Generate\TablesDto\Wenyuehui\UserTableDto;use Swlib\Admin\Config\PageConfig;use Swlib\Admin\Config\PageFieldsConfig;use Swlib\Admin\Controller\Abstract\AbstractAdmin;use Swlib\Admin\Fields\HiddenField;use Swlib\Admin\Fields\Int2TimeField;use Swlib\Admin\Fields\NumberField;use Swlib\Admin\Fields\SelectField;use Swlib\Admin\Fields\TextField;use Swlib\Admin\Manager\OptionManager;use Swlib\Table\Interface\TableInterface;
+use App\AdminXsom756\Controller\AdminConfig;use Generate\Models\Wenyuehui\UserModel;use Generate\Tables\Wenyuehui\UserTable;use Generate\TablesDto\Wenyuehui\UserTableDto;use Swlib\Admin\Config\PageConfig;use Swlib\Admin\Config\PageFieldsConfig;use Swlib\Admin\Controller\Abstract\AbstractAdmin;use Swlib\Admin\Fields\HiddenField;use Swlib\Admin\Fields\Int2TimeField;use Swlib\Admin\Fields\NumberField;use Swlib\Admin\Fields\SelectField;use Swlib\Admin\Fields\TextField;use Swlib\Admin\Manager\OptionManager;use Swlib\Table\Interface\TableInterface;
 
 class UserAdmin extends AbstractAdmin
 {

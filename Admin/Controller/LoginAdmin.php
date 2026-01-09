@@ -21,7 +21,7 @@ use Swlib\Utils\Url;
 use Throwable;
 
 #[Router(middleware: AdminInitMiddleware::class)]
-class Login extends AbstractController
+class LoginAdmin extends AbstractController
 {
     /**
      * @throws Throwable

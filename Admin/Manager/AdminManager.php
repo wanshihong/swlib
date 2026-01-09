@@ -2,7 +2,7 @@
 
 namespace Swlib\Admin\Manager;
 
-use Generate\AdminConfigMap;
+use Generate\ConfigEnum;
 use Swlib\Admin\Menu\MenuGroup;
 use Swlib\DataManager\WorkerSingleton;
 use Swlib\Enum\CtxEnum;
@@ -37,11 +37,10 @@ class AdminManager extends WorkerSingleton
     protected function initialize(): void
     {
         $this->languages = Language::getLanguages();
+        $adminNamespace = ConfigEnum::get('ADMIN_NAMESPACE');
+        $className = $adminNamespace . '\AdminConfig';
 
-        $config = AdminConfigMap::Init;
-        $className = $config[0];
-        $methodName = $config[1];
-        (new $className)->$methodName($this);
+        (new $className)->Init($this);
     }
 
 
@@ -56,11 +55,9 @@ class AdminManager extends WorkerSingleton
      */
     public function getMenus(): array
     {
-        $config = AdminConfigMap::ConfigMenus;
-        $className = $config[0];
-        $methodName = $config[1];
-        $menus = (new $className)->$methodName();
-
+        $adminNamespace = ConfigEnum::get('ADMIN_NAMESPACE');
+        $className = $adminNamespace . '\AdminConfig';
+        $menus = (new $className)->configMenus();
 
         // 遍历菜单，设置选中状态
         $isSelect = false;
@@ -106,10 +103,9 @@ class AdminManager extends WorkerSingleton
      */
     public function getTitle(): string
     {
-        $config = AdminConfigMap::ConfigTitle;
-        $className = $config[0];
-        $methodName = $config[1];
-        $adminTitle = (new $className)->$methodName();
+        $adminNamespace = ConfigEnum::get('ADMIN_NAMESPACE');
+        $className = $adminNamespace . '\AdminConfig';
+        $adminTitle = (new $className)->configAdminTitle();
         return Language::get($adminTitle);
     }
 

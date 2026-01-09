@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Swlib\Parse;
 
 
-use Generate\AdminConfigMap;
+use Generate\ConfigEnum;
 use Swlib\Connect\PoolMysql;
 use Swlib\Utils\File;
 use Throwable;
@@ -52,10 +52,10 @@ class ParseLanguage
 
         // 拿到后台的标题
         if (class_exists('AdminConfigMap')) {
-            $config = AdminConfigMap::ConfigTitle;
-            $className = $config[0];
-            $methodName = $config[1];
-            $strings[] = (new $className)->$methodName();
+            $adminNamespace = ConfigEnum::get('ADMIN_NAMESPACE');
+            $className = $adminNamespace . '\AdminConfig';
+            $adminTitle = (new $className)->configAdminTitle();
+            $strings[] = $adminTitle;
         }
 
         parallel(64, function () use (&$files, &$strings) {

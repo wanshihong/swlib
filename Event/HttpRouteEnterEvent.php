@@ -10,6 +10,8 @@ use Swlib\Coroutine\Attribute\CoroutineAttribute;
 use Swlib\Event\Abstract\AbstractEvent;
 use Swlib\Event\Attribute\Event;
 use Swlib\Table\Db;
+use Swlib\Utils\StringConverter;
+use Swlib\Utils\Url;
 use Throwable;
 
 /**
@@ -44,7 +46,9 @@ class HttpRouteEnterEvent extends AbstractEvent
      */
     public function handle(array $args): void
     {
-        if (str_starts_with($args['uri'], ConfigEnum::ADMIN_ROUTER_START_PATH)) {
+
+        // 后台的路由不记录
+        if (Url::isAdmin($args['uri'])) {
             return;
         }
         // 到 task 进程去执行

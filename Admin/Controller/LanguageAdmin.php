@@ -60,7 +60,6 @@ class LanguageAdmin extends AbstractAdmin
         $reflection = Db::getTableReflection('LanguageTable');
         $fields->setFields(
             new TextField(field: $reflection->getConstant('ID'), label: "ID")->hideOnForm(),
-            new TextField(field: $reflection->getConstant('KEY'), label: '标识')->setReadonly($isEdit),
             new Int2TimeField(field: $reflection->getConstant('USE_TIME'), label: '上次使用时间')->hideOnForm(),
             new TextField(field: $reflection->getConstant('ZH'), label: '简体中文'),
             new TextField(field: $reflection->getConstant('VI'), label: '越南语')->hideOnFilter()->setRequired(false),
