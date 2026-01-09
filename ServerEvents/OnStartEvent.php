@@ -55,7 +55,9 @@ class OnStartEvent
                 AdminAccountHelper::ensureSuperAdminExists();
                 AdminAccountHelper::displayAdminAccount();
             } catch (Throwable $e) {
-                error_log('Failed to ensure super admin: ' . $e->getMessage());
+                echo '检测管理员账号失败';
+                echo $e->getMessage() . PHP_EOL;
+                echo $e->getTraceAsString() . PHP_EOL;
             }
         } else {
             AdminAccountHelper::delAccountFile();

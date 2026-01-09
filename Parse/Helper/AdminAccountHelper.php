@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Swlib\Parse\Helper;
 
-use Generate\Tables\CommonApi\AdminManagerTable;
 use Random\RandomException;
+use Swlib\Connect\PoolMysql;
 use Throwable;
 
 /**
@@ -21,23 +21,16 @@ class AdminAccountHelper
      */
     public static function ensureSuperAdminExists(): void
     {
-        try {
-            // 检查是否存在超级管理员 - 使用原生 SQL
-            $result = new AdminManagerTable()->where([
-                [AdminManagerTable::ROLES, 'json_contains', "ROLE_SUPPER_ADMIN"]
-            ])->selectOne();
-
-            if (!empty($result)) {
-                // 超级管理员已存在
-                return;
-            }
-
-            // 创建超级管理员账号
-            self::createSuperAdmin();
-        } catch (Throwable $e) {
-            // 记录错误但不中断启动
-            error_log('Failed to ensure super admin exists: ' . $e->getMessage());
+        // 检查是否存在超级管理员 - 使用原生 SQL
+        $sql = "SELECT * FROM admin_manager WHERE JSON_CONTAINS(`roles`, '[\"ROLE_SUPPER_ADMIN\"]') LIMIT 1";
+        $result = PoolMysql::query($sql)->fetch_assoc();
+        if (!empty($result)) {
+            // 超级管理员已存在
+            return;
         }
+
+        // 创建超级管理员账号
+        self::createSuperAdmin();
     }
 
     /**
@@ -56,12 +49,12 @@ class AdminAccountHelper
         // 超级管理员角色 JSON
         $roles = json_encode(['ROLE_SUPPER_ADMIN']);
 
-        // 插入数据库 - 使用 ORM 的 insert 方法
-        new AdminManagerTable()->insert([
-            AdminManagerTable::USERNAME => $username,
-            AdminManagerTable::PASSWORD => $hashedPassword,
-            AdminManagerTable::ROLES => $roles,
-        ]);
+        // 插入数据库 - 使用原生 SQL
+        $sql = "INSERT INTO admin_manager (`username`, `roles`, `password`) VALUES ('$username', '$roles', '$hashedPassword')";
+
+        PoolMysql::call(function ($mysqli) use ($sql) {
+            $mysqli->query($sql);
+        });
 
         // 保存账号密码到文件
         self::saveAdminAccountToFile($username, $plainPassword);
