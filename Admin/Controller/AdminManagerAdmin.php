@@ -2,7 +2,7 @@
 
 namespace Swlib\Admin\Controller;
 
-use Generate\Tables\CommonApi\AdminManagerTable;
+use ReflectionException;
 use Swlib\Admin\Config\PageConfig;
 use Swlib\Admin\Config\PageFieldsConfig;
 use Swlib\Admin\Controller\Abstract\AbstractAdmin;
@@ -10,15 +10,20 @@ use Swlib\Admin\Fields\CheckboxField;
 use Swlib\Admin\Fields\NumberField;
 use Swlib\Admin\Fields\TextField;
 use Swlib\Admin\Manager\OptionManager;
+use Swlib\Table\Db;
 use Throwable;
 
 
 class AdminManagerAdmin extends AbstractAdmin
 {
+    /**
+     * @throws ReflectionException
+     */
     protected function configPage(PageConfig $config): void
     {
         $config->pageName = "管理员";
-        $config->tableName = AdminManagerTable::class;
+        $reflection = Db::getTableReflection('AdminManagerTable');
+        $config->tableName = $reflection->getName();
     }
 
 
@@ -27,10 +32,11 @@ class AdminManagerAdmin extends AbstractAdmin
      */
     protected function configField(PageFieldsConfig $fields): void
     {
+        $reflection = Db::getTableReflection('AdminManagerTable');
         $fields->setFields(
-            new NumberField(field: AdminManagerTable::ID, label: 'ID')->hideOnForm(),
-            new TextField(field: AdminManagerTable::USERNAME, label: '登录账号'),
-            new CheckboxField(field: AdminManagerTable::ROLES, label: '角色')->setOptions(
+            new NumberField(field: $reflection->getConstant('ID'), label: 'ID')->hideOnForm(),
+            new TextField(field: $reflection->getConstant('USERNAME'), label: '登录账号'),
+            new CheckboxField(field: $reflection->getConstant('ROLES'), label: '角色')->setOptions(
                 new OptionManager('ROLE_ADMIN', '登录权限'),
                 new OptionManager('ROLE_SUPPER_ADMIN', '超级管理员'),
                 new OptionManager('ROLE_OPERATION', '运营'),

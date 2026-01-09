@@ -58,7 +58,7 @@ class ActionButton
         public string $template = 'action/action-alink.twig',
         public string $sourceUrl = '',
         public bool   $enable = true,
-        public array  $allowRoles = [AdminUserManager::DEFAULT_LOGIN_ROLE],
+        public array  $allowRoles = AdminUserManager::DEFAULT_LOGIN_ROLE,
         public array  $cssFiles = [],
         public array  $jsFiles = [],
     )

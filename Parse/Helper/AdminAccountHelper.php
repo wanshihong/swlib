@@ -109,7 +109,6 @@ class AdminAccountHelper
     public static function displayAdminAccount(): void
     {
         $adminAccountFile = RUNTIME_DIR . 'admin_account.txt';
-
         if (file_exists($adminAccountFile)) {
             $content = file_get_contents($adminAccountFile);
             if (!empty($content)) {

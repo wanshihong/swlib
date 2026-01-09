@@ -111,11 +111,18 @@ class AdminUserManager
             $roles = [$roles];
         }
 
+        // 平铺一下数组，防止用户传入二维数组
+        $roles = array_merge(...array_map(fn($item) => is_array($item) ? $item : [$item], $roles));
+
         $userRoles = self::getRoles();
 
         // 判断用户是否有权限
         // 需要的角色存在于用户角色中，则返回true
-        return array_any($roles, fn($role) => in_array($role, $userRoles));
+        if (array_any($userRoles, fn($userRole) => in_array($userRole, $roles))) {
+            return true;
+        }
+
+        return false;
 
     }
 
