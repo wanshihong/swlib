@@ -3,6 +3,7 @@
 namespace Swlib\Admin\Manager;
 
 use Generate\ConfigEnum;
+use Swlib\Admin\Menu\Menu;
 use Swlib\Admin\Menu\MenuGroup;
 use Swlib\DataManager\WorkerSingleton;
 use Swlib\Enum\CtxEnum;
@@ -51,7 +52,7 @@ class AdminManager extends WorkerSingleton
 
     /**
      * 获取当前的菜单
-     * @return MenuGroup[]
+     * @return MenuGroup[]|Menu[]
      */
     public function getMenus(): array
     {
@@ -61,10 +62,10 @@ class AdminManager extends WorkerSingleton
 
         // 遍历菜单，设置选中状态
         $isSelect = false;
-        /** @var MenuGroup $menuGroup */
-        foreach ($menus as $menuGroup) {
-            $menuGroup->checkActive();
-            if ($menuGroup->isActive) {
+        /** @var MenuGroup|Menu $menu */
+        foreach ($menus as $menu) {
+            $menu->checkActive();
+            if ($menu->isActive) {
                 $isSelect = true;
                 break;
             }
@@ -73,13 +74,13 @@ class AdminManager extends WorkerSingleton
         if ($isSelect === false) {
             // 查找activeMatchWeight数值最小的菜单并设置为选中
             $minWeight = null;
-            $activeMenuGroup = null;
+            $activeMenu = null;
 
-            foreach ($menus as $menuGroup) {
-                $weight = $menuGroup->activeMatchWeight;
+            foreach ($menus as $menu) {
+                $weight = $menu->activeMatchWeight;
                 if ($minWeight === null || $weight < $minWeight) {
                     $minWeight = $weight;
-                    $activeMenuGroup = $menuGroup;
+                    $activeMenu = $menu;
 
                     // 如果是完全匹配（checkActiveByFull选中的），直接选择，不需要继续遍历
                     if ($weight === 1) {
@@ -89,8 +90,8 @@ class AdminManager extends WorkerSingleton
             }
 
             // 设置最小权重的菜单为选中状态
-            if ($activeMenuGroup !== null) {
-                $activeMenuGroup->isActive = true;
+            if ($activeMenu !== null) {
+                $activeMenu->isActive = true;
             }
 
         }

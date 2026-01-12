@@ -16,6 +16,8 @@ class Menu implements PermissionInterface
 
     public bool $isActive = false;
 
+    public int $activeMatchWeight = 999;
+
     /**
      * @throws Throwable
      */
@@ -28,6 +30,29 @@ class Menu implements PermissionInterface
     {
         $this->label = Language::get($label);
         $this->url = Url::appendQueryParams($url, $params);
+    }
+
+    public function checkActive(): void
+    {
+        $this->isActive = false;
+        $this->activeMatchWeight = 999;
+
+        $this->checkActiveByFull();
+        if ($this->isActive) {
+            $this->activeMatchWeight = 1;
+            return;
+        }
+
+        $this->checkActiveByPathParams();
+        if ($this->isActive) {
+            $this->activeMatchWeight = 2;
+            return;
+        }
+
+        $this->checkActiveByPath();
+        if ($this->isActive) {
+            $this->activeMatchWeight = 3;
+        }
     }
 
 
@@ -102,4 +127,3 @@ class Menu implements PermissionInterface
 
 
 }
-
