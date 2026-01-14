@@ -117,8 +117,8 @@ class ParseTableCRUD
         $this->saveStr[] = '    #[Router(errorTitle: \'获取' . $this->tableComment . '列表数据失败\')]';
         $this->saveStr[] = '    public function lists(' . $this->tableName . 'Proto $request): ' . $this->tableName . 'ListsProto';
         $this->saveStr[] = '    {';
-        $this->saveStr[] = '        $pageNumber = $request->getExt()?->getPage() ?: 1;';
-        $this->saveStr[] = '        $pageSize = $request->getExt()?->getSize() ?: 10;';
+        $this->saveStr[] = '        $pageNumber = $request->getPageNumber() ?: 1;';
+        $this->saveStr[] = '        $pageSize = $request->getPageSize() ?: 10;';
         $this->saveStr[] = '';
         $this->saveStr[] = '        $where = [];';
         $this->saveStr[] = '        $order = [' . $this->tableName . 'Table::PRI_KEY=>"desc"];';

@@ -32,7 +32,7 @@ class ParseTableAdmin
         $this->saveStr[] = "use Generate\Tables\\$this->database\\{$this->tableName}Table;";
         $this->saveStr[] = 'use Swlib\Admin\Config\PageConfig;';
         $this->saveStr[] = 'use Swlib\Admin\Config\PageFieldsConfig;';
-        $this->saveStr[] = 'use Swlib\Admin\Controller\AbstractAdmin;';
+        $this->saveStr[] = 'use Swlib\Admin\Controller\Abstract\AbstractAdmin;';
         $this->saveStr[] = 'use Swlib\Admin\Fields\Int2TimeField;';
         $this->saveStr[] = 'use Swlib\Admin\Fields\NumberField;';
         $this->saveStr[] = 'use Swlib\Admin\Fields\SelectField;';
