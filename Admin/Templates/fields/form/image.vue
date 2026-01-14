@@ -37,6 +37,7 @@
         <div class="invalid-feedback">
           请上传[[ config.label ]]
         </div>
+        <div class="form-text" v-if="config.helpText" v-html="config.helpText"></div>
     </div>
 
 </div>

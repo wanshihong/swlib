@@ -21,6 +21,10 @@
             </div>
         {% endfor %}
 
+        {% if field.helpText %}
+            <div class="form-text">{{ field.helpText|raw }}</div>
+        {% endif %}
+
     </div>
 
 </div>

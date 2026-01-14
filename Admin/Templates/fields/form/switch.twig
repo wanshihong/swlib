@@ -16,5 +16,8 @@
                    role="switch"
             >
         </div>
+        {% if field.helpText %}
+            <div class="form-text ms-2">{{ field.helpText|raw }}</div>
+        {% endif %}
     </div>
 </div>

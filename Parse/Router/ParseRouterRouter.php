@@ -149,19 +149,40 @@ trait ParseRouterRouter
 
 
                 // 获取方法的注解，方法的注解会覆盖类的注解
-                $attribute = $method->getAttributes(Router::class, ReflectionAttribute::IS_INSTANCEOF);
-                if (empty($attribute)) {
-                    continue;
+                $methodAttributes = $method->getAttributes(Router::class, ReflectionAttribute::IS_INSTANCEOF);
+                $isMethodLevel = !empty($methodAttributes);
+                if (!$isMethodLevel) {
+                    // 如果方法没有 Router 注解，检查类是否有 Router 注解
+                    if (!$classAttribute) {
+                        continue;  // 类和方法都没有 Router 注解，跳过
+                    }
+                    // 使用类级别的 Router 注解
+                    $attribute = clone $classAttribute;
+                } else {
+                    /** @var Router $attribute */
+                    $attribute = $methodAttributes[0]->newInstance();
                 }
-                /** @var Router $attribute */
-                $attribute = $attribute[0]->newInstance();
 
 
                 // 路由的文件地址
                 $urlPath = $this->getUrlPath($file, $method->name);
+                $urlPathForConst = $urlPath;
 
                 // 用户访问的 URL
-                $url = $attribute->url ?: $this->formatUrlPath($urlPath);
+                if ($isMethodLevel) {
+                    $url = $attribute->url ?: $this->formatUrlPath($urlPath);
+                } else {
+                    $baseUrl = trim($attribute->url ?: '', '/');
+                    if ($baseUrl !== '') {
+                        $url = $baseUrl . '/' . $this->formatUrlPath($method->name);
+                        $urlPathForConst = $this->getUrlPath($file, '') . '/' . $method->name;
+                    } else {
+                        $classUrlPath = $this->getUrlPath($file, '');
+                        $composedPath = trim($classUrlPath . '/' . $method->name, '/');
+                        $url = $this->formatUrlPath($composedPath);
+                        $urlPathForConst = $composedPath;
+                    }
+                }
                 $url = ltrim($url, '/');
 
                 if (in_array($url, $urls)) {
@@ -183,7 +204,10 @@ trait ParseRouterRouter
                 $paramRequests = $method->getParameters();
                 if ($paramRequests) {
                     $paramRequest = $paramRequests[0];
-                    $request = $paramRequest->getType()->getName();
+                    $request = $paramRequest->getType()?->getName();
+                    if (empty($request)) {
+                        $request = '';
+                    }
                 }
 
 
@@ -220,7 +244,8 @@ trait ParseRouterRouter
 
                 }
 
-                $constKey = StringConverter::underscoreToCamelCase($urlPath, '/');
+
+                $constKey = StringConverter::underscoreToCamelCase($urlPathForConst, '/');
                 $constStr .= "    const string $constKey = '/$url';" . PHP_EOL;
                 $mapStr .= $this->generateItem($constKey, $file, $method->name, $request, $cache, $allowMethod, $middleware);
             }

@@ -15,5 +15,8 @@
         <div class="invalid-feedback">
             {{ lang('请输入') }}{{ field.label }}
         </div>
+        {% if field.helpText %}
+            <div class="form-text">{{ field.helpText|raw }}</div>
+        {% endif %}
     </div>
 </div>

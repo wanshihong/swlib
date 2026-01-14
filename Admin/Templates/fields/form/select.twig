@@ -45,6 +45,9 @@
         <div class="invalid-feedback">
             请选择{{ field.label }}
         </div>
+        {% if field.helpText %}
+            <div class="form-text">{{ field.helpText|raw }}</div>
+        {% endif %}
 
         {# 下拉菜单 #}
         <ul class="dropdown-menu">

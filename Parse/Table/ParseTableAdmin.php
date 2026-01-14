@@ -5,6 +5,7 @@ namespace Swlib\Parse\Table;
 
 
 use Exception;
+use Generate\ConfigEnum;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
 
@@ -25,8 +26,13 @@ class ParseTableAdmin
         $this->pathPrefix = StringConverter::getPrefixBeforeUnderscore($this->tableName);
         $this->tableName = StringConverter::underscoreToCamelCase($this->tableName);
 
+        $adminNamespace = ConfigEnum::get('ADMIN_NAMESPACE');
+        // 解析命名空间，获取目录路径
+        $parts = explode('\\', $adminNamespace);
+        $namespace = implode('\\', $parts);
+
         $this->saveStr[] = "<?php //$this->tableName";
-        $this->saveStr[] = 'namespace App\\' . $this->database . '\Admin;';
+        $this->saveStr[] = "namespace $namespace\\$this->tableName;";
         $this->saveStr[] = '';
         $this->saveStr[] = '';
         $this->saveStr[] = "use Generate\Tables\\$this->database\\{$this->tableName}Table;";

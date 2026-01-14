@@ -8,3 +8,6 @@
          {{ value|date('Y-m-d H:i:s') }}
     </span>
 {% endif %}
+{% if getCurrentAction()=='detail' and field.helpText %}
+    <div class="form-text">{{ field.helpText|raw }}</div>
+{% endif %}

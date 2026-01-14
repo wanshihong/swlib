@@ -9,3 +9,6 @@
         {{ value }}
     </span>
 {% endif %}
+{% if getCurrentAction()=='detail' and field.helpText %}
+    <div class="form-text">{{ field.helpText|raw }}</div>
+{% endif %}

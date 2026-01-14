@@ -4,6 +4,7 @@ namespace Swlib\Utils;
 
 use Generate\ConfigEnum;
 use RuntimeException;
+use Swlib\Admin\Controller\Helper\ControllerHelper;
 use Swlib\Admin\Manager\AdminManager;
 use Swlib\Admin\Manager\AdminUserManager;
 use Swlib\Table\Db;
@@ -61,6 +62,7 @@ class Twig
                 'url' => new TwigFunction('url', [Url::class, 'generateUrl']),
                 'lang' => new TwigFunction('lang', [Language::class, 'get']),
                 'getFieldAsByName' => new TwigFunction('getFieldAsByName', [Db::class, 'getFieldAsByName']),
+                'getCurrentAction' => new TwigFunction('getCurrentAction', [ControllerHelper::class, 'getCurrentAction']),
                 'adminLayout' => new TwigFunction('adminLayout', [AdminManager::class, 'getInstance']),
                 'adminUser' => new TwigFunction('adminUser', [AdminUserManager::class, 'getUser']),
                 default => null,

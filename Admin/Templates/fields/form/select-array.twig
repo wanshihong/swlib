@@ -169,4 +169,10 @@
         {% endfor %}
 
     </div>
+
+    {% if field.helpText %}
+        <div class="col-sm-10 offset-sm-2">
+            <div class="form-text">{{ field.helpText|raw }}</div>
+        </div>
+    {% endif %}
 </div>

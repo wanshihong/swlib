@@ -9,6 +9,9 @@
 </div>
 <span v-if="!paths.length" class="badge user-select-none rounded-0">未赋值</span>
 </div>
+{% if getCurrentAction()=='detail' and field.helpText %}
+    <div class="form-text mt-1">{{ field.helpText|raw }}</div>
+{% endif %}
 <script>
 pageConfig['{{ field.elemId }}'] = {{ field|json_encode|raw }}
 </script>

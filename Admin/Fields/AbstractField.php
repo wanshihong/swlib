@@ -108,6 +108,12 @@ abstract class AbstractField implements PermissionInterface
      */
     public mixed $filterRequestAfter = null;
 
+    /**
+     * 字段帮助说明
+     * @var string
+     */
+    public string $helpText = '';
+
 
     /**
      * 设置列表页面 字段值的格式化方法
@@ -222,6 +228,12 @@ abstract class AbstractField implements PermissionInterface
     public function setFilterDefault(mixed $filterDefault): AbstractField
     {
         $this->filterDefault = $filterDefault;
+        return $this;
+    }
+
+    public function setHelpText(string $helpText): static
+    {
+        $this->helpText = $helpText;
         return $this;
     }
 

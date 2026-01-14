@@ -159,6 +159,37 @@ trait SqlTrait
     }
 
     /**
+     * 添加表连接
+     *
+     * @param string $table 要连接的表名
+     * @param string $field 当前表的连接字段
+     * @param string $field2 要连接表的连接字段
+     * @param string $alias 表别名，如果为空则使用表名 , 如果自己关联自己查询,则需要定义表别名; 然后查询的字段,使用表别名.数据库字段名称
+     * @return static 返回当前实例以支持链式调用
+     */
+    public function leftJoin(string $table, string $field, string $field2, string $alias = ''): static
+    {
+        $this->queryBuild->join($table, $field, $field2, JoinEnum::LEFT, $alias);
+        return $this;
+    }
+
+
+    /**
+     * 添加表连接
+     *
+     * @param string $table 要连接的表名
+     * @param string $field 当前表的连接字段
+     * @param string $field2 要连接表的连接字段
+     * @param string $alias 表别名，如果为空则使用表名 , 如果自己关联自己查询,则需要定义表别名; 然后查询的字段,使用表别名.数据库字段名称
+     * @return static 返回当前实例以支持链式调用
+     */
+    public function rightJoin(string $table, string $field, string $field2, string $alias = ''): static
+    {
+        $this->queryBuild->join($table, $field, $field2, JoinEnum::RIGHT, $alias);
+        return $this;
+    }
+
+    /**
      * 设置GROUP BY分组
      *
      * @param string|Expression $field 分组字段名
