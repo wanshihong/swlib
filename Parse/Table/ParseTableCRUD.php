@@ -29,7 +29,7 @@ class ParseTableCRUD
         $this->saveStr[] = 'namespace App\Curd\\' . $this->database . ';';
         $this->saveStr[] = '';
         $this->saveStr[] = '';
-        $this->saveStr[] = 'use Swlib\Controller\AbstractController;';
+        $this->saveStr[] = 'use Swlib\Controller\Abstract\AbstractController;';
         $this->saveStr[] = 'use Swlib\Exception\AppException;';
         $this->saveStr[] = 'use Protobuf\Common\Success;';
         $this->saveStr[] = 'use Swlib\Router\Router;';
