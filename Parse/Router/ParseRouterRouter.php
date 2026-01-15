@@ -11,7 +11,7 @@ use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
 use Swlib\Connect\PoolMysql;
-use Swlib\Controller\AbstractController;
+use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Router\Router;
 use Swlib\Router\RouterMiddleware;
@@ -114,6 +114,9 @@ trait ParseRouterRouter
             if (!$class->isSubclassOf(AbstractController::class)) {
                 continue;
             }
+            if ($class->isAbstract()) {
+                continue;
+            }
 
             $tempClass = $class;
             // 获取路由注解，这里是类的路由注解，方法的路由注解会覆盖类的注解
@@ -172,13 +175,24 @@ trait ParseRouterRouter
                 if ($isMethodLevel) {
                     $url = $attribute->url ?: $this->formatUrlPath($urlPath);
                 } else {
+                    $isDefaultRun = strtolower($method->name) === 'run';
                     $baseUrl = trim($attribute->url ?: '', '/');
                     if ($baseUrl !== '') {
-                        $url = $baseUrl . '/' . $this->formatUrlPath($method->name);
-                        $urlPathForConst = $this->getUrlPath($file, '') . '/' . $method->name;
+                        if ($isDefaultRun) {
+                            $url = $baseUrl;
+                            $urlPathForConst = $this->getUrlPath($file, '');
+                        } else {
+                            $url = $baseUrl . '/' . $this->formatUrlPath($method->name);
+                            $urlPathForConst = $this->getUrlPath($file, '') . '/' . $method->name;
+                        }
                     } else {
+
                         $classUrlPath = $this->getUrlPath($file, '');
-                        $composedPath = trim($classUrlPath . '/' . $method->name, '/');
+                        if ($isDefaultRun) {
+                            $composedPath = trim($classUrlPath, '/');
+                        } else {
+                            $composedPath = trim($classUrlPath . '/' . $method->name, '/');
+                        }
                         $url = $this->formatUrlPath($composedPath);
                         $urlPathForConst = $composedPath;
                     }
@@ -325,40 +339,45 @@ STR;
 
     private function getUrlPath(string $file, string $methodName): string
     {
-        $urlPathArr = explode('\\', $file);
+        $parts = explode('\\', ltrim($file, '\\'));
 
-        // 如果文件名称后缀是某个目录名称，则删除文件后缀
-        // App\Tools\Image\Ctrl\ImageCtrl  ->  App\Tools\Image\Ctrl\Image
-        // App\Tools\Image\Ctrl\ImageTools ->  App\Tools\Image\Ctrl\Image
-        // App\Tools\Image\Ctrl\ImageApp   ->  App\Tools\Image\Ctrl\Image
-        // 转换成
-        //
 
-        foreach ($urlPathArr as $key => $value) {
-            if ($key === 0) continue;
-            for ($i = $key - 1; $i >= 0; $i--) {
-                $dir = $urlPathArr[$i];
-                if (str_ends_with($value, $dir)) {
-                    $urlPathArr[$key] = substr($value, 0, -strlen($dir));
-                }
+        $appDir = APP_DIR;
+        $appDirArr = array_filter(explode(DIRECTORY_SEPARATOR, $appDir));
+        $appDirLast = strtolower(end($appDirArr));
+
+
+        $swlibDir = SWLIB_DIR;
+        $swlibDirArr = array_filter(explode(DIRECTORY_SEPARATOR, $swlibDir));
+        $swlibDirLast = strtolower(end($swlibDirArr));
+
+        $firstPart = strtolower($parts[0]);
+        if (!empty($parts) && ($firstPart === $appDirLast || $firstPart === $swlibDirLast)) {
+            array_shift($parts);
+        }
+
+        $parts = array_values(array_filter($parts, static function (string $part): bool {
+            return !in_array(strtolower($part), ['controller', 'ctrl'], true);
+        }));
+
+        if (!empty($parts)) {
+            $lastIndex = count($parts) - 1;
+            $original = $parts[$lastIndex];
+            $trimmed = preg_replace('/(Controller|Ctrl)$/', '', $original);
+            if (is_string($trimmed) && $trimmed !== '') {
+                $parts[$lastIndex] = $trimmed;
             }
         }
 
-
-        // 去掉 应用目录和 控制器目录
-        foreach ($urlPathArr as $key => $value) {
-            if (in_array(strtolower($value), ['app', 'ctrl', 'controller'])) {
-                unset($urlPathArr[$key]);
-            }
+        if ($methodName !== '') {
+            $parts[] = $methodName;
         }
 
-        // 添加上方法
-        $urlPathArr[] = $methodName;
+        $parts = array_values(array_filter($parts, static function (string $part): bool {
+            return $part !== '';
+        }));
 
-        // 数组去重
-        $urlPathArr = array_unique(array_filter($urlPathArr));
-
-        return implode('/', $urlPathArr);
+        return implode('/', $parts);
 
     }
 

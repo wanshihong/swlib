@@ -4,7 +4,7 @@ namespace Swlib\DevTool\Ctrls;
 
 use Exception;
 use Generate\ConfigEnum;
-use Swlib\Controller\AbstractController;
+use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Exception\AppException;
 use Swlib\Response\JsonResponse;
 use Swlib\Router\Router;

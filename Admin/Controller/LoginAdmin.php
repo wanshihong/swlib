@@ -7,7 +7,7 @@ use Swlib\Admin\Manager\AdminManager;
 use Swlib\Admin\Manager\AdminUserManager;
 use Swlib\Admin\Middleware\AdminInitMiddleware;
 use Swlib\Connect\PoolRedis;
-use Swlib\Controller\AbstractController;
+use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
 use Swlib\Response\JsonResponse;

@@ -17,11 +17,11 @@ use Swlib\Admin\Fields\SelectField;
 use Swlib\Admin\Manager\ListRowManager;
 use Swlib\Admin\Middleware\AdminInitMiddleware;
 use Swlib\Admin\Middleware\PermissionsMiddleware;
-use Swlib\Controller\AbstractController;
+use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
-use Swlib\Response\RedirectResponse;
 use Swlib\Response\JsonResponse;
+use Swlib\Response\RedirectResponse;
 use Swlib\Response\TwigResponse;
 use Swlib\Router\Router;
 use Swlib\Table\Db;
@@ -459,7 +459,7 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
         // 查询出来完整的数据,其他钩子可能会用到
         $dto = $table->addWhere($priFieldName, $priFieldValue)->selectOne();
         // 数据库的原始数据 临时存储
-        $oldTableArray = $dto->__toArray();
+        $oldTableArray = $dto->toArray();
 
 
         // 本次switch 更新的字段

@@ -5,7 +5,7 @@ namespace Swlib\Admin\Controller;
 use Swlib\Admin\Manager\AdminManager;
 use Swlib\Admin\Middleware\AdminInitMiddleware;
 use Swlib\Admin\Middleware\PermissionsMiddleware;
-use Swlib\Controller\AbstractController;
+use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Request\Request;
 use Swlib\Response\TwigResponse;
 use Swlib\Router\Router;

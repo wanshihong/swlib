@@ -4,7 +4,7 @@ namespace Swlib\DevTool\Ctrls;
 
 use Generate\ConfigEnum;
 use Swlib\Connect\PoolMysql;
-use Swlib\Controller\AbstractController;
+use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Exception\AppException;
 use Swlib\Response\TwigResponse;
 use Swlib\Router\Router;

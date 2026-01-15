@@ -841,8 +841,7 @@ SWLib 使用基于注解的路由系统，支持 RESTful API、中间件、参�
 #### 控制器定义
 
 ```php
-use Swlib\Router\Router;
-use Swlib\Controller\AbstractController;
+use Swlib\Controller\Abstract\AbstractController;use Swlib\Router\Router;
 
 #[Router(method: 'POST')]
 class UserController extends AbstractController

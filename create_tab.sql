@@ -154,3 +154,35 @@ CREATE TABLE IF NOT EXISTS `article`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci
   ROW_FORMAT = DYNAMIC COMMENT ='文章信息表';
+
+
+CREATE TABLE `images`
+(
+    `id`               bigint unsigned                                               NOT NULL AUTO_INCREMENT COMMENT '图片ID（作为API返回的标识）',
+    `original_name`    varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '原始文件名',
+    `storage_path`     varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '存储路径（相对路径）',
+    `file_name`        varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '存储的文件名（唯一）',
+    `file_size`        bigint unsigned                                               NOT NULL COMMENT '文件大小（字节）',
+    `file_ext`         varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL COMMENT '文件扩展名',
+    `mime_type`        varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL COMMENT 'MIME类型',
+    `md5_hash`         char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci     NOT NULL COMMENT '文件MD5哈希值（用于去重）',
+    `width`            int unsigned                                                           DEFAULT NULL COMMENT '图片宽度',
+    `height`           int unsigned                                                           DEFAULT NULL COMMENT '图片高度',
+    `uploader_id`      int unsigned                                                           DEFAULT NULL COMMENT '上传者ID',
+    `uploader_ip`      varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci           DEFAULT NULL COMMENT '上传者IP',
+    `upload_time`      timestamp                                                     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
+    `status`           tinyint                                                       NOT NULL DEFAULT '1' COMMENT '状态：1-正常，0-已删除',
+    `access_count`     int unsigned                                                  NOT NULL DEFAULT '0' COMMENT '访问次数统计',
+    `last_access_time` timestamp                                                     NULL     DEFAULT NULL COMMENT '最后访问时间',
+    `expire_time`      timestamp                                                     NULL     DEFAULT NULL COMMENT '过期时间（可空，为NULL则永不过期）',
+    PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE KEY `uk_file_name` (`file_name`) USING BTREE,
+    UNIQUE KEY `uk_md5_hash` (`md5_hash`) USING BTREE,
+    KEY `idx_upload_time` (`upload_time`) USING BTREE,
+    KEY `idx_last_access_time` (`last_access_time`) USING BTREE,
+    KEY `idx_status` (`status`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 14
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci
+  ROW_FORMAT = DYNAMIC COMMENT ='图片存储主表';

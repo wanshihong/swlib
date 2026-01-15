@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Controller;
+namespace Swlib\Controller\Abstract;
 
 use Swlib\Enum\CtxEnum;
 use Swlib\Exception\AppException;

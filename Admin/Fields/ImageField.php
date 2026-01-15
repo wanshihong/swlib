@@ -2,6 +2,7 @@
 
 namespace Swlib\Admin\Fields;
 
+use Generate\RouterPath;
 use Swlib\Admin\Manager\AdminManager;
 
 class ImageField extends AbstractField
@@ -22,7 +23,11 @@ class ImageField extends AbstractField
     public function __construct(string $field, string $label)
     {
         parent::__construct($field, $label);
-        $this->url = AdminManager::getInstance()->uploadUrl;
+        $uploadUrl = AdminManager::getInstance()->uploadUrl;
+        if (empty($uploadUrl)) {
+            $uploadUrl = RouterPath::FileUpload;
+        }
+        $this->url = $uploadUrl;
         $this->addJsFile('/admin/js/field-image.js');
         $this->addCssFile('/admin/css/field-image.css');
         $this->hideOnFilter();

@@ -3,7 +3,7 @@
 namespace Swlib\DevTool\Ctrls;
 
 use Generate\ConfigEnum;
-use Swlib\Controller\AbstractController;
+use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Router\Router;
 use Swlib\Utils\DevSslCert as DevSslCertUtil;
 

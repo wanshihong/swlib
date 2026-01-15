@@ -96,18 +96,11 @@ class ApiGeneratorHelper
 
     /**
      * 获取 API 方法名称
-     * 规则：
-     * 1. 去掉类名通用后缀（Api、Controller、Service）
-     * 2. 忽略通用模块目录（Api、Apis、Controller、Controllers 等）
-     * 3. 如果去后缀的类名以上级目录名开头，不加目录前缀；否则加目录前缀
-     * 4. 拼接方法名（首字母大写）
-     *
-     * 示例：
-     * - App\Api\Ad\AdConfigApi + lists → AdConfigLists
-     * - App\Api\User\ProfileApi + update → UserProfileUpdate
-     * - App\Apis\Notes\TagApi + delete → NotesTagDelete
-     * - App\Apis\Language + saveAndUse → LanguageSaveAndUse
-     * - Swlib\Controller\LanguageController + saveAndUse → LanguageSaveAndUse
+     * 规则（参考 ParseRouterRouter::getUrlPath）：
+     * 1. 去掉顶层命名空间（App/Swlib）
+     * 2. 移除通用目录段（Controller/Ctrl）
+     * 3. 仅移除末段类名的 Controller/Ctrl 后缀
+     * 4. 将剩余各段 + 方法名拼成大驼峰
      *
      * @param string $class 完整类名（含命名空间）
      * @param string $method 方法名
@@ -115,56 +108,48 @@ class ApiGeneratorHelper
      */
     public static function getApiMethodName(string $class, string $method): string
     {
-        // 常见后缀列表
-        $suffixes = ['Api', 'Controller', 'Service', 'Ctrl'];
+        $parts = explode('\\', ltrim($class, '\\'));
 
-        // 通用模块目录（不作为前缀）
-        $ignoredDirs = ['Api', 'Apis', 'Controller', 'Controllers', 'Service', 'Services', 'App', 'Swlib', 'Ctrl'];
+        $appRoot = defined('APP_DIR') ? strtolower(basename(rtrim(APP_DIR, DIRECTORY_SEPARATOR))) : 'app';
+        $swlibRoot = defined('SWLIB_DIR') ? strtolower(basename(rtrim(SWLIB_DIR, DIRECTORY_SEPARATOR))) : 'swlib';
 
-        // 分割命名空间
-        $parts = explode('\\', $class);
+        $firstPart = strtolower($parts[0] ?? '');
+        if ($firstPart !== '' && ($firstPart === $appRoot || $firstPart === $swlibRoot)) {
+            array_shift($parts);
+        }
 
-        // 获取类名（最后一段）
-        $className = array_pop($parts);
+        $parts = array_values(array_filter($parts, static function (string $part): bool {
+            return !in_array(strtolower($part), ['controller', 'controllers', 'ctrl', 'api', 'apis'], true);
+        }));
 
-        // 获取有效的上级目录名（跳过通用模块目录）
-        $parentDir = '';
-        while (!empty($parts)) {
-            $dir = array_pop($parts);
-            if (!in_array($dir, $ignoredDirs, true)) {
-                $parentDir = $dir;
-                break;
+        if (!empty($parts)) {
+            $lastIndex = count($parts) - 1;
+            $original = $parts[$lastIndex];
+            $trimmed = preg_replace('/(Controller|Ctrl)$/', '', $original);
+            if (is_string($trimmed) && $trimmed !== '') {
+                $parts[$lastIndex] = $trimmed;
             }
         }
 
-        // 去掉类名的通用后缀
-        $cleanClassName = $className;
-        foreach ($suffixes as $suffix) {
-            if (str_ends_with($cleanClassName, $suffix)) {
-                $cleanClassName = substr($cleanClassName, 0, -strlen($suffix));
-                break; // 只去掉一个后缀
-            }
+        $methodSegment = trim($method);
+        if ($methodSegment !== '') {
+            $parts[] = $methodSegment;
         }
 
-        // 判断是否需要加目录前缀
-        // 如果类名以上级目录名开头（不区分大小写），则不加前缀
-        $needPrefix = true;
-        if (!empty($parentDir) && !empty($cleanClassName)) {
-            if (stripos($cleanClassName, $parentDir) === 0) {
-                $needPrefix = false;
-            }
+        $parts = array_values(array_filter($parts, static fn(string $part): bool => $part !== ''));
+        if (empty($parts)) {
+            return StringConverter::underscoreToCamelCase($method, '_', true);
         }
 
-        // 构建结果
         $result = '';
-        if ($needPrefix && !empty($parentDir)) {
-            $result .= $parentDir;
+        foreach ($parts as $segment) {
+            $segment = str_replace(['-', '.'], '_', $segment);
+            if (str_contains($segment, '_')) {
+                $result .= StringConverter::underscoreToCamelCase($segment, '_', true);
+            } else {
+                $result .= ucfirst($segment);
+            }
         }
-        $result .= $cleanClassName;
-
-        // 拼接方法名（转换为大驼峰）
-        $methodName = StringConverter::underscoreToCamelCase($method);
-        $result .= ucfirst($methodName);
 
         return $result;
     }
@@ -192,4 +177,3 @@ class ApiGeneratorHelper
         return date('Y-m-d H:i:s');
     }
 }
-
