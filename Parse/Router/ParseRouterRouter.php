@@ -190,6 +190,7 @@ trait ParseRouterRouter
 
                 if (str_ends_with($url, '/run')) {
                     $url = substr($url, 0, -4);
+                    $urlPathForConst = substr($urlPathForConst, 0, -3);
                 }
 
                 if (in_array($url, $urls)) {
