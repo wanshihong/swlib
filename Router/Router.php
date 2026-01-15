@@ -45,7 +45,7 @@ class Router
      */
     public function __construct(
         // 允许请求的类型，  GET  POST   ["GET","POST"]  WS  WSS
-        public string|array $method = '',
+        public string|array $method = ["GET","POST"],
 
         // 用户访问的 URL ， 默认是自动根据目录生成
         public string       $url = '',

@@ -175,29 +175,22 @@ trait ParseRouterRouter
                 if ($isMethodLevel) {
                     $url = $attribute->url ?: $this->formatUrlPath($urlPath);
                 } else {
-                    $isDefaultRun = strtolower($method->name) === 'run';
                     $baseUrl = trim($attribute->url ?: '', '/');
                     if ($baseUrl !== '') {
-                        if ($isDefaultRun) {
-                            $url = $baseUrl;
-                            $urlPathForConst = $this->getUrlPath($file, '');
-                        } else {
-                            $url = $baseUrl . '/' . $this->formatUrlPath($method->name);
-                            $urlPathForConst = $this->getUrlPath($file, '') . '/' . $method->name;
-                        }
+                        $url = $baseUrl . '/' . $this->formatUrlPath($method->name);
+                        $urlPathForConst = $this->getUrlPath($file, '') . '/' . $method->name;
                     } else {
-
                         $classUrlPath = $this->getUrlPath($file, '');
-                        if ($isDefaultRun) {
-                            $composedPath = trim($classUrlPath, '/');
-                        } else {
-                            $composedPath = trim($classUrlPath . '/' . $method->name, '/');
-                        }
+                        $composedPath = trim($classUrlPath . '/' . $method->name, '/');
                         $url = $this->formatUrlPath($composedPath);
                         $urlPathForConst = $composedPath;
                     }
                 }
                 $url = ltrim($url, '/');
+
+                if (str_ends_with($url, '/run')) {
+                    $url = substr($url, 0, -4);
+                }
 
                 if (in_array($url, $urls)) {
                     ConsoleColor::writeErrorHighlight("路由地址重复：$url  on file: $file->$method->name" . PHP_EOL);

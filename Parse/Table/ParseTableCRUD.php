@@ -13,45 +13,16 @@ class ParseTableCRUD
 
     const string saveDir = RUNTIME_DIR . "codes/crud/";
 
-    private array $saveStr = [];
-    private string $pathPrefix;
 
     /**
      * @throws Exception
      */
     public function __construct(public $database, public string $tableName, public array $fields, public string $tableComment)
     {
-
-        $this->pathPrefix = StringConverter::getPrefixBeforeUnderscore($this->tableName);
-        $this->tableName = StringConverter::underscoreToCamelCase($this->tableName);
-
-        $this->saveStr[] = "<?php //$tableName";
-        $this->saveStr[] = 'namespace App\Curd\\' . $this->database . ';';
-        $this->saveStr[] = '';
-        $this->saveStr[] = '';
-        $this->saveStr[] = 'use Swlib\Controller\Abstract\AbstractController;';
-        $this->saveStr[] = 'use Swlib\Exception\AppException;';
-        $this->saveStr[] = 'use Protobuf\Common\Success;';
-        $this->saveStr[] = 'use Swlib\Router\Router;';
-        $this->saveStr[] = "use Generate\Models\\$this->database\\{$this->tableName}Model;";
-        $this->saveStr[] = "use Generate\Tables\\$database\\{$this->tableName}Table;";
-        $this->saveStr[] = 'use Protobuf\\' . $this->database . '\\' . $this->tableName . '\\' . $this->tableName . 'Proto;';
-        $this->saveStr[] = 'use Protobuf\\' . $this->database . '\\' . $this->tableName . '\\' . $this->tableName . 'ListsProto;';
-        $this->saveStr[] = 'use Throwable;';
-        $this->saveStr[] = '';
-        $this->saveStr[] = '';
-        $this->saveStr[] = "/*";
-        $this->saveStr[] = "* $tableComment";
-        $this->saveStr[] = "*/";
-        $this->saveStr[] = '#[Router(method: \'POST\')]';
-        $this->saveStr[] = "class {$this->tableName}Api extends AbstractController{\n";
-
-
-        $this->createSave();
-        $this->createLists();
-        $this->createDetail();
-        $this->createRemove();
-
+        $this->saveFile('Save', $this->createSave());
+        $this->saveFile('Lists', $this->createLists());
+        $this->saveFile('Detail', $this->createDetail());
+        $this->saveFile('Remove', $this->createRemove());
     }
 
     public static function createDir(): void
@@ -59,27 +30,56 @@ class ParseTableCRUD
         ParseTable::createDir(self::saveDir, false);
     }
 
-    public function __destruct()
+    public function saveFile($actionName, array $ctx): void
     {
-        $this->saveStr[] = '}';
-        $file = self::saveDir . "$this->database/$this->pathPrefix/{$this->tableName}Api.php";
-        File::save($file, implode(PHP_EOL, $this->saveStr));
+
+        $this->tableName = StringConverter::underscoreToCamelCase($this->tableName);
+
+        $saveStr[] = "<?php //$this->tableName";
+        $saveStr[] = 'namespace App\Curd\\' . $this->database . ';';
+        $saveStr[] = '';
+        $saveStr[] = '';
+        $saveStr[] = 'use Swlib\Controller\Abstract\AbstractController;';
+        $saveStr[] = 'use Swlib\Exception\AppException;';
+        $saveStr[] = 'use Protobuf\Common\Success;';
+        $saveStr[] = 'use Swlib\Router\Router;';
+        $saveStr[] = "use Generate\Models\\$this->database\\{$this->tableName}Model;";
+        $saveStr[] = "use Generate\Tables\\$this->database\\{$this->tableName}Table;";
+        $saveStr[] = 'use Protobuf\\' . $this->database . '\\' . $this->tableName . '\\' . $this->tableName . 'Proto;';
+        $saveStr[] = 'use Protobuf\\' . $this->database . '\\' . $this->tableName . '\\' . $this->tableName . 'ListsProto;';
+        $saveStr[] = 'use Throwable;';
+        $saveStr[] = '';
+        $saveStr[] = '';
+        $saveStr[] = "/*";
+        $saveStr[] = "* $this->tableComment";
+        $saveStr[] = "*/";
+        $saveStr[] = '#[Router(method: \'POST\')]';
+        $saveStr[] = "class {$this->tableName}Api extends AbstractController{\n";
+
+        foreach ($ctx as $ctxItem) {
+            $saveStr[] = $ctxItem;
+        }
+
+        $saveStr[] = '}';
+
+        $file = self::saveDir . "$this->database/$this->tableName/$actionName.php";
+        File::save($file, implode(PHP_EOL, $saveStr));
     }
 
 
-    private function createSave(): void
+    private function createSave(): array
     {
 
-        $this->saveStr[] = '';
-        $this->saveStr[] = '    /**';
-        $this->saveStr[] = '    /* 更新和创建';
-        $this->saveStr[] = '    * @throws Throwable';
-        $this->saveStr[] = '    */';
-        $this->saveStr[] = '    #[Router(errorTitle: \'保存' . $this->tableComment . '失败\')]';
-        $this->saveStr[] = '    public function save(' . $this->tableName . 'Proto $request): Success';
-        $this->saveStr[] = '    {';
-        $this->saveStr[] = '        $dto = ' . $this->tableName . 'Model::request($request);';
-        $this->saveStr[] = '';
+        $saveStr[] = '';
+        $saveStr[] = '    /**';
+        $saveStr[] = '    /* 更新和创建';
+        $saveStr[] = '    * @throws Throwable';
+        $saveStr[] = '    */';
+        $saveStr[] = '    #[Router(errorTitle: \'保存' . $this->tableComment . '失败\')]';
+        $saveStr[] = '    public function run(' . $this->tableName . 'Proto $request): Success';
+        $saveStr[] = '    {';
+        $saveStr[] = '        $dto = ' . $this->tableName . 'Model::request($request);';
+        $saveStr[] = '';
         foreach ($this->fields as $item) {
             $field = $item['Field'];
             if ($field === 'id') {
@@ -92,108 +92,112 @@ class ParseTableCRUD
 
             $fieldName = StringConverter::underscoreToCamelCase($field);
             $lcFieldName = lcfirst($fieldName);
-            $this->saveStr[] = "        if (empty(\$dto->$lcFieldName)){";
-            $this->saveStr[] = '            throw new AppException(\'请输入' . ($comment ?: $lcFieldName) . '\');';
-            $this->saveStr[] = '        }';
+            $saveStr[] = "        if (empty(\$dto->$lcFieldName)){";
+            $saveStr[] = '            throw new AppException(\'请输入' . ($comment ?: $lcFieldName) . '\');';
+            $saveStr[] = '        }';
         }
-        $this->saveStr[] = '';
-        $this->saveStr[] = "        \$res = \$dto->save();";
-        $this->saveStr[] = '';
-        $this->saveStr[] = '        $msg = new Success();';
-        $this->saveStr[] = '        $msg->setSuccess((bool)$res);';
-        $this->saveStr[] = '        return $msg;';
-        $this->saveStr[] = '    }';
+        $saveStr[] = '';
+        $saveStr[] = "        \$res = \$dto->save();";
+        $saveStr[] = '';
+        $saveStr[] = '        $msg = new Success();';
+        $saveStr[] = '        $msg->setSuccess((bool)$res);';
+        $saveStr[] = '        return $msg;';
+        $saveStr[] = '    }';
+        return $saveStr;
 
     }
 
 
-    private function createLists(): void
+    private function createLists(): array
     {
-        $this->saveStr[] = '';
-        $this->saveStr[] = '    /**';
-        $this->saveStr[] = '    /* 查询列表';
-        $this->saveStr[] = '    * @throws Throwable';
-        $this->saveStr[] = '    */';
-        $this->saveStr[] = '    #[Router(errorTitle: \'获取' . $this->tableComment . '列表数据失败\')]';
-        $this->saveStr[] = '    public function lists(' . $this->tableName . 'Proto $request): ' . $this->tableName . 'ListsProto';
-        $this->saveStr[] = '    {';
-        $this->saveStr[] = '        $pageNumber = $request->getPageNumber() ?: 1;';
-        $this->saveStr[] = '        $pageSize = $request->getPageSize() ?: 10;';
-        $this->saveStr[] = '';
-        $this->saveStr[] = '        $where = [];';
-        $this->saveStr[] = '        $order = [' . $this->tableName . 'Table::PRI_KEY=>"desc"];';
-        $this->saveStr[] = '        $' . lcfirst($this->tableName) . 'Table = new ' . $this->tableName . 'Table();';
-        $this->saveStr[] = '        $dto = $' . lcfirst($this->tableName) . 'Table->order($order)->where($where)->page($pageNumber, $pageSize)->selectAll();';
-        $this->saveStr[] = '        $total = $' . lcfirst($this->tableName) . 'Table->where($where)->count();';
-        $this->saveStr[] = '        $totalPage = (int)ceil($total / $pageSize);;';
-        $this->saveStr[] = '';
-        $this->saveStr[] = '        $protoLists = [];';
+        $saveStr[] = '';
+        $saveStr[] = '    /**';
+        $saveStr[] = '    /* 查询列表';
+        $saveStr[] = '    * @throws Throwable';
+        $saveStr[] = '    */';
+        $saveStr[] = '    #[Router(errorTitle: \'获取' . $this->tableComment . '列表数据失败\')]';
+        $saveStr[] = '    public function run(' . $this->tableName . 'Proto $request): ' . $this->tableName . 'ListsProto';
+        $saveStr[] = '    {';
+        $saveStr[] = '        $pageNumber = $request->getPageNumber() ?: 1;';
+        $saveStr[] = '        $pageSize = $request->getPageSize() ?: 10;';
+        $saveStr[] = '';
+        $saveStr[] = '        $where = [];';
+        $saveStr[] = '        $order = [' . $this->tableName . 'Table::PRI_KEY=>"desc"];';
+        $saveStr[] = '        $' . lcfirst($this->tableName) . 'Table = new ' . $this->tableName . 'Table();';
+        $saveStr[] = '        $dto = $' . lcfirst($this->tableName) . 'Table->order($order)->where($where)->page($pageNumber, $pageSize)->selectAll();';
+        $saveStr[] = '        $total = $' . lcfirst($this->tableName) . 'Table->where($where)->count();';
+        $saveStr[] = '        $totalPage = (int)ceil($total / $pageSize);;';
+        $saveStr[] = '';
+        $saveStr[] = '        $protoLists = [];';
         $name = '$' . lcfirst($this->tableName) . 'Dto';
-        $this->saveStr[] = "        foreach (\$dto as $name) {";
-        $this->saveStr[] = "            \$proto = {$this->tableName}Model::formatItem($name);";
-        $this->saveStr[] = '            // 其他自定义字段格式化';
-        $this->saveStr[] = '            $protoLists[] = $proto;';
-        $this->saveStr[] = '        }';
-        $this->saveStr[] = '';
-        $this->saveStr[] = '        $ret = new ' . $this->tableName . 'ListsProto();';
-        $this->saveStr[] = '        $ret->setTotal($total);';
-        $this->saveStr[] = '        $ret->setTotal($total);';
-        $this->saveStr[] = '        $ret->setCurrPage($pageNumber);';
-        $this->saveStr[] = '        $ret->setTotalPage($totalPage);';
-        $this->saveStr[] = '        $ret->setLists($protoLists);';
-        $this->saveStr[] = '        return $ret;';
-        $this->saveStr[] = '    }';
+        $saveStr[] = "        foreach (\$dto as $name) {";
+        $saveStr[] = "            \$proto = {$this->tableName}Model::formatItem($name);";
+        $saveStr[] = '            // 其他自定义字段格式化';
+        $saveStr[] = '            $protoLists[] = $proto;';
+        $saveStr[] = '        }';
+        $saveStr[] = '';
+        $saveStr[] = '        $ret = new ' . $this->tableName . 'ListsProto();';
+        $saveStr[] = '        $ret->setTotal($total);';
+        $saveStr[] = '        $ret->setTotal($total);';
+        $saveStr[] = '        $ret->setCurrPage($pageNumber);';
+        $saveStr[] = '        $ret->setTotalPage($totalPage);';
+        $saveStr[] = '        $ret->setLists($protoLists);';
+        $saveStr[] = '        return $ret;';
+        $saveStr[] = '    }';
+        return $saveStr;
     }
 
-    private function createDetail(): void
+    private function createDetail(): array
     {
-        $this->saveStr[] = '';
-        $this->saveStr[] = '    /**';
-        $this->saveStr[] = '    /* 查询详情';
-        $this->saveStr[] = '    * @throws Throwable';
-        $this->saveStr[] = '    */';
-        $this->saveStr[] = '    #[Router(errorTitle: \'查看' . $this->tableComment . '详情失败\')]';
-        $this->saveStr[] = '    public function detail(' . $this->tableName . 'Proto $request): ' . $this->tableName . 'Proto';
-        $this->saveStr[] = '    {';
-        $this->saveStr[] = '        $id = $request->getId();';
-        $this->saveStr[] = '        if(empty($id)){';
-        $this->saveStr[] = '            throw new AppException("缺少参数");';
-        $this->saveStr[] = '        }';
-        $this->saveStr[] = '';
-        $this->saveStr[] = '        $table = new ' . $this->tableName . 'Table()->where([';
-        $this->saveStr[] = '            ' . $this->tableName . 'Table::ID=>$id,';
-        $this->saveStr[] = '        ])->selectOne();';
-        $this->saveStr[] = '        if(empty($table)){';
-        $this->saveStr[] = '            throw new AppException("参数错误");';
-        $this->saveStr[] = '        }';
-        $this->saveStr[] = '';
-        $this->saveStr[] = '        return ' . $this->tableName . 'Model::formatItem($table);';
-        $this->saveStr[] = '    }';
+        $saveStr[] = '';
+        $saveStr[] = '    /**';
+        $saveStr[] = '    /* 查询详情';
+        $saveStr[] = '    * @throws Throwable';
+        $saveStr[] = '    */';
+        $saveStr[] = '    #[Router(errorTitle: \'查看' . $this->tableComment . '详情失败\')]';
+        $saveStr[] = '    public function run(' . $this->tableName . 'Proto $request): ' . $this->tableName . 'Proto';
+        $saveStr[] = '    {';
+        $saveStr[] = '        $id = $request->getId();';
+        $saveStr[] = '        if(empty($id)){';
+        $saveStr[] = '            throw new AppException("缺少参数");';
+        $saveStr[] = '        }';
+        $saveStr[] = '';
+        $saveStr[] = '        $table = new ' . $this->tableName . 'Table()->where([';
+        $saveStr[] = '            ' . $this->tableName . 'Table::ID=>$id,';
+        $saveStr[] = '        ])->selectOne();';
+        $saveStr[] = '        if(empty($table)){';
+        $saveStr[] = '            throw new AppException("参数错误");';
+        $saveStr[] = '        }';
+        $saveStr[] = '';
+        $saveStr[] = '        return ' . $this->tableName . 'Model::formatItem($table);';
+        $saveStr[] = '    }';
+        return $saveStr;
     }
 
-    private function createRemove(): void
+    private function createRemove(): array
     {
-        $this->saveStr[] = '';
-        $this->saveStr[] = '    /**';
-        $this->saveStr[] = '    /* 删除';
-        $this->saveStr[] = '    * @throws Throwable';
-        $this->saveStr[] = '    */';
-        $this->saveStr[] = '    #[Router(errorTitle: \'删除' . $this->tableComment . '失败\')]';
-        $this->saveStr[] = '    public function delete(' . $this->tableName . 'Proto $request): Success';
-        $this->saveStr[] = '    {';
-        $this->saveStr[] = '        $id = $request->getId();';
-        $this->saveStr[] = '        if(empty($id)){';
-        $this->saveStr[] = '            throw new AppException("参数错误");';
-        $this->saveStr[] = '        }';
-        $this->saveStr[] = '';
-        $this->saveStr[] = '        $res = new ' . $this->tableName . 'Table()->where([';
-        $this->saveStr[] = '            ' . $this->tableName . 'Table::ID=>$id,';
-        $this->saveStr[] = '        ])->delete();';
-        $this->saveStr[] = '';
-        $this->saveStr[] = '        $msg = new Success();';
-        $this->saveStr[] = '        $msg->setSuccess((bool)$res);';
-        $this->saveStr[] = '        return $msg;';
-        $this->saveStr[] = '    }';
+        $saveStr[] = '';
+        $saveStr[] = '    /**';
+        $saveStr[] = '    /* 删除';
+        $saveStr[] = '    * @throws Throwable';
+        $saveStr[] = '    */';
+        $saveStr[] = '    #[Router(errorTitle: \'删除' . $this->tableComment . '失败\')]';
+        $saveStr[] = '    public function run(' . $this->tableName . 'Proto $request): Success';
+        $saveStr[] = '    {';
+        $saveStr[] = '        $id = $request->getId();';
+        $saveStr[] = '        if(empty($id)){';
+        $saveStr[] = '            throw new AppException("参数错误");';
+        $saveStr[] = '        }';
+        $saveStr[] = '';
+        $saveStr[] = '        $res = new ' . $this->tableName . 'Table()->where([';
+        $saveStr[] = '            ' . $this->tableName . 'Table::ID=>$id,';
+        $saveStr[] = '        ])->delete();';
+        $saveStr[] = '';
+        $saveStr[] = '        $msg = new Success();';
+        $saveStr[] = '        $msg->setSuccess((bool)$res);';
+        $saveStr[] = '        return $msg;';
+        $saveStr[] = '    }';
+        return $saveStr;
     }
 
 
