@@ -4,7 +4,7 @@ namespace Swlib\Admin\Manager;
 
 use Redis;
 use Swlib\Admin\Interface\PermissionInterface;
-use Swlib\Connect\PoolRedis;
+use Swlib\Table\Trait\PoolRedis;
 use Swlib\Enum\CtxEnum;
 use Swlib\Exception\AppException;
 use Swlib\Response\RedirectResponse;

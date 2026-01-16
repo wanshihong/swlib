@@ -3,7 +3,7 @@
 namespace Swlib\DevTool\Ctrls;
 
 use Generate\ConfigEnum;
-use Swlib\Connect\PoolMysql;
+use Generate\DatabaseConnect;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Exception\AppException;
 use Swlib\Response\TwigResponse;
@@ -81,7 +81,7 @@ class ProtobufExtEditor extends AbstractController
             $comment = 'protobuf:ext:json:' . $json;
         }
 
-        PoolMysql::call(function ($mysqli) use ($table, $comment) {
+        DatabaseConnect::call(function ($mysqli) use ($table, $comment) {
             $tableEscaped = $mysqli->real_escape_string($table);
             $commentEscaped = $mysqli->real_escape_string($comment);
             $sql = "SHOW FULL COLUMNS FROM `$tableEscaped` WHERE Field = 'id'";
@@ -113,11 +113,12 @@ class ProtobufExtEditor extends AbstractController
     {
         $dbTables = [];
 
-        PoolMysql::eachDbName(/**
+        DatabaseConnect::eachDbName(
+        /**
          * @throws Throwable
          */ function ($dbName) use (&$dbTables) {
             $tables = [];
-            PoolMysql::call(function ($mysqli) use (&$tables) {
+            DatabaseConnect::call(function ($mysqli) use (&$tables) {
                 $res = $mysqli->query('SHOW TABLES');
                 while ($row = $res->fetch_array()) {
                     $tables[] = $row[0];
@@ -136,7 +137,7 @@ class ProtobufExtEditor extends AbstractController
      */
     private function renderEditForm(string $dbName, string $table): TwigResponse
     {
-        $fields = PoolMysql::query('SHOW FULL COLUMNS FROM `' . $table . '`', $dbName)->fetch_all(MYSQLI_ASSOC);
+        $fields = DatabaseConnect::query('SHOW FULL COLUMNS FROM `' . $table . '`', $dbName)->fetch_all(MYSQLI_ASSOC);
         $idComment = '';
         foreach ($fields as $field) {
             if ($field['Field'] === 'id') {

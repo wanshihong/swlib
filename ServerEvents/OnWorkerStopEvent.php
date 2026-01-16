@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Swlib\ServerEvents;
 
+use Generate\DatabaseConnect;
 use Swlib\Connect\MysqlHeart;
-use Swlib\Connect\PoolMysql;
 use Swlib\Connect\PoolRedis;
 use Swlib\Connect\RedisHeart;
 use Swlib\DataManager\WorkerManager;
@@ -34,7 +34,7 @@ class OnWorkerStopEvent
         MysqlHeart::stop();
         RedisHeart::stop();
         PoolRedis::close();
-        PoolMysql::close();
+        DatabaseConnect::close();
 
 
         WorkerManager::clear();

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Swlib\Parse\Helper;
 
+use Generate\DatabaseConnect;
 use Random\RandomException;
-use Swlib\Connect\PoolMysql;
 use Throwable;
 
 /**
@@ -23,7 +23,7 @@ class AdminAccountHelper
     {
         // 检查是否存在超级管理员 - 使用原生 SQL
         $sql = "SELECT * FROM admin_manager WHERE JSON_CONTAINS(`roles`, '[\"ROLE_SUPPER_ADMIN\"]') LIMIT 1";
-        $result = PoolMysql::query($sql)->fetch_assoc();
+        $result = DatabaseConnect::query($sql)->fetch_assoc();
         if (!empty($result)) {
             // 超级管理员已存在
             return;
@@ -52,7 +52,7 @@ class AdminAccountHelper
         // 插入数据库 - 使用原生 SQL
         $sql = "INSERT INTO admin_manager (`username`, `roles`, `password`) VALUES ('$username', '$roles', '$hashedPassword')";
 
-        PoolMysql::call(function ($mysqli) use ($sql) {
+        DatabaseConnect::call(function ($mysqli) use ($sql) {
             $mysqli->query($sql);
         });
 

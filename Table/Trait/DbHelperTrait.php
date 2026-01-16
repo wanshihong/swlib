@@ -3,10 +3,10 @@
 namespace Swlib\Table\Trait;
 
 use Exception;
+use Generate\DatabaseConnect;
 use Generate\TableFieldMap;
 use ReflectionClass;
 use ReflectionException;
-use Swlib\Connect\PoolMysql;
 use Swlib\DataManager\ReflectionManager;
 use Swlib\Table\Expression;
 use Swlib\Utils\StringConverter;
@@ -40,7 +40,7 @@ trait DbHelperTrait
      */
     private static function _getFieldNameByAs(string $fieldAs, string $dbName = 'default'): string
     {
-        $dbName = PoolMysql::getDbName($dbName);
+        $dbName = DatabaseConnect::getDbName($dbName);
         if (!isset(TableFieldMap::maps[$dbName][$fieldAs])) {
             throw new Exception("在字段定义中没有找到$fieldAs");
         }
@@ -54,7 +54,7 @@ trait DbHelperTrait
      */
     public static function getFieldAsByName(string $fieldName, string $dbName = 'default'): string
     {
-        $dbName = PoolMysql::getDbName($dbName);
+        $dbName = DatabaseConnect::getDbName($dbName);
         $res = array_search($fieldName, TableFieldMap::maps[$dbName]);
         if (empty($res)) {
             throw new Exception("在别名定义中没有找到$fieldName");
@@ -112,7 +112,7 @@ trait DbHelperTrait
      */
     private static function _getReflection(string $className, string $namespace): ReflectionClass
     {
-        $dbName = PoolMysql::getDbName();
+        $dbName = DatabaseConnect::getDbName();
         $dbName = StringConverter::underscoreToCamelCase($dbName);
         $routerTableName = "Generate\\$namespace\\$dbName\\$className";
 

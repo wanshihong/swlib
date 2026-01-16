@@ -4,7 +4,7 @@ namespace Swlib\Controller\File\Service;
 
 use finfo;
 use Redis;
-use Swlib\Connect\PoolRedis;
+use Swlib\Table\Trait\PoolRedis;
 use Swlib\Controller\Config\Service\ConfigService;
 use Swlib\Enum\CtxEnum;
 use Swlib\Exception\AppException;

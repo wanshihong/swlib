@@ -5,6 +5,7 @@ namespace Swlib\Parse\Table;
 
 
 use Exception;
+use Generate\DatabaseConnect;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
 
@@ -17,6 +18,8 @@ class ParseTableModel
 
     private array $saveModelStr = [];
 
+    private string $namespace = '';
+
     /**
      * @throws Exception
      */
@@ -24,20 +27,22 @@ class ParseTableModel
     {
         $this->tableName = StringConverter::underscoreToCamelCase($this->tableName);
 
+        $this->namespace = DatabaseConnect::getNamespace($this->database);
+
         $this->saveModelStr[] = "<?php //$this->tableName";
-        $this->saveModelStr[] = 'namespace Generate\Models\\' . $this->database . ';';
+        $this->saveModelStr[] = 'namespace Generate\Models\\' . $this->namespace . ';';
         $this->saveModelStr[] = '';
         $this->saveModelStr[] = '';
         $this->saveModelStr[] = 'use Throwable;';
         $this->saveModelStr[] = 'use Swlib\Exception\AppException;';
         $this->saveModelStr[] = 'use Swlib\Enum\CtxEnum;';
         $this->saveModelStr[] = 'use Google\Protobuf\Internal\RepeatedField;';
-        $this->saveModelStr[] = "use Generate\TablesDto\\$this->database\\{$this->tableName}TableDto;";
-        $this->saveModelStr[] = 'use Protobuf\\' . $this->database . '\\' . $this->tableName . '\\' . $this->tableName . 'Proto;';
+        $this->saveModelStr[] = "use Generate\TablesDto\\$this->namespace\\{$this->tableName}TableDto;";
+        $this->saveModelStr[] = 'use Protobuf\\' . $this->namespace . '\\' . $this->tableName . '\\' . $this->tableName . 'Proto;';
         foreach ($this->fields as $item) {
             // 引入枚举 protobuf 类
             if (str_contains($item['Type'], 'enum')) {
-                $this->saveModelStr[] = "use Protobuf\\" . $this->database . "\\" . $this->tableName . "\\" . $this->tableName . StringConverter::underscoreToCamelCase($item['Field']) . "Enum;";
+                $this->saveModelStr[] = "use Protobuf\\" . $this->namespace . "\\" . $this->tableName . "\\" . $this->tableName . StringConverter::underscoreToCamelCase($item['Field']) . "Enum;";
             }
         }
 
@@ -56,7 +61,7 @@ class ParseTableModel
     {
         $this->saveModelStr[] = '}';
 
-        File::save(self::saveDir . $this->database . '/' . $this->tableName . "Model.php", implode(PHP_EOL, $this->saveModelStr));
+        File::save(self::saveDir . $this->namespace . '/' . $this->tableName . "Model.php", implode(PHP_EOL, $this->saveModelStr));
     }
 
 

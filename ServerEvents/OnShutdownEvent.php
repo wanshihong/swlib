@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Swlib\ServerEvents;
 
+use Generate\DatabaseConnect;
 use Swlib\Connect\MysqlHeart;
-use Swlib\Connect\PoolMysql;
 use Swlib\Connect\PoolRedis;
 use Swlib\Connect\RedisHeart;
 use Swlib\DataManager\WorkerManager;
@@ -50,7 +50,7 @@ class OnShutdownEvent
         }
 
         try {
-            PoolMysql::close();
+            DatabaseConnect::close();
         } catch (Throwable) {
             // 忽略异常
         }

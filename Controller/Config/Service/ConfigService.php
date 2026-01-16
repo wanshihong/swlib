@@ -2,7 +2,7 @@
 
 namespace Swlib\Controller\Config\Service;
 
-use Generate\Tables\CommonApi\ConfigTable;
+use Generate\Tables\Main\ConfigTable;
 use Swlib\Connect\PoolRedis;
 use Swlib\Crontab\Attribute\CrontabAttribute;
 use Swlib\Event\Attribute\Event;

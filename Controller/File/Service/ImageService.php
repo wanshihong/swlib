@@ -3,8 +3,7 @@
 namespace Swlib\Controller\File\Service;
 
 use finfo;
-use mysqli;
-use Swlib\Connect\PoolMysql;
+use Generate\DatabaseConnect;
 use Swlib\Enum\CtxEnum;
 use Swlib\Utils\Ip;
 use Throwable;
@@ -76,7 +75,7 @@ class ImageService
         $uploaderIp = Ip::get();
 
         // 记录图片信息到数据库
-        return PoolMysql::call(function ($mysqli) use (
+        return DatabaseConnect::call(function ($mysqli) use (
             $originalName, $storagePath, $fileName, $fileSize, $fileExt,
             $mimeType, $md5Hash, $width, $height, $uploaderId, $uploaderIp
         ) {

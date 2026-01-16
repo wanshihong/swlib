@@ -6,11 +6,11 @@ namespace Swlib\Table;
 use DateInterval;
 use DateTime;
 use Exception;
+use Generate\DatabaseConnect;
 use mysqli;
 use mysqli_result;
 use mysqli_stmt;
 use Redis;
-use Swlib\Connect\PoolMysql;
 use Swlib\Connect\PoolRedis;
 use Swlib\Enum\CtxEnum;
 use Swlib\Table\Aspects\DatabaseOperationEventAspect;
@@ -65,7 +65,7 @@ class Db
 
         // 如果我们为迭代器持有了连接，现在就归还它
         if ($this->dbh !== null) {
-            PoolMysql::put($this->dbh, $this->dbName);
+            DatabaseConnect::put($this->dbh, $this->dbName);
             $this->dbh = null;
         }
     }
@@ -192,7 +192,7 @@ class Db
             $transactionDbName = CtxEnum::TransactionDbName->get();
             if ($transactionDbName !== null) {
                 // 当前查询使用的数据库名称（处理 default 别名）
-                $currentDbName = PoolMysql::getDbName($this->dbName);
+                $currentDbName = DatabaseConnect::getDbName($this->dbName);
                 if ($transactionDbName !== $currentDbName) {
                     throw new Exception("事务内部不能跨数据库操作，当前事务数据库为 {$transactionDbName}，本次查询的数据库为 $currentDbName");
                 }
@@ -204,11 +204,11 @@ class Db
 
         // 迭代器查询需要持有连接，直到迭代结束
         if ($this->action === self::ACTION_GET_ITERATOR) {
-            $this->dbh = PoolMysql::get($this->dbName);
+            $this->dbh = DatabaseConnect::get($this->dbName);
             $this->executeWithDbh($this->dbh);
         } else {
             // 其他查询使用安全的 'call' 模式
-            PoolMysql::call(fn(MysqliProxy|mysqli $dbh) => $this->executeWithDbh($dbh), $this->dbName);
+            DatabaseConnect::call(fn(MysqliProxy|mysqli $dbh) => $this->executeWithDbh($dbh), $this->dbName);
         }
     }
 

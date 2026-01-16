@@ -5,7 +5,7 @@ namespace Swlib\Parse\Table;
 
 
 use Exception;
-use Swlib\Connect\PoolMysql;
+use Generate\DatabaseConnect;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
@@ -50,7 +50,7 @@ class ParseTableProtoc
      */
     public function __construct(string $database, string $tableName, array $fields, string $tableComment = '')
     {
-        $this->dbName = $database;
+        $this->dbName = DatabaseConnect::getNamespace($database);
         $this->tableComment = $tableComment ?? '';
         $this->protobufMessage = [];
         $upperTableName = StringConverter::underscoreToCamelCase($tableName);
@@ -79,8 +79,8 @@ class ParseTableProtoc
 //        File::delDirectory(RUNTIME_DIR . "Protobuf/GPBMetadata/");
 
         $dirs = [""];
-        PoolMysql::eachDbName(function ($dbName) use (&$dirs) {
-            $dbName = StringConverter::underscoreToCamelCase($dbName);
+        DatabaseConnect::eachDbName(function ($dbName) use (&$dirs) {
+            $dbName = DatabaseConnect::getNamespace($dbName);
             $dirs[] = $dbName;
         });
 

@@ -5,9 +5,9 @@ namespace Swlib\Parse\Table;
 
 
 use Exception;
+use Generate\DatabaseConnect;
 use Swlib\Parse\Helper\FieldDefaultValueHelper;
 use Swlib\Utils\File;
-use Swlib\Utils\Func;
 use Swlib\Utils\StringConverter;
 
 
@@ -15,7 +15,7 @@ class ParseTableTable
 {
     const  string saveDir = ROOT_DIR . 'runtime/Generate/Tables/';
     private array $saveStr = [];
-    private string $dbName;
+    private string $namespace;
 
     /**
      * @throws Exception
@@ -27,15 +27,14 @@ class ParseTableTable
         public int    $tableIndex
     )
     {
-        $this->dbName = StringConverter::underscoreToCamelCase($this->database);
         $this->tableName = StringConverter::underscoreToCamelCase($tableName);
-        $namespace = "$this->dbName";
+        $this->namespace = DatabaseConnect::getNamespace($this->database);
 
         $this->saveStr[] = '<?php';
-        $this->saveStr[] = "namespace Generate\Tables\\$namespace;";
+        $this->saveStr[] = "namespace Generate\Tables\\$this->namespace;";
         $this->saveStr[] = '';
         $this->saveStr[] = '';
-        $this->saveStr[] = "use Generate\\TablesDto\\$this->dbName\\{$this->tableName}TableDto;";
+        $this->saveStr[] = "use Generate\\TablesDto\\$this->namespace\\{$this->tableName}TableDto;";
         $this->saveStr[] = 'use Swlib\\Table\\Trait\\FuncTrait;';
         $this->saveStr[] = 'use Swlib\\Table\\Trait\\RawQueryTrait;';
         $this->saveStr[] = 'use Swlib\\Table\\Trait\\SqlTrait;';
@@ -79,7 +78,7 @@ class ParseTableTable
     public function __destruct()
     {
         $this->saveStr[] = '}';
-        File::save(self::saveDir . $this->dbName . '/' . "{$this->tableName}Table.php", implode(PHP_EOL, $this->saveStr));
+        File::save(self::saveDir . $this->namespace . '/' . "{$this->tableName}Table.php", implode(PHP_EOL, $this->saveStr));
     }
 
     public static function createDir(): void
@@ -197,7 +196,7 @@ class ParseTableTable
         $this->saveStr[] = '';
         $this->saveStr[] = '    // 别名对应的 dto 属性';
         $this->saveStr[] = '    const array AS_FIELD = [';
-        foreach ($this->fields as $fieldIndex => $item) {
+        foreach ($this->fields as $item) {
             $field = $item['Field'];
             $fieldName = StringConverter::underscoreToCamelCase($field, '_', false);
             $this->saveStr[] = '        self::' . strtoupper($field) . ' => "' . $fieldName . '",';

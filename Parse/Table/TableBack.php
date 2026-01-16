@@ -3,7 +3,7 @@
 namespace Swlib\Parse\Table;
 
 use DateTime;
-use Swlib\Connect\PoolMysql;
+use Generate\DatabaseConnect;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Utils\File;
 use Swlib\Utils\Log;
@@ -37,13 +37,13 @@ class TableBack
      */
     private function getCurrentSchema(): array
     {
-        $tables = PoolMysql::query("SHOW TABLES");
+        $tables = DatabaseConnect::query("SHOW TABLES");
         $schema = [];
 
         parallel(64, function () use ($tables, &$schema) {
             while ($table = $tables->fetch_row()) {
                 $tableName = $table[0];
-                $createTable = PoolMysql::query("SHOW CREATE TABLE `$tableName`")->fetch_row()[1];
+                $createTable = DatabaseConnect::query("SHOW CREATE TABLE `$tableName`")->fetch_row()[1];
                 $schema[$tableName] = $createTable;
             }
         });
@@ -61,13 +61,13 @@ class TableBack
         $views = [];
 
         // 获取所有视图名称
-        $viewList = PoolMysql::query("SHOW FULL TABLES WHERE Table_type = 'VIEW'");
+        $viewList = DatabaseConnect::query("SHOW FULL TABLES WHERE Table_type = 'VIEW'");
 
         parallel(64, function () use ($viewList, &$views) {
             while ($view = $viewList->fetch_row()) {
                 $viewName = $view[0];
                 // 获取视图的创建语句
-                $createViewResult = PoolMysql::query("SHOW CREATE VIEW `$viewName`")->fetch_row();
+                $createViewResult = DatabaseConnect::query("SHOW CREATE VIEW `$viewName`")->fetch_row();
                 $createView = $createViewResult[1]; // 视图定义通常在第二列
                 $views[$viewName] = $createView;
             }

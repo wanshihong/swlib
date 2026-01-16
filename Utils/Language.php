@@ -5,10 +5,10 @@ namespace Swlib\Utils;
 
 
 use Redis;
-use Swlib\Connect\PoolMysql;
-use Swlib\Connect\PoolRedis;
+use Swlib\Table\Trait\PoolRedis;
 use Swlib\Enum\CtxEnum;
 use Swlib\Exception\LangException;
+use Swlib\Table\Connect\MysqlConnect;
 use Throwable;
 
 class Language
@@ -22,7 +22,7 @@ class Language
      */
     public static function getLanguages(): array
     {
-        $languageTableInfo = PoolMysql::query("DESCRIBE  language")->fetch_all(MYSQLI_ASSOC);
+        $languageTableInfo = MysqlConnect::query("DESCRIBE  language")->fetch_all(MYSQLI_ASSOC);
         $strings = [];
         foreach ($languageTableInfo as $index => $item) {
             if ($index <= 2) continue;
@@ -93,18 +93,18 @@ class Language
             return $redis->get($key);
         });
         if (empty($ret)) {
-            $find = PoolMysql::query("select id,$lang from `language` where `zh`='$str'")->fetch_assoc();
+            $find = MysqlConnect::query("select id,$lang from `language` where `zh`='$str'")->fetch_assoc();
             $time = time();
             if (empty($find)) {
-                PoolMysql::query("insert into `language` (`zh`,`use_time`) values ('$str',$time)");
-                $find = PoolMysql::query("select id,$lang from `language` where `zh`='$str'")->fetch_assoc();
+                MysqlConnect::query("insert into `language` (`zh`,`use_time`) values ('$str',$time)");
+                $find = MysqlConnect::query("select id,$lang from `language` where `zh`='$str'")->fetch_assoc();
             }
 
             $ret = $find[$lang];
             if (empty($ret)) {
-                PoolMysql::query("update `language` set `$lang`='$ret',`use_time`=$time where id={$find['id']}");
+                MysqlConnect::query("update `language` set `$lang`='$ret',`use_time`=$time where id={$find['id']}");
             } else {
-                PoolMysql::query("update `language` set `use_time`=$time where id={$find['id']}");
+                MysqlConnect::query("update `language` set `use_time`=$time where id={$find['id']}");
             }
 
 

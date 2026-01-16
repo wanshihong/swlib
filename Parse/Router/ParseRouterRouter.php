@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Swlib\Parse\Router;
 
+use Generate\DatabaseConnect;
 use Generate\RouterPath;
 use mysqli;
 use ReflectionAttribute;
@@ -10,7 +11,6 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
-use Swlib\Connect\PoolMysql;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Router\Router;
@@ -32,7 +32,7 @@ trait ParseRouterRouter
      */
     private function saveRouter(): void
     {
-        $dbRouters = PoolMysql::query("select uri from router")->fetch_all(MYSQLI_ASSOC);
+        $dbRouters = DatabaseConnect::query("select uri from router")->fetch_all(MYSQLI_ASSOC);
         $dbRouters = array_column($dbRouters, 'uri');
 
         $routers = array_keys(RouterPath::PATHS);
@@ -43,7 +43,7 @@ trait ParseRouterRouter
                 if (in_array($route, $dbRouters)) {
                     continue;
                 }
-                PoolMysql::query("insert into router (`uri`) values ('$route')");
+                DatabaseConnect::query("insert into router (`uri`) values ('$route')");
             }
         });
     }
@@ -54,11 +54,11 @@ trait ParseRouterRouter
      */
     private function cleanRouterProcess(): void
     {
-        $routers = PoolMysql::query("select * from router");
+        $routers = DatabaseConnect::query("select * from router");
         parallel(64, function () use ($routers) {
             while ($router = $routers->fetch_assoc()) {
                 if (!array_key_exists($router['uri'], RouterPath::PATHS)) {
-                    PoolMysql::call(function ($mysqli) use ($router) {
+                    DatabaseConnect::call(function ($mysqli) use ($router) {
                         /** @var mysqli $mysqli */
                         $res = $mysqli->execute_query("delete from router where uri= ?", [$router['uri']]);
                         if ($res) {

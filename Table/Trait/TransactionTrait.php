@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Swlib\Table\Trait;
 
 use Exception;
+use Generate\DatabaseConnect;
 use mysqli;
-use Swlib\Connect\PoolMysql;
 use Swlib\Enum\CtxEnum;
 use Swlib\Event\EventEnum;
 use Swlib\Table\Event\DatabaseTransactionEvent;
@@ -49,7 +49,7 @@ trait TransactionTrait
     ): mixed
     {
         // 解析 default 等别名，得到真实的数据库名称
-        $resolvedDbName = PoolMysql::getDbName($dbName);
+        $resolvedDbName = DatabaseConnect::getDbName($dbName);
 
         // 如果已经在事务中，则不再开启新的事务，直接复用当前事务连接
         if ($existingDbh = CtxEnum::TransactionDbh->get()) {
@@ -63,7 +63,7 @@ trait TransactionTrait
 
         $startTime = microtime(true);
 
-        return PoolMysql::call(function (MysqliProxy|mysqli $dbh) use ($call, $isolationLevel, $timeout, $enableLog, $startTime, $dbName, $resolvedDbName) {
+        return DatabaseConnect::call(function (MysqliProxy|mysqli $dbh) use ($call, $isolationLevel, $timeout, $enableLog, $startTime, $dbName, $resolvedDbName) {
             // 记录当前事务使用的连接到协程上下文，便于后续查询复用
             CtxEnum::TransactionDbh->set($dbh);
             CtxEnum::TransactionDbName->set($resolvedDbName);

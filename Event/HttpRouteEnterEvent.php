@@ -5,7 +5,7 @@ namespace Swlib\Event;
 
 use Generate\ConfigEnum;
 use ReflectionException;
-use Swlib\Connect\PoolRedis;
+use Swlib\Table\Trait\PoolRedis;
 use Swlib\Coroutine\Attribute\CoroutineAttribute;
 use Swlib\Event\Abstract\AbstractEvent;
 use Swlib\Event\Attribute\Event;

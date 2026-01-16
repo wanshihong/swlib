@@ -5,6 +5,7 @@ namespace Swlib\Parse\Table;
 
 
 use Exception;
+use Generate\DatabaseConnect;
 use Swlib\Parse\Helper\FieldDefaultValueHelper;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
@@ -14,7 +15,7 @@ class ParseTableTableDto
 {
     const  string saveDir = ROOT_DIR . 'runtime/Generate/TablesDto/';
     private array $saveStr = [];
-    private string $dbName;
+    private string $namespace;
 
     /**
      * @throws Exception
@@ -26,12 +27,11 @@ class ParseTableTableDto
         public int    $tableIndex
     )
     {
-        $this->dbName = StringConverter::underscoreToCamelCase($this->database);
         $this->tableName = StringConverter::underscoreToCamelCase($tableName);
-        $namespace = "$this->dbName";
+        $this->namespace = DatabaseConnect::getNamespace($this->database);
 
         $this->saveStr[] = '<?php';
-        $this->saveStr[] = "namespace Generate\TablesDto\\$namespace;";
+        $this->saveStr[] = "namespace Generate\TablesDto\\$this->namespace;";
         $this->saveStr[] = '';
         $this->saveStr[] = '';
         $this->saveStr[] = 'use Countable;';
@@ -40,7 +40,7 @@ class ParseTableTableDto
         $this->saveStr[] = 'use Swlib\Table\Trait\TableDataListsTrait;';
         $this->saveStr[] = 'use Swlib\Table\Interface\TableDtoInterface;';
         $this->saveStr[] = 'use Generator;';
-        $this->saveStr[] = "use Generate\Tables\\$this->dbName\\{$this->tableName}Table;";
+        $this->saveStr[] = "use Generate\Tables\\$this->namespace\\{$this->tableName}Table;";
         $this->saveStr[] = '';
         $this->saveStr[] = '';
         $this->saveStr[] = 'class ' . $this->tableName . 'TableDto implements TableDtoInterface, IteratorAggregate, Countable {';
@@ -58,7 +58,7 @@ class ParseTableTableDto
     public function __destruct()
     {
         $this->saveStr[] = '}';
-        File::save(self::saveDir . $this->dbName . '/' . "{$this->tableName}TableDto.php", implode(PHP_EOL, $this->saveStr));
+        File::save(self::saveDir . $this->namespace . '/' . "{$this->tableName}TableDto.php", implode(PHP_EOL, $this->saveStr));
     }
 
     public static function createDir(): void

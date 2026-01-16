@@ -3,8 +3,8 @@
 namespace Swlib\Controller\File\Controller;
 
 use Exception;
+use Generate\DatabaseConnect;
 use Generate\RouterPath;
-use Swlib\Connect\PoolMysql;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Controller\File\Service\FileUploader;
 use Swlib\Controller\File\Service\ImageService;
@@ -70,7 +70,7 @@ class Upload extends AbstractController
 
 
         // 检查数据库中是否已存在相同 MD5 的文件（秒传）
-        $existingImage = PoolMysql::call(function ($mysqli) use ($md5Hash) {
+        $existingImage = DatabaseConnect::call(function ($mysqli) use ($md5Hash) {
             $sql = "SELECT id FROM images
                     WHERE md5_hash = ? AND status = 1
                     LIMIT 1";

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Parse;
+namespace Swlib\Parse\Config;
 
 
 use Swlib\Parse\Helper\ConsoleColor;

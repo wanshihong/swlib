@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Connect;
+namespace Swlib\Table\Trait;
 
 use Generate\ConfigEnum;
 use RuntimeException;

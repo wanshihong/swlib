@@ -6,6 +6,7 @@ namespace Swlib\Connect;
 
 use Generate\ConfigEnum;
 use Redis;
+use Swlib\Table\Trait\PoolConnectionTrait;
 use Swoole\Coroutine;
 use Swoole\Database\RedisConfig;
 use Swoole\Database\RedisPool;
@@ -20,19 +21,10 @@ class PoolRedis
 
     private static function createPool(): void
     {
-        $redisConfig = ConfigEnum::get('REDIS');
-        $redisDefault = (string)ConfigEnum::get('REDIS_DEFAULT', 'default');
-        $conf = is_array($redisConfig) ? ($redisConfig[$redisDefault] ?? null) : null;
-        if (!is_array($conf)) {
-            throw new \RuntimeException('Redis 配置未生成或结构错误');
-        }
-
-        $host = (string)($conf['host'] ?? '');
-        $port = (int)($conf['port'] ?? 0);
-        $password = (string)($conf['auth'] ?? '');
-        $num = (int)($conf['pool_num'] ?? 0);
-        $dbIndex = (int)($conf['db_index'] ?? 0);
-        $timeout = (float)($conf['timeout'] ?? 1);
+        $host = ConfigEnum::REDIS_HOST;
+        $port = ConfigEnum::REDIS_PORT;
+        $password = ConfigEnum::REDIS_AUTH;
+        $num = ConfigEnum::REDIS_POOL_NUM;
 
         // 强制最小连接池大小
         if ($num < self::MIN_POOL_SIZE) {
@@ -43,8 +35,8 @@ class PoolRedis
             ->withHost($host)
             ->withPort($port)
             ->withAuth($password)
-            ->withDbIndex($dbIndex)
-            ->withTimeout($timeout)
+            ->withDbIndex(0)
+            ->withTimeout(1)
             , $num);
     }
 
@@ -57,11 +49,7 @@ class PoolRedis
 
         $startTime = microtime(true);
         $getCount = 0;
-        $redisConfig = ConfigEnum::get('REDIS');
-        $redisDefault = (string)ConfigEnum::get('REDIS_DEFAULT', 'default');
-        $conf = is_array($redisConfig) ? ($redisConfig[$redisDefault] ?? null) : null;
-        $poolNum = is_array($conf) ? (int)($conf['pool_num'] ?? 0) : 0;
-        $poolSize = max($poolNum, self::MIN_POOL_SIZE);
+        $poolSize = max(ConfigEnum::REDIS_POOL_NUM, self::MIN_POOL_SIZE);
 
         while (self::$num >= $poolSize) {
             Coroutine::sleep(0.11);
@@ -103,11 +91,7 @@ class PoolRedis
     public static function call(callable $call): mixed
     {
         // 获取连接池大小
-        $redisConfig = ConfigEnum::get('REDIS');
-        $redisDefault = (string)ConfigEnum::get('REDIS_DEFAULT', 'default');
-        $conf = is_array($redisConfig) ? ($redisConfig[$redisDefault] ?? null) : null;
-        $poolNum = is_array($conf) ? (int)($conf['pool_num'] ?? 0) : 0;
-        $poolSize = max($poolNum, self::MIN_POOL_SIZE);
+        $poolSize = max(ConfigEnum::REDIS_POOL_NUM, self::MIN_POOL_SIZE);
 
         // 检测嵌套深度（如果 >= 连接池大小会直接抛出异常）
         $depth = self::checkNestDepth('redis_call_depth', $poolSize, 'Redis');

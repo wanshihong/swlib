@@ -5,15 +5,16 @@ namespace Swlib;
 
 use Exception;
 use Generate\ConfigEnum;
-use Swlib\Connect\PoolMysql;
+use Generate\DatabaseConnect;
 use Swlib\Connect\PoolRedis;
 use Swlib\Crontab\CrontabScheduler;
 use Swlib\Parse\Admin\ParseAdminScaffold;
 use Swlib\Parse\ast\AstCompiler;
+use Swlib\Parse\Config\ParseConfig;
+use Swlib\Parse\Config\ParseDatabaseConfig;
 use Swlib\Parse\ConfigValidator;
 use Swlib\Parse\CopyProtoFile;
 use Swlib\Parse\Helper\ConsoleColor;
-use Swlib\Parse\ParseConfig;
 use Swlib\Parse\ParseCrontab;
 use Swlib\Parse\ParseDevTool;
 use Swlib\Parse\ParseEvent;
@@ -42,6 +43,7 @@ class App
 
         run(fn: function () {
             new ParseConfig();
+            new ParseDatabaseConfig();
         });
 
         echo "解析配置文件完成，耗时: " . round(microtime(true) - $stepStartTime, 4) . "秒" . PHP_EOL;
@@ -137,7 +139,7 @@ class App
         ConsoleColor::writeSuccess("所有解析操作完成，总耗时: {$totalDuration}秒");
 
 
-        PoolMysql::close();
+        DatabaseConnect::close();
         PoolRedis::close();
     }
 
