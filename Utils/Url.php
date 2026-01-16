@@ -71,7 +71,6 @@ class Url
         }
 
         // 3.2 PathInfo 模式：参数编码到路径中，兼容 OnRequestEvent + Router::parse
-
         if ($hasAddParam === false) {
             // 仅使用传入参数构建 PathInfo，不合并当前请求参数
             $finalParams = $params;

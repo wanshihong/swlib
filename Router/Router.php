@@ -5,6 +5,7 @@ namespace Swlib\Router;
 
 use Attribute;
 use Exception;
+use Generate\ConfigEnum;
 use Generate\RouterPath;
 use Google\Protobuf\Internal\Message;
 use InvalidArgumentException;
@@ -45,7 +46,7 @@ class Router
      */
     public function __construct(
         // 允许请求的类型，  GET  POST   ["GET","POST"]  WS  WSS
-        public string|array $method = ["GET","POST"],
+        public string|array $method = ["GET", "POST"],
 
         // 用户访问的 URL ， 默认是自动根据目录生成
         public string       $url = '',
@@ -344,7 +345,11 @@ class Router
 
         // 必须是成对的 key/value
         if ($pathInfoCount % 2 !== 0) {
-            throw new InvalidArgumentException('PathInfo 参数必须成对出现');
+            $error = 'PathInfo 参数必须成对出现';
+            if (ConfigEnum::APP_PROD === false) {
+                $error .= ' ' . implode('/', $pathInfoSegments);
+            }
+            throw new InvalidArgumentException($error);
         }
 
         for ($i = 0; $i < $pathInfoCount; $i += 2) {

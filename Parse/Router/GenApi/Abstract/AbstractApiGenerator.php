@@ -125,7 +125,7 @@ abstract class AbstractApiGenerator
             }
 
             // 跳过 GET 请求（通常不需要生成 API）
-            if (in_array('get', $methods, true)) {
+            if (count($methods) === 1 && in_array('get', $methods, true)) {
                 continue;
             }
 
