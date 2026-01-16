@@ -2,11 +2,10 @@
 
 namespace Swlib\Admin\Controller;
 
-use ReflectionException;
+use Generate\Tables\Main\LanguageTable;
 use Swlib\Admin\Config\PageConfig;
 use Swlib\Admin\Config\PageFieldsConfig;
 use Swlib\Admin\Controller\Abstract\AbstractAdmin;
-use Swlib\Admin\Controller\Enum\AdminActionEnum;
 use Swlib\Admin\Fields\Int2TimeField;
 use Swlib\Admin\Fields\TextField;
 use Swlib\Admin\Manager\AdminManager;
@@ -15,7 +14,6 @@ use Swlib\Enum\CtxEnum;
 use Swlib\Exception\AppException;
 use Swlib\Response\RedirectResponse;
 use Swlib\Router\Router;
-use Swlib\Table\Db;
 use Swlib\Utils\Cookie;
 use Throwable;
 
@@ -23,14 +21,10 @@ use Throwable;
 class LanguageAdmin extends AbstractAdmin
 {
 
-    /**
-     * @throws ReflectionException
-     */
     protected function configPage(PageConfig $config): void
     {
         $config->pageName = "翻译配置";
-        $reflection = Db::getTableReflection('LanguageTable');
-        $config->tableName = $reflection->getName();
+        $config->tableName = LanguageTable::class;
     }
 
 
@@ -55,29 +49,26 @@ class LanguageAdmin extends AbstractAdmin
     protected function configField(PageFieldsConfig $fields): void
     {
 
-
-        $isEdit = $this->getCurrentAction() === AdminActionEnum::EDIT->value;
-        $reflection = Db::getTableReflection('LanguageTable');
         $fields->setFields(
-            new TextField(field: $reflection->getConstant('ID'), label: "ID")->hideOnForm(),
-            new Int2TimeField(field: $reflection->getConstant('USE_TIME'), label: '上次使用时间')->hideOnForm(),
-            new TextField(field: $reflection->getConstant('ZH'), label: '简体中文'),
-            new TextField(field: $reflection->getConstant('VI'), label: '越南语')->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('EN'), label: '英语'),
-            new TextField(field: $reflection->getConstant('JA'), label: '日语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('KO'), label: '韩语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('FR'), label: '法语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('ES'), label: '西班牙语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('IT'), label: '意大利语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('DE'), label: '德语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('TR'), label: '土耳其语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('RU'), label: '俄语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('PT'), label: '葡萄牙语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('INA'), label: '印尼语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('TH'), label: '泰语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('MS'), label: '马来西亚语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('AR'), label: '阿拉伯语')->hideOnList()->hideOnFilter()->setRequired(false),
-            new TextField(field: $reflection->getConstant('HI'), label: '印地语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::ID, label: "ID")->hideOnForm(),
+            new Int2TimeField(field: LanguageTable::USE_TIME, label: '上次使用时间')->hideOnForm(),
+            new TextField(field: LanguageTable::ZH, label: '简体中文'),
+            new TextField(field: LanguageTable::VI, label: '越南语')->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::EN, label: '英语'),
+            new TextField(field: LanguageTable::JA, label: '日语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::KO, label: '韩语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::FR, label: '法语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::ES, label: '西班牙语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::IT, label: '意大利语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::DE, label: '德语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::TR, label: '土耳其语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::RU, label: '俄语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::PT, label: '葡萄牙语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::INA, label: '印尼语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::TH, label: '泰语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::MS, label: '马来西亚语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::AR, label: '阿拉伯语')->hideOnList()->hideOnFilter()->setRequired(false),
+            new TextField(field: LanguageTable::HI, label: '印地语')->hideOnList()->hideOnFilter()->setRequired(false),
         );
 
     }

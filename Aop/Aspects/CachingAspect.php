@@ -7,7 +7,7 @@ use Attribute;
 use Generate\ConfigEnum;
 use Swlib\Aop\Abstract\AbstractAspect;
 use Swlib\Aop\JoinPoint;
-use Swlib\Table\Trait\PoolRedis;
+use Swlib\Connect\PoolRedis;
 use Swlib\Proxy\Interface\ProxyAttributeInterface;
 use Throwable;
 

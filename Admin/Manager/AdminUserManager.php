@@ -2,13 +2,14 @@
 
 namespace Swlib\Admin\Manager;
 
+use Generate\Tables\Main\AdminManagerTable;
+use Generate\TablesDto\Main\AdminManagerTableDto;
 use Redis;
 use Swlib\Admin\Interface\PermissionInterface;
-use Swlib\Table\Trait\PoolRedis;
+use Swlib\Connect\PoolRedis;
 use Swlib\Enum\CtxEnum;
 use Swlib\Exception\AppException;
 use Swlib\Response\RedirectResponse;
-use Swlib\Table\Db;
 use Swlib\Utils\Cookie;
 use Swlib\Utils\Log;
 use Throwable;
@@ -32,9 +33,7 @@ class AdminUserManager
             if (empty($token)) {
                 throw new AppException("请登录");
             }
-            $tableReflection = Db::getTableReflection('AdminManagerTable');
-            $dtoReflection = Db::getTableDtoReflection('AdminManagerTableDto');
-            $user = PoolRedis::call(function (Redis $redis) use ($dtoReflection, $token) {
+            $user = PoolRedis::call(function (Redis $redis) use ($token) {
                 $key = "admin_user:$token";
                 $user = $redis->hGetAll($key);
                 $redis->expire($key, 3600);
@@ -42,7 +41,9 @@ class AdminUserManager
                 if (empty($user)) {
                     return null;
                 }
-                return $dtoReflection->newInstance()->fromArray($user);
+                $dto = new AdminManagerTableDto();
+                $dto->fromArray($user);
+                return $dto;
             });
 
             if ($user) {
@@ -59,7 +60,7 @@ class AdminUserManager
                 throw new AppException("请登录");
             }
 
-            $find = $tableReflection->newInstance()->addWhere($tableReflection->getConstant("ID"), $userId)->selectOne();
+            $find = new AdminManagerTable()->addWhere(AdminManagerTable::ID, $userId)->selectOne();
             if (empty($find)) {
                 throw new AppException("请登录");
             }

@@ -2,11 +2,12 @@
 
 namespace Swlib\Admin\Controller;
 
+use Generate\Tables\Main\AdminManagerTable;
 use Redis;
 use Swlib\Admin\Manager\AdminManager;
 use Swlib\Admin\Manager\AdminUserManager;
 use Swlib\Admin\Middleware\AdminInitMiddleware;
-use Swlib\Table\Trait\PoolRedis;
+use Swlib\Connect\PoolRedis;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
@@ -14,7 +15,6 @@ use Swlib\Response\JsonResponse;
 use Swlib\Response\RedirectResponse;
 use Swlib\Response\TwigResponse;
 use Swlib\Router\Router;
-use Swlib\Table\Db;
 use Swlib\Utils\Cookie;
 use Swlib\Utils\Language;
 use Swlib\Utils\Url;
@@ -42,8 +42,7 @@ class LoginAdmin extends AbstractController
             $username = Request::post("username", '请输入用户名');
             $password = Request::post("password", '请输入密码');
 
-            $reflection = Db::getTableReflection('AdminManagerTable');
-            $find = $reflection->newInstance()->addWhere($reflection->getConstant("USERNAME"), $username)->selectOne();
+            $find = new AdminManagerTable()->addWhere(AdminManagerTable::USERNAME, $username)->selectOne();
             if (empty($find)) {
                 throw new AppException("用户名或者密码错误");
             }
@@ -90,9 +89,8 @@ class LoginAdmin extends AbstractController
             $find = AdminUserManager::getUser();
 
             $pwd = password_hash($password, PASSWORD_DEFAULT);
-            $reflection = Db::getTableReflection('AdminManagerTable');
-            $reflection->newInstance()->addWhere($reflection->getConstant("ID"), $find->id)->update([
-                $reflection->getConstant("PASSWORD") => $pwd,
+            new AdminManagerTable()->addWhere(AdminManagerTable::ID, $find->id)->update([
+                AdminManagerTable::PASSWORD => $pwd,
             ]);
 
             Cookie::delete('admin_token');
@@ -124,17 +122,17 @@ class LoginAdmin extends AbstractController
                 throw new AppException('两次密码不一致');
             }
 
-            $reflection = Db::getTableReflection('AdminManagerTable');
-            $find = $reflection->newInstance()->addWhere($reflection->getConstant("USERNAME"), $username)->selectOne();
+
+            $find = new AdminManagerTable()->addWhere(AdminManagerTable::USERNAME, $username)->selectOne();
             if ($find) {
                 throw new AppException("用户名已存在");
             }
 
             $pwd = password_hash($password, PASSWORD_DEFAULT);
-            $reflection->newInstance()->insert([
-                $reflection->getConstant("USERNAME") => $username,
-                $reflection->getConstant("PASSWORD") => $pwd,
-                $reflection->getConstant("ROLES") => '[]',
+            new AdminManagerTable()->insert([
+                AdminManagerTable::USERNAME => $username,
+                AdminManagerTable::PASSWORD => $pwd,
+                AdminManagerTable::ROLES => '[]',
             ]);
 
             return JsonResponse::success();

@@ -3,6 +3,7 @@
 namespace Swlib\Controller\File\Controller;
 
 use Exception;
+use Generate\Tables\Main\ImagesTable;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
@@ -39,11 +40,10 @@ class Read extends AbstractController
     {
         $id = (int)$this->get('id', '缺少图片ID参数');
 
-        $imageTableReflection = Db::getTableReflection('ImagesTable');
         // 查询图片信息
-        $image = $imageTableReflection->newInstance()->where([
-            $imageTableReflection->getConstant('ID') => $id,
-            $imageTableReflection->getConstant('STATUS') => 1,
+        $image = new ImagesTable()->where([
+            ImagesTable::ID => $id,
+            ImagesTable::STATUS => 1,
         ])->selectOne();
 
         if (empty($image)) {
@@ -51,11 +51,11 @@ class Read extends AbstractController
         }
 
         // 更新访问次数和最后访问时间
-        $imageTableReflection->newInstance()->where([
-            $imageTableReflection->getConstant('ID') => $id,
+        new ImagesTable()->where([
+            ImagesTable::ID => $id,
         ])->update([
-            $imageTableReflection->getConstant('ACCESS_COUNT') => Db::incr(),
-            $imageTableReflection->getConstant('LAST_ACCESS_TIME') => date('Y-m-d H:i:s'),
+            ImagesTable::ACCESS_COUNT => Db::incr(),
+            ImagesTable::LAST_ACCESS_TIME => date('Y-m-d H:i:s'),
         ]);
 
         // 构建图片的真实访问地址

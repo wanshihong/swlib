@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Swlib\Utils;
 
 
+use Generate\DatabaseConnect;
 use Redis;
-use Swlib\Table\Trait\PoolRedis;
+use Swlib\Connect\PoolRedis;
 use Swlib\Enum\CtxEnum;
 use Swlib\Exception\LangException;
-use Swlib\Table\Connect\MysqlConnect;
 use Throwable;
 
 class Language
@@ -22,7 +22,7 @@ class Language
      */
     public static function getLanguages(): array
     {
-        $languageTableInfo = MysqlConnect::query("DESCRIBE  language")->fetch_all(MYSQLI_ASSOC);
+        $languageTableInfo = DatabaseConnect::query("DESCRIBE  language")->fetch_all(MYSQLI_ASSOC);
         $strings = [];
         foreach ($languageTableInfo as $index => $item) {
             if ($index <= 2) continue;
@@ -93,18 +93,18 @@ class Language
             return $redis->get($key);
         });
         if (empty($ret)) {
-            $find = MysqlConnect::query("select id,$lang from `language` where `zh`='$str'")->fetch_assoc();
+            $find = DatabaseConnect::query("select id,$lang from `language` where `zh`='$str'")->fetch_assoc();
             $time = time();
             if (empty($find)) {
-                MysqlConnect::query("insert into `language` (`zh`,`use_time`) values ('$str',$time)");
-                $find = MysqlConnect::query("select id,$lang from `language` where `zh`='$str'")->fetch_assoc();
+                DatabaseConnect::query("insert into `language` (`zh`,`use_time`) values ('$str',$time)");
+                $find = DatabaseConnect::query("select id,$lang from `language` where `zh`='$str'")->fetch_assoc();
             }
 
             $ret = $find[$lang];
             if (empty($ret)) {
-                MysqlConnect::query("update `language` set `$lang`='$ret',`use_time`=$time where id={$find['id']}");
+                DatabaseConnect::query("update `language` set `$lang`='$ret',`use_time`=$time where id={$find['id']}");
             } else {
-                MysqlConnect::query("update `language` set `use_time`=$time where id={$find['id']}");
+                DatabaseConnect::query("update `language` set `use_time`=$time where id={$find['id']}");
             }
 
 

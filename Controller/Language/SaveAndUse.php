@@ -3,6 +3,8 @@
 namespace Swlib\Controller\Language;
 
 
+use Generate\Tables\Main\LanguageTable;
+use Protobuf\Main\Language\LanguageProto;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Response\JsonResponse;
 use Swlib\Router\Router;
@@ -18,31 +20,30 @@ class SaveAndUse extends AbstractController
      * @throws Throwable
      */
     #[Router(method: 'POST', errorTitle: '设置使用时间失败')]
-    public function run(): JsonResponse
+    public function run(LanguageProto $request): JsonResponse
     {
 
-        $zh = $this->post('zh');
+        $zh = $request->getZh();
 
         // 为空 或者 太长了,可能是错误信息 也不必理会
         if (empty($zh) || strlen($zh) > 120) {
             return JsonResponse::success();
         }
 
-        $languageTableReflection = Db::getTableReflection('LanguageTable');
-        $id = $languageTableReflection->newInstance()->where([
-            $languageTableReflection->getConstant('ZH') => $zh,
-        ])->selectField($languageTableReflection->getConstant('ID'));
+        $id = new LanguageTable()->where([
+            LanguageTable::ZH => $zh,
+        ])->selectField(LanguageTable::ID);
 
         if (empty($id)) {
-            $languageTableReflection->newInstance()->insert([
-                $languageTableReflection->getConstant('ZH') => $zh,
-                $languageTableReflection->getConstant('USE_TIME') => time(),
+            new LanguageTable()->insert([
+                LanguageTable::ZH => $zh,
+                LanguageTable::USE_TIME => time(),
             ]);
         } else {
-            $languageTableReflection->newInstance()->where([
-                $languageTableReflection->getConstant('ID') => $id,
+            new LanguageTable()->where([
+                LanguageTable::ID => $id,
             ])->update([
-                $languageTableReflection->getConstant('USE_TIME') => time(),
+                LanguageTable::USE_TIME => time(),
             ]);
         }
 

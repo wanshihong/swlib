@@ -3,14 +3,14 @@
 namespace Swlib\Event;
 
 
-use Generate\ConfigEnum;
+use Generate\Tables\Main\RouterHisTable;
+use Generate\Tables\Main\RouterTable;
 use ReflectionException;
-use Swlib\Table\Trait\PoolRedis;
+use Swlib\Connect\PoolRedis;
 use Swlib\Coroutine\Attribute\CoroutineAttribute;
 use Swlib\Event\Abstract\AbstractEvent;
 use Swlib\Event\Attribute\Event;
 use Swlib\Table\Db;
-use Swlib\Utils\StringConverter;
 use Swlib\Utils\Url;
 use Throwable;
 
@@ -75,8 +75,7 @@ class HttpRouteEnterEvent extends AbstractEvent
 
         // 获取或创建router_id
         $routerId = PoolRedis::getSet("saveRouterHistory:$uri", function () use ($uri) {
-            $routerTableReflection = Db::getTableReflection('RouterTable');
-            $router = $routerTableReflection->newInstance()->addWhere($routerTableReflection->getConstant('URI'), "$uri")->selectOne();
+            $router = new RouterTable()->addWhere(RouterTable::URI, "$uri")->selectOne();
             return $router->id;
         });
 
@@ -119,7 +118,7 @@ class HttpRouteEnterEvent extends AbstractEvent
 
     /**
      * 检查并执行批量写入
-     * @throws ReflectionException
+     * @throws Throwable
      */
     private function checkAndBatchWrite(): void
     {
@@ -132,7 +131,7 @@ class HttpRouteEnterEvent extends AbstractEvent
 
     /**
      * 检查超时写入
-     * @throws ReflectionException
+     * @throws Throwable
      */
     private function checkTimeoutWrite(): void
     {
@@ -162,11 +161,10 @@ class HttpRouteEnterEvent extends AbstractEvent
 
             // 使用Redis缓存避免同一天重复执行
             PoolRedis::getSet("deleteRouterHistory:$currentDate", function () {
-                $routerHisTableReflection = Db::getTableReflection('RouterHisTable');
-                $timeField = $routerHisTableReflection->getConstant('TIME');
+                $timeField = RouterHisTable::TIME;
                 $minSaveTime = time() - 86400 * 90; // 90天前
 
-                $minTime = $routerHisTableReflection->newInstance()->where([
+                $minTime = new RouterHisTable()->where([
                     [$timeField, '<', $minSaveTime]
                 ])->order([
                     $timeField => 'asc'
@@ -182,7 +180,7 @@ class HttpRouteEnterEvent extends AbstractEvent
 
     /**
      * 批量写入历史记录
-     * @throws ReflectionException
+     * @throws Throwable
      */
     private function batchWriteHistory(string $uri, array $data): void
     {
@@ -198,40 +196,35 @@ class HttpRouteEnterEvent extends AbstractEvent
         // 立即清空当前URI的历史记录
         unset(self::$historyBuffer[$uri]);
 
-        // 使用 ReflectionClass 动态导入类
-        $routerTableReflection = Db::getTableReflection('RouterTable');
-        $routerHisTableReflection = Db::getTableReflection('RouterHisTable');
-
         $insertData = [];
         foreach ($tempHistoryData as $record) {
             $insertData[] = [
-                $routerHisTableReflection->getConstant('ROUTER_ID') => $routerId,
-                $routerHisTableReflection->getConstant('URI') => $uri,
-                $routerHisTableReflection->getConstant('TIME') => $record['time'],
-                $routerHisTableReflection->getConstant('IP') => $record['ip'],
+                RouterHisTable::ROUTER_ID => $routerId,
+                RouterHisTable::URI => $uri,
+                RouterHisTable::TIME => $record['time'],
+                RouterHisTable::IP => $record['ip'],
             ];
         }
 
         // 批量插入
-        $routerHisTableReflection->newInstance()->insertAll($insertData);
+        new RouterHisTable()->insertAll($insertData);
 
         // 更新router表的统计信息
-        $routerTableReflection->newInstance()->addWhere($routerTableReflection->getConstant('ID'), $routerId)->update([
-            $routerTableReflection->getConstant('LAST_TIME') => time(),
-            $routerTableReflection->getConstant('NUM') => Db::incr($recordCount)
+        new RouterTable()->addWhere(RouterTable::ID, $routerId)->update([
+            RouterTable::LAST_TIME => time(),
+            RouterTable::NUM => Db::incr($recordCount)
         ]);
     }
 
     /**
      * 删除路由
-     * @throws ReflectionException
+     * @throws Throwable
      */
     public function deleteHistory(int $minSaveTime): void
     {
-        $routerHisTableReflection = Db::getTableReflection('RouterHisTable');
         while (true) {
-            $res = $routerHisTableReflection->newInstance()->where([
-                [$routerHisTableReflection->getConstant('TIME'), '<', $minSaveTime]
+            $res = new RouterHisTable()->where([
+                [RouterHisTable::TIME, '<', $minSaveTime]
             ])->limit(3000)->delete();
             if (empty($res)) {
                 break;

@@ -5,11 +5,7 @@ namespace Swlib\Table\Trait;
 use Exception;
 use Generate\DatabaseConnect;
 use Generate\TableFieldMap;
-use ReflectionClass;
-use ReflectionException;
-use Swlib\DataManager\ReflectionManager;
 use Swlib\Table\Expression;
-use Swlib\Utils\StringConverter;
 use Throwable;
 
 trait DbHelperTrait
@@ -85,40 +81,6 @@ trait DbHelperTrait
         return isset(TableFieldMap::maps[$dbName][$asName]);
     }
 
-
-    /**
-     * 通过类的反射获取数据库表的反射
-     * @throws ReflectionException
-     * @throws Exception
-     */
-    public static function getTableReflection(string $className): ReflectionClass
-    {
-        return self::_getReflection($className, 'Tables');
-    }
-
-    /**
-     * 通过类的反射获取数据库表的反射
-     * @throws ReflectionException
-     * @throws Exception
-     */
-    public static function getTableDtoReflection(string $className): ReflectionClass
-    {
-        return self::_getReflection($className, 'TablesDto');
-    }
-
-    /**
-     * @throws ReflectionException
-     * @throws Exception
-     */
-    private static function _getReflection(string $className, string $namespace): ReflectionClass
-    {
-        $dbName = DatabaseConnect::getDbName();
-        $dbName = StringConverter::underscoreToCamelCase($dbName);
-        $routerTableName = "Generate\\$namespace\\$dbName\\$className";
-
-        // 使用 ReflectionClass 动态导入类
-        return ReflectionManager::getClass($routerTableName);
-    }
 
     /**
      * 生成 update 增量字段 sql

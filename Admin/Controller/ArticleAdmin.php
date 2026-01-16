@@ -2,7 +2,7 @@
 
 namespace Swlib\Admin\Controller;
 
-use ReflectionException;
+use Generate\Tables\Main\ArticleTable;
 use Swlib\Admin\Config\PageConfig;
 use Swlib\Admin\Config\PageFieldsConfig;
 use Swlib\Admin\Controller\Abstract\AbstractAdmin;
@@ -17,16 +17,13 @@ use Throwable;
 class ArticleAdmin extends AbstractAdmin
 {
 
-    /**
-     * @throws ReflectionException
-     */
+
     protected function configPage(PageConfig $config): void
     {
         $config->pageName = "文章内容";
-        $reflection = Db::getTableReflection('ArticleTable');
-        $config->tableName = $reflection->getName();
+        $config->tableName = ArticleTable::class;
         $config->order = [
-            $reflection->getConstant('ID') => 'desc'
+            ArticleTable::ID => 'desc'
         ];
     }
 
@@ -36,15 +33,14 @@ class ArticleAdmin extends AbstractAdmin
      */
     protected function configField(PageFieldsConfig $fields): void
     {
-        $reflection = Db::getTableReflection('ArticleTable');
         $fields->setFields(
-            new NumberField(field: $reflection->getConstant('ID'), label: 'ID')->hideOnForm(),
-            new TextField(field: $reflection->getConstant('TITLE'), label: '标题'),
-            new TextField(field: $reflection->getConstant('SUB_TITLE'), label: '副标题')->setRequired(false)->hideOnFilter(),
-            new ImageField(field: $reflection->getConstant('COVER'), label: '封面')->setRequired(false)->hideOnFilter(),
-            new EditorField(field: $reflection->getConstant('CONTENT'), label: '内容')->hideOnList()->hideOnFilter(),
-            new SwitchField(field: $reflection->getConstant('IS_ENABLE'), label: '是否启用')->hideOnForm(),
-            new TextField(field: $reflection->getConstant('GROUP_POS'), label: '分组位置')->setRequired(false),
+            new NumberField(field: ArticleTable::ID, label: 'ID')->hideOnForm(),
+            new TextField(field: ArticleTable::TITLE, label: '标题'),
+            new TextField(field: ArticleTable::SUB_TITLE, label: '副标题')->setRequired(false)->hideOnFilter(),
+            new ImageField(field: ArticleTable::COVER, label: '封面')->setRequired(false)->hideOnFilter(),
+            new EditorField(field: ArticleTable::CONTENT, label: '内容')->hideOnList()->hideOnFilter(),
+            new SwitchField(field: ArticleTable::IS_ENABLE, label: '是否启用')->hideOnForm(),
+            new TextField(field: ArticleTable::GROUP_POS, label: '分组位置')->setRequired(false),
         );
     }
 

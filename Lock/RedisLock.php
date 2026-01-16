@@ -6,7 +6,7 @@ namespace Swlib\Lock;
 
 use Redis;
 use RuntimeException;
-use Swlib\Table\Trait\PoolRedis;
+use Swlib\Connect\PoolRedis;
 use Swlib\Coroutine\CoroutineContext;
 use Swoole\Coroutine;
 use Swoole\Timer;

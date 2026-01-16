@@ -2,10 +2,11 @@
 
 namespace Swlib\Controller\Config\Controller;
 
+use Protobuf\Main\Config\ConfigListsProto;
+use Protobuf\Main\Config\ConfigProto;
 use Swlib\Controller\Abstract\AbstractController;
 
 use Swlib\Controller\Config\Service\ConfigService;
-use Swlib\Response\JsonResponse;
 use Swlib\Router\Router;
 use Throwable;
 
@@ -15,9 +16,9 @@ class Get extends AbstractController
      * @throws Throwable
      */
     #[Router(errorTitle: '获取配置信息失败')]
-    public function run(): JsonResponse
+    public function run(ConfigProto $request): ConfigListsProto
     {
-        $key = $this->post('key');
+        $key = $request->getKey();
         $keyArr = explode(',', $key);
         $desc = $this->post('desc');
         $arr = ConfigService::get(
@@ -27,14 +28,16 @@ class Get extends AbstractController
         );
         $nodes = [];
         foreach ($arr as $k => $v) {
-            $nodes[] = [
-                'key' => $k,
-                'value' => $v ?: '',
-            ];
+            $proto = new ConfigProto();
+            $proto->setKey($k);
+            $proto->setValue($v);
+
+            $nodes[] = $proto;
         }
 
-
-        return JsonResponse::success($nodes);
+        $message = new ConfigListsProto();
+        $message->setLists($nodes);
+        return $message;
     }
 
 }

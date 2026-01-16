@@ -3,6 +3,7 @@
 namespace Swlib\Controller\Language;
 
 
+use Generate\Tables\Main\LanguageTable;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Response\JsonResponse;
 use Swlib\Router\Router;
@@ -20,11 +21,10 @@ class All extends AbstractController
     #[Router(method: ['GET', 'POST'], errorTitle: '获取翻译列表数据失败')]
     public function run(): JsonResponse
     {
-        $languageTableReflection = Db::getTableReflection('LanguageTable');
-        $languages = $languageTableReflection->newInstance()->selectAll();
+        $languages = new LanguageTable()->selectAll();
 
 
-        $excludeFields = [$languageTableReflection->getConstant('USE_TIME'), $languageTableReflection->getConstant('ID')];
+        $excludeFields = [LanguageTable::USE_TIME, LanguageTable::ID];
 
         $ret = [];
         foreach ($languages as $row) {

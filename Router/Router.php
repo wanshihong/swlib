@@ -11,7 +11,7 @@ use Google\Protobuf\Internal\Message;
 use InvalidArgumentException;
 use Redis;
 use ReflectionException;
-use Swlib\Table\Trait\PoolRedis;
+use Swlib\Connect\PoolRedis;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\DataManager\ReflectionManager;
 use Swlib\Exception\AppException;
