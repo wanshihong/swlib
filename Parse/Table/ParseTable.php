@@ -142,7 +142,7 @@ class ParseTable
                 $parseTableMap->createMap($dbName, $tableName, $fields, $lastCount);
 
 
-                new ParseTableCRUD($database, $tableName, $fields, $tableComment);
+                new ParseTableCRUD($dbName, $tableName, $fields, $tableComment);
                 new ParseTableAdmin($database, $tableName, $fields, $tableComment);
 
 

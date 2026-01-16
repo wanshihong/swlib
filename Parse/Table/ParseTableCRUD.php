@@ -5,6 +5,7 @@ namespace Swlib\Parse\Table;
 
 
 use Exception;
+use Generate\DatabaseConnect;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
 
@@ -12,7 +13,6 @@ class ParseTableCRUD
 {
 
     const string saveDir = RUNTIME_DIR . "codes/crud/";
-
 
     /**
      * @throws Exception
@@ -34,19 +34,19 @@ class ParseTableCRUD
     {
 
         $this->tableName = StringConverter::underscoreToCamelCase($this->tableName);
-
+        $namespace = DatabaseConnect::getNamespace($this->database);
         $saveStr[] = "<?php //$this->tableName";
-        $saveStr[] = 'namespace App\Curd\\' . $this->database . ';';
+        $saveStr[] = 'namespace App\Curd\\' . $namespace . ';';
         $saveStr[] = '';
         $saveStr[] = '';
         $saveStr[] = 'use Swlib\Controller\Abstract\AbstractController;';
         $saveStr[] = 'use Swlib\Exception\AppException;';
         $saveStr[] = 'use Protobuf\Common\Success;';
         $saveStr[] = 'use Swlib\Router\Router;';
-        $saveStr[] = "use Generate\Models\\$this->database\\{$this->tableName}Model;";
-        $saveStr[] = "use Generate\Tables\\$this->database\\{$this->tableName}Table;";
-        $saveStr[] = 'use Protobuf\\' . $this->database . '\\' . $this->tableName . '\\' . $this->tableName . 'Proto;';
-        $saveStr[] = 'use Protobuf\\' . $this->database . '\\' . $this->tableName . '\\' . $this->tableName . 'ListsProto;';
+        $saveStr[] = "use Generate\Models\\$namespace\\{$this->tableName}Model;";
+        $saveStr[] = "use Generate\Tables\\$namespace\\{$this->tableName}Table;";
+        $saveStr[] = 'use Protobuf\\' . $namespace . '\\' . $this->tableName . '\\' . $this->tableName . 'Proto;';
+        $saveStr[] = 'use Protobuf\\' . $namespace . '\\' . $this->tableName . '\\' . $this->tableName . 'ListsProto;';
         $saveStr[] = 'use Throwable;';
         $saveStr[] = '';
         $saveStr[] = '';
@@ -162,14 +162,14 @@ class ParseTableCRUD
         $saveStr[] = '            throw new AppException("缺少参数");';
         $saveStr[] = '        }';
         $saveStr[] = '';
-        $saveStr[] = '        $table = new ' . $this->tableName . 'Table()->where([';
+        $saveStr[] = '        $dto = new ' . $this->tableName . 'Table()->where([';
         $saveStr[] = '            ' . $this->tableName . 'Table::ID=>$id,';
         $saveStr[] = '        ])->selectOne();';
-        $saveStr[] = '        if(empty($table)){';
+        $saveStr[] = '        if(empty($dto)){';
         $saveStr[] = '            throw new AppException("参数错误");';
         $saveStr[] = '        }';
         $saveStr[] = '';
-        $saveStr[] = '        return ' . $this->tableName . 'Model::formatItem($table);';
+        $saveStr[] = '        return ' . $this->tableName . 'Model::formatItem($dto);';
         $saveStr[] = '    }';
         return $saveStr;
     }
