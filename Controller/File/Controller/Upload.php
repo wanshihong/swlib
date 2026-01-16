@@ -4,7 +4,6 @@ namespace Swlib\Controller\File\Controller;
 
 use Exception;
 use Generate\RouterPath;
-use mysqli;
 use Swlib\Connect\PoolMysql;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Controller\File\Service\FileUploader;

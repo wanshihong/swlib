@@ -103,13 +103,8 @@ class ParseConfig
             $retVal = $value;
             $retType = 'bool';
         } else {
-            if (str_contains($value, ',')) {
-                $retVal = var_export(explode(',', $value), true);
-                $retType = 'array';
-            } else {
-                $retVal = "'$value'";
-                $retType = 'string';
-            }
+            $retVal = "'$value'";
+            $retType = 'string';
         }
 
         return "    const $retType $key = $retVal;";

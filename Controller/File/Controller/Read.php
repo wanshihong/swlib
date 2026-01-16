@@ -3,7 +3,6 @@
 namespace Swlib\Controller\File\Controller;
 
 use Exception;
-use Generate\Tables\CommonApi\ImagesTable;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;

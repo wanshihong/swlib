@@ -60,7 +60,7 @@ class Router
         // 路由中间件 className
         public string|array $middleware = '',
 
-        // 广播出去的消息
+        // 广播出去的消息,仅限 websocket[ws wss] 请求有效
         public mixed        $broadcastMessage = null
     )
     {

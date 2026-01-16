@@ -2,7 +2,6 @@
 
 namespace Swlib\Admin\Controller;
 
-use App\Service\ConfigService;
 use ReflectionException;
 use Swlib\Admin\Config\PageConfig;
 use Swlib\Admin\Config\PageFieldsConfig;
@@ -18,6 +17,7 @@ use Swlib\Admin\Fields\TextareaField;
 use Swlib\Admin\Fields\TextField;
 use Swlib\Admin\Fields\UrlField;
 use Swlib\Admin\Manager\OptionManager;
+use Swlib\Controller\Config\Service\ConfigService;
 use Swlib\Table\Db;
 use Swlib\Table\Interface\TableDtoInterface;
 use Swlib\Table\Interface\TableInterface;
