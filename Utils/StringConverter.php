@@ -2,7 +2,6 @@
 
 namespace Swlib\Utils;
 
-use Throwable;
 
 /**
  * 字符串转换工具类

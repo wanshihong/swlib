@@ -6,6 +6,7 @@ namespace Swlib\Parse\Table;
 
 use Exception;
 use Generate\ConfigEnum;
+use Generate\DatabaseConnect;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
 
@@ -13,7 +14,7 @@ use Swlib\Utils\StringConverter;
 class ParseTableAdmin
 {
 
-    const string saveDir = RUNTIME_DIR . "codes/admin/";
+    const string saveDir = RUNTIME_DIR . "codes/admin/Controller/";
 
     private string $pathPrefix;
     private array $saveStr = [];
@@ -23,19 +24,19 @@ class ParseTableAdmin
      */
     public function __construct(public string $database, public string $tableName, public array $fields, public string $tableComment)
     {
-        $this->pathPrefix = StringConverter::getPrefixBeforeUnderscore($this->tableName);
+        $this->pathPrefix = StringConverter::underscoreToCamelCase($this->tableName);
         $this->tableName = StringConverter::underscoreToCamelCase($this->tableName);
 
         $adminNamespace = ConfigEnum::get('ADMIN_NAMESPACE');
-        // 解析命名空间，获取目录路径
-        $parts = explode('\\', $adminNamespace);
-        $namespace = implode('\\', $parts);
+
+
+        $namespace = DatabaseConnect::getNamespace($this->database);
 
         $this->saveStr[] = "<?php //$this->tableName";
-        $this->saveStr[] = "namespace $namespace\\$this->tableName;";
+        $this->saveStr[] = "namespace $adminNamespace\\Controller\\$this->pathPrefix;";
         $this->saveStr[] = '';
         $this->saveStr[] = '';
-        $this->saveStr[] = "use Generate\Tables\\$this->database\\{$this->tableName}Table;";
+        $this->saveStr[] = "use Generate\Tables\\$namespace\\{$this->tableName}Table;";
         $this->saveStr[] = 'use Swlib\Admin\Config\PageConfig;';
         $this->saveStr[] = 'use Swlib\Admin\Config\PageFieldsConfig;';
         $this->saveStr[] = 'use Swlib\Admin\Controller\Abstract\AbstractAdmin;';

@@ -155,7 +155,7 @@ class MessageQueue
             return $redis->get(self::MESSAGE_LOCK);
         });
         if ($lock) {
-            echo "被锁住了" . PHP_EOL;
+//            echo "被锁住了" . PHP_EOL;
             return;
         }
         //执行

@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS `router_his`
 CREATE TABLE IF NOT EXISTS `language`
 (
     `id`       int unsigned NOT NULL AUTO_INCREMENT,
-    `use_time` int DEFAULT NULL COMMENT '上次使用时间，太久没使用可以删除',
+    `use_time` int                                                    DEFAULT NULL COMMENT '上次使用时间，太久没使用可以删除',
+    `key`      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
     `zh`       text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT '中文-简体',
     `zh_tw`    text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT '中文-繁体(台湾)',
     `zh_hk`    text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT '中文-繁体(香港)',
@@ -73,8 +74,10 @@ CREATE TABLE IF NOT EXISTS `language`
     `ur`       text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT '乌尔都语',
     `sw`       text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT '斯瓦希里语',
     PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE KEY `key` (`key`),
     KEY `idx_use_time` (`use_time`)
 ) ENGINE = InnoDB
+  AUTO_INCREMENT = 356
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_bin
   ROW_FORMAT = DYNAMIC COMMENT ='多语言翻译表（App 本地化）';

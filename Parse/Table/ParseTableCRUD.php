@@ -36,7 +36,7 @@ class ParseTableCRUD
         $this->tableName = StringConverter::underscoreToCamelCase($this->tableName);
         $namespace = DatabaseConnect::getNamespace($this->database);
         $saveStr[] = "<?php //$this->tableName";
-        $saveStr[] = 'namespace App\Curd\\' . $namespace . ';';
+        $saveStr[] = "namespace App\Controller\\$this->tableName;";
         $saveStr[] = '';
         $saveStr[] = '';
         $saveStr[] = 'use Swlib\Controller\Abstract\AbstractController;';
@@ -54,11 +54,13 @@ class ParseTableCRUD
         $saveStr[] = "* $this->tableComment";
         $saveStr[] = "*/";
         $saveStr[] = '#[Router(method: \'POST\')]';
-        $saveStr[] = "class {$this->tableName}Api extends AbstractController{\n";
+        $saveStr[] = "class $actionName extends AbstractController{\n";
 
         foreach ($ctx as $ctxItem) {
             $saveStr[] = $ctxItem;
         }
+
+        $saveStr[] = '    // 其他私有方法,可以写在这里;一个文件一个功能,可以集中管理功能,减少到处创建 service 和 model';
 
         $saveStr[] = '}';
 

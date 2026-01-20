@@ -31,7 +31,7 @@
         </div>
 
 
-        <input type="text" class="form-control visually-hidden" :name="config.field"
+        <input type="text" class="form-control visually-hidden" id="{{ field.elemId }}" :name="config.field"
                :required="config.required"
                :value="value">
         <div class="invalid-feedback">

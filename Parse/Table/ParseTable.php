@@ -143,7 +143,7 @@ class ParseTable
 
 
                 new ParseTableCRUD($dbName, $tableName, $fields, $tableComment);
-                new ParseTableAdmin($database, $tableName, $fields, $tableComment);
+                new ParseTableAdmin($dbName, $tableName, $fields, $tableComment);
 
 
                 $this->tableNames[$dbName][] = StringConverter::underscoreToCamelCase($tableName);

@@ -68,6 +68,39 @@ function showImageFull(src) {
     myModal.show()
 }
 
+const imageFieldApps = window.imageFieldApps || (window.imageFieldApps = {})
+
+function normalizeImageValue(value) {
+    if (Array.isArray(value)) {
+        return value.filter(item => item)
+    }
+    if (value === undefined || value === null) {
+        return []
+    }
+    return String(value)
+        .split(',')
+        .map(item => item.trim())
+        .filter(item => item)
+}
+
+/**
+ * 设置上传组件的值
+ * @param elemId
+ * @param value
+ * @returns {boolean}
+ */
+function setImageFieldValue(elemId, value) {
+    const app = imageFieldApps[elemId]
+    if (!app) {
+        return false
+    }
+    app.paths = normalizeImageValue(value)
+    app.updateValue()
+    return true
+}
+
+window.setImageFieldValue = setImageFieldValue
+
 
 document.addEventListener('DOMContentLoaded', function () {
     const {createApp} = Vue
@@ -83,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
 
-        createApp({
+        const instance = createApp({
             delimiters: ['[[', ']]'],
             data() {
                 return {
@@ -128,9 +161,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }).mount(`#${id}`)
+        imageFieldApps[id] = instance
 
     })
 
 
 });
-
