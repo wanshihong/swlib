@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Swlib\Parse\Router\GenApi;
 
+use Exception;
 use Generate\ConfigEnum;
 use Swlib\Parse\Router\GenApi\Abstract\AbstractApiGenerator;
 use Swlib\Parse\Router\GenApi\Helper\ApiGeneratorHelper;
@@ -18,7 +19,7 @@ class TsApiGenerator extends AbstractApiGenerator
     /**
      * 模板目录路径
      */
-    private const TEMPLATE_DIR = __DIR__ . '/Templates/ts/';
+    private const string TEMPLATE_DIR = __DIR__ . '/Templates/ts/';
 
     protected function getSaveDir(): string
     {
@@ -167,6 +168,7 @@ export const {$name}SocketSend = (params: {$requestI}) => {
 
     /**
      * 保存文件后复制模板和生成配置
+     * @throws Exception
      */
     protected function saveFiles(): void
     {
@@ -177,6 +179,7 @@ export const {$name}SocketSend = (params: {$requestI}) => {
 
     /**
      * 复制模板文件到目标目录
+     * @throws Exception
      */
     private function copyTemplates(): void
     {
@@ -202,20 +205,14 @@ export const {$name}SocketSend = (params: {$requestI}) => {
 
         $template = file_get_contents($templateFile);
 
-        // 获取配置值
-        $dbName = ConfigEnum::DB_DATABASE;
-        if (is_array($dbName)) {
-            $dbName = $dbName[0];
-        }
-
         // 构建 API URL
         $protocol = ConfigEnum::get('HTTPS', true) ? 'https' : 'http';
         $port = ConfigEnum::get('PORT', 9511);
-        $apiUrl = ConfigEnum::get('API_URL', "{$protocol}://localhost:{$port}");
+        $apiUrl = ConfigEnum::get('API_URL', "$protocol://localhost:$port");
 
         // 构建 WebSocket URL
         $wsProtocol = ConfigEnum::get('HTTPS', true) ? 'wss' : 'ws';
-        $wsHost = ConfigEnum::get('WS_HOST', "{$wsProtocol}://localhost:{$port}");
+        $wsHost = ConfigEnum::get('WS_HOST', "$wsProtocol://localhost:$port");
 
         // 替换模板变量
         $replacements = [
