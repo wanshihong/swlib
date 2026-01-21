@@ -14,10 +14,14 @@ class CopyProtoFile
 
     public function __construct()
     {
-        $dir = ROOT_DIR . "App";
-        $files = File::eachDir($dir, function ($filePath) {
+        $appFiles = File::eachDir(ROOT_DIR . "App", function ($filePath) {
             return str_ends_with($filePath, '.php');
         });
+
+        $swlibFiles = File::eachDir(ROOT_DIR . "Swlib/Controller", function ($filePath) {
+            return str_ends_with($filePath, '.php');
+        });
+        $files = array_merge($appFiles, $swlibFiles);
 
         $protoFiles = [];
 
@@ -148,7 +152,7 @@ class CopyProtoFile
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0777, true);
         }
-        
+
         foreach ($protoFiles as $protoFile) {
             copy($protoFile['source'], $targetDir . $protoFile['fileName']);
         }

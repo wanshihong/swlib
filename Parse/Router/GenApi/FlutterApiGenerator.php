@@ -3,26 +3,23 @@ declare(strict_types=1);
 
 namespace Swlib\Parse\Router\GenApi;
 
+use Exception;
+use Generate\ConfigEnum;
 use Swlib\Parse\Router\GenApi\Abstract\AbstractApiGenerator;
 use Swlib\Parse\Router\GenApi\Helper\ApiGeneratorHelper;
 use Swlib\Router\Router;
-use Swlib\Utils\StringConverter;
+use Swlib\Utils\File;
 
 /**
  * Flutter API 生成器
+ * 生成完整的 API 调用代码，包括 http.dart、crypto.dart 等通用库
  */
 class FlutterApiGenerator extends AbstractApiGenerator
 {
     /**
-     * 配置变量名（如 miYaoBiJiUrl）
+     * 模板目录路径
      */
-    protected string $configVarName;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->configVarName = $this->convertDbNameToConfigVar($this->dbName);
-    }
+    private const string TEMPLATE_DIR = __DIR__ . '/Templates/flutter/';
 
     protected function getSaveDir(): string
     {
@@ -39,13 +36,14 @@ class FlutterApiGenerator extends AbstractApiGenerator
         return <<<'DART'
   /// {$desc}
   static Future<{$responseType}> {$name}({$params}) async {
-    return ApiClient.instance.request<{$responseType}>(
-      '${AppConfig.{$configVar}}/{$url}',
-      requestData: {$paramsMap},
-      fromProto: (bytes) => {$responseType}.fromBuffer(bytes),
-      toProto: {$toProtoFunc},
+    return Http.callApi<{$responseType}>(
+      url: '${Config.apiUrl}/{$url}',
+      params: {$paramsValue},
       showError: showErr,
-      errorTitle: '{$title}',
+      errorMessage: '{$title}',
+      toProto: {$toProtoFunc},
+      fromProto: (bytes) => {$responseType}.fromBuffer(bytes),
+      cacheTime: {$cache},
     );
   }
 
@@ -56,21 +54,31 @@ DART;
     {
         return <<<'DART'
   /// {$desc} - WebSocket 监听
-  static void {$name}On({
+  static void {$name}SocketOn({
     bool showErr = true,
     required void Function({$responseType} res) callback,
   }) {
-    // TODO: WebSocket 实现
+    Socket.getInstance().on(SocketBindOnResponse<{$responseType}>(
+      url: '{$url}',
+      fromProto: (bytes) => {$responseType}.fromBuffer(bytes),
+      callback: callback,
+      showError: showErr,
+      errorMessage: '{$title}',
+    ));
   }
 
   /// {$desc} - 取消 WebSocket 监听
-  static void {$name}Off(void Function({$responseType} res) callback) {
-    // TODO: WebSocket 实现
+  static void {$name}SocketOff([void Function({$responseType})? callback]) {
+    Socket.getInstance().off('{$url}', callback);
   }
 
   /// {$desc} - 发送 WebSocket 消息
-  static void {$name}Send({$params}) {
-    // TODO: WebSocket 实现
+  static void {$name}SocketSend({$params}) {
+    Socket.getInstance().send(SocketSendRequest(
+      url: '{$url}',
+      params: {$paramsValue},
+      toProto: {$toProtoFunc},
+    ));
   }
 
 DART;
@@ -78,24 +86,21 @@ DART;
 
     protected function getFileHeader(string $filePath): string
     {
-        // 从文件路径提取类名
-        $fileName = basename($filePath, '.dart');
-        $fileName = str_replace('-', '_', $fileName);
-        $className = StringConverter::underscoreToCamelCase($fileName);
-        $className = ucfirst($className) . 'Api';
-
         $dateTime = ApiGeneratorHelper::getCurrentDateTime();
 
         return <<<DART
 // Auto-generated file. Do not edit manually.
 // Generated at: {$dateTime}
 
-import 'package:mi_yao_bi_ji/core/network/api_client.dart';
-import 'package:mi_yao_bi_ji/core/config/app_config.dart';
-import 'package:mi_yao_bi_ji/proto/generated/proto.dart';
+import 'dart:typed_data';
+import './Lib/lib.dart';
+import './config.dart';
 
-/// $className
-class $className {
+// TODO: 根据实际项目调整 Protobuf 导入路径
+// import 'package:your_app/proto/generated/proto.dart';
+
+/// API 调用类
+class Api {
 
 DART;
     }
@@ -103,6 +108,14 @@ DART;
     protected function getFileFooter(): string
     {
         return "}\n";
+    }
+
+    /**
+     * 合并所有 API 到单个文件
+     */
+    protected function getSavePath(string $url): string
+    {
+        return $this->getSaveDir() . 'api.' . $this->getFileExtension();
     }
 
     protected function processRouterItem(Router $item, string $requestType): ?array
@@ -123,7 +136,7 @@ DART;
 
         // 生成参数列表
         $params = $this->generateDartParams($item->request);
-        $paramsMap = $this->generateDartParamsMap($item->request);
+        $paramsValue = $this->generateDartParamsValue($item->request);
         $toProtoFunc = $this->generateToProtoFunc($item->request);
 
         return [
@@ -133,24 +146,107 @@ DART;
             '{$response}' => $response,
             '{$responseType}' => $responseType,
             '{$params}' => $params,
-            '{$paramsMap}' => $paramsMap,
+            '{$paramsValue}' => $paramsValue,
             '{$toProtoFunc}' => $toProtoFunc,
             '{$cache}' => $item->cache ?: 0,
             '{$title}' => $item->errorTitle,
             '{$desc}' => str_replace('失败', '', $item->errorTitle),
-            '{$dbNameUpper}' => $this->dbNameUpper,
-            '{$configVar}' => $this->configVarName,
         ];
     }
 
     /**
-     * 将数据库名转换为配置变量名
-     * 例如：mi_yao_bi_ji -> miYaoBiJiUrl
+     * 生成前清理目录
      */
-    private function convertDbNameToConfigVar(string $dbName): string
+    public function generate(array $attributes): bool
     {
-        $camelCase = StringConverter::underscoreToCamelCase($dbName, '_', false);
-        return $camelCase . 'Url';
+        $this->cleanDirectory();
+        return parent::generate($attributes);
+    }
+
+    /**
+     * 清理生成目录（保留 Lib 目录）
+     */
+    private function cleanDirectory(): void
+    {
+        $dir = $this->getSaveDir();
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        // 只删除根目录下的 .dart 文件，保留子目录
+        $files = glob($dir . '*.dart');
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                @unlink($file);
+            }
+        }
+    }
+
+    /**
+     * 保存文件后复制模板和生成配置
+     * @throws Exception
+     */
+    protected function saveFiles(): void
+    {
+        parent::saveFiles();
+        $this->copyTemplates();
+        $this->generateConfig();
+    }
+
+    /**
+     * 复制模板文件到目标目录
+     * @throws Exception
+     */
+    private function copyTemplates(): void
+    {
+        $templateLibDir = self::TEMPLATE_DIR . 'Lib/';
+        $targetLibDir = $this->getSaveDir() . 'Lib/';
+
+        // 复制整个 Lib 目录
+        if (is_dir($templateLibDir)) {
+            File::copyDirectory($templateLibDir, $targetLibDir);
+        }
+    }
+
+    /**
+     * 生成 config.dart 配置文件
+     */
+    private function generateConfig(): void
+    {
+        $templateFile = self::TEMPLATE_DIR . 'config.dart.tpl';
+
+        if (!file_exists($templateFile)) {
+            return;
+        }
+
+        $template = file_get_contents($templateFile);
+
+        // 构建 API URL
+        $protocol = ConfigEnum::get('HTTPS', true) ? 'https' : 'http';
+        $port = ConfigEnum::get('PORT', 9511);
+        $apiUrl = ConfigEnum::get('API_URL', "$protocol://localhost:$port");
+
+        // 构建 WebSocket URL
+        $wsProtocol = ConfigEnum::get('HTTPS', true) ? 'wss' : 'ws';
+        $wsHost = ConfigEnum::get('WS_HOST', "$wsProtocol://localhost:$port");
+
+        // 替换模板变量
+        $replacements = [
+            '{$API_URL}' => $apiUrl,
+            '{$WS_HOST}' => $wsHost,
+            '{$APP_ID}' => ConfigEnum::get('APP_ID', '1'),
+            '{$APP_SECRET}' => ConfigEnum::get('APP_SECRET', 'secret'),
+            '{$TIMEOUT}' => ConfigEnum::get('TIMEOUT', 30000),
+            '{$DEFAULT_LANGUAGE}' => ConfigEnum::get('DEFAULT_LANGUAGE', 'zh'),
+        ];
+
+        $content = str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $template
+        );
+
+        File::save($this->getSaveDir() . 'config.dart', $content);
     }
 
     /**
@@ -193,9 +289,9 @@ DART;
     }
 
     /**
-     * 生成 Dart 参数映射
+     * 生成 Dart 参数值
      */
-    private function generateDartParamsMap(string $request): string
+    private function generateDartParamsValue(string $request): string
     {
         if (empty($request) || !ApiGeneratorHelper::isProtobufType($request)) {
             return 'null';
@@ -216,4 +312,3 @@ DART;
         return "(data) => (data as $requestType).writeToBuffer()";
     }
 }
-

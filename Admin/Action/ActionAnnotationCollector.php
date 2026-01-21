@@ -10,6 +10,8 @@ use Swlib\Admin\Controller\Attribute\DisableAction;
 use Swlib\Admin\Controller\Interface\AdminControllerInterface;
 use Swlib\Admin\Manager\AdminUserManager;
 use Swlib\DataManager\ReflectionManager;
+use Swlib\Enum\CtxEnum;
+use Swlib\Request\Request;
 use Swlib\Utils\Url;
 use Throwable;
 
@@ -101,6 +103,21 @@ class ActionAnnotationCollector
         usort($actions, function ($a, $b) {
             return $a->sort <=> $b->sort;
         });
+
+
+        // 处理占位符
+        foreach ($actions as $action) {
+            foreach ($action->params as $k => $param) {
+                if (str_starts_with($param, 'get:')) {
+                    $key = substr($param, 4);
+                    $action->params [$k] = Request::get($key);
+                }
+                if (str_starts_with($param, 'post:')) {
+                    $key = substr($param, 5);
+                    $action->params [$k] = Request::post($key);
+                }
+            }
+        }
 
 
         // 收集静态页面添加到页面

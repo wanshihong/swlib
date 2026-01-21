@@ -44,7 +44,11 @@ class ActionButton
      * @param string $template 按钮使用的模板文件
      * @param array $params 按钮附加的参数，支持占位符语法：以 % 开头的值会被替换为当前行对应字段的值
      *                      例如：params: [PostContentTable::POST_ID => '%' . PostsTable::ID]
+     *                      例如：params: [PostContentTable::POST_ID => 'get:' . PostsTable::ID]
+     *                      例如：params: [PostContentTable::POST_ID => 'post:' . PostsTable::ID]
      *                      运行时 '%id' 会被替换为当前行的 id 字段值
+     *                      运行时 'get:' 会被替换为 接收 get 参数
+     *                      运行时 'post:' 会被替换为 接收 post 参数
      * @param string $sourceUrl 链接的来源页面URL，用于锁定左侧导航菜单
      */
     public function __construct(
