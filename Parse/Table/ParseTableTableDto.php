@@ -48,8 +48,15 @@ class ParseTableTableDto
         $this->saveStr[] = '';
         $this->saveStr[] = '    use TableDtoTrait;';
         $this->saveStr[] = '    use TableDataListsTrait;';
-        $this->saveStr[] = '    const string TABLE_CLASS = ' . $this->tableName . 'Table::class;';
+        $this->saveStr[] = '    const string TABLE_CLASS = ' . $this->tableName . 'Table::class;' . PHP_EOL . PHP_EOL;
+        $this->saveStr[] = '    /**';
+        $this->saveStr[] = '    * @var ' . $this->tableName . 'TableDto[]';
+        $this->saveStr[] = '    */';
+        $this->saveStr[] = '    private array $__rows = [];' . PHP_EOL . PHP_EOL;
+        $this->saveStr[] = '    /**';
+
         $this->createFieldGetSet();
+        $this->createGenerator();
         $this->saveStr[] = '';
 
 
@@ -84,7 +91,7 @@ class ParseTableTableDto
 
     private function fieldType(string $dbFieldType, string $field, string $comment, mixed $dbDefault, bool $allowNull): void
     {
-        $fieldCamelCase = StringConverter::underscoreToCamelCase($field,'_',false);
+        $fieldCamelCase = StringConverter::underscoreToCamelCase($field, '_', false);
         $fieldConstName = strtoupper($field); // 字段别名常量名，例如：APP_ID
 
         // 使用统一的默认值处理方法
@@ -109,6 +116,30 @@ class ParseTableTableDto
 
         $this->saveStr[] = '    }';
         $this->saveStr[] = '';
+    }
+
+    public function createGenerator(): void{
+        $this->saveStr[] = <<<php
+    /**
+     * @return Generator<{$this->tableName}TableDto>
+     */
+    public function getIterator(): Generator
+    {
+        // 如果是列表数据（多行）
+        if (!empty(\$this->__rows)) {
+            foreach (\$this->__rows as \$index => \$item) {
+                yield \$index => \$item;
+            }
+        } // 如果是单行数据（遍历字段）
+        else if (!empty(\$this->__row)) {
+            foreach (\$this->__row as \$fieldAsName => \$value) {
+                yield \$fieldAsName => \$value;
+            }
+        }
+
+    }
+php;
+
     }
 
 }

@@ -4,11 +4,10 @@ namespace Swlib\Controller\Language;
 
 
 use Generate\Tables\Main\LanguageTable;
+use Protobuf\Common\Success;
 use Protobuf\Main\Language\LanguageProto;
 use Swlib\Controller\Abstract\AbstractController;
-use Swlib\Response\JsonResponse;
 use Swlib\Router\Router;
-use Swlib\Table\Db;
 use Throwable;
 
 
@@ -20,14 +19,17 @@ class SaveAndUse extends AbstractController
      * @throws Throwable
      */
     #[Router(method: 'POST', errorTitle: '设置使用时间失败')]
-    public function run(LanguageProto $request): JsonResponse
+    public function run(LanguageProto $request): Success
     {
 
         $zh = $request->getZh();
 
+        $ret = new Success();
+        $ret->setSuccess(true);
+
         // 为空 或者 太长了,可能是错误信息 也不必理会
         if (empty($zh) || strlen($zh) > 120) {
-            return JsonResponse::success();
+            return $ret;
         }
 
         $id = new LanguageTable()->where([
@@ -47,8 +49,7 @@ class SaveAndUse extends AbstractController
             ]);
         }
 
-
-        return JsonResponse::success();
+        return $ret;
 
     }
 

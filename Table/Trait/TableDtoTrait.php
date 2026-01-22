@@ -4,7 +4,6 @@ namespace Swlib\Table\Trait;
 
 
 use Exception;
-use Generator;
 use InvalidArgumentException;
 use Swlib\Table\Db;
 use Throwable;
@@ -323,20 +322,5 @@ trait TableDtoTrait
         return $this->__row[$name] ?? null;
     }
 
-    public function getIterator(): Generator
-    {
-        // 如果是列表数据（多行）
-        if (!empty($this->__rows)) {
-            foreach ($this->__rows as $index => $item) {
-                yield $index => $item;
-            }
-        } // 如果是单行数据（遍历字段）
-        else if (!empty($this->__row)) {
-            foreach ($this->__row as $fieldAsName => $value) {
-                yield $fieldAsName => $value;
-            }
-        }
-
-    }
 
 }

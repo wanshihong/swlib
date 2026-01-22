@@ -130,6 +130,10 @@ DART;
 
         // 获取方法名称（小驼峰）
         $name = lcfirst(ApiGeneratorHelper::getApiMethodName($item->className, $item->methodName));
+        if(str_ends_with($name, 'Run')) {
+            $name = substr($name, 0, -3);
+        }
+
 
         // 获取响应类型
         $responseType = $this->getDartResponseType($response);

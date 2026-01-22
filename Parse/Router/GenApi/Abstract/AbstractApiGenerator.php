@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Swlib\Parse\Router\GenApi\Abstract;
 
-use Generate\ConfigEnum;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Parse\Router\GenApi\Helper\ApiGeneratorHelper;
 use Swlib\Router\Router;
@@ -15,30 +14,12 @@ use Swlib\Utils\File;
  */
 abstract class AbstractApiGenerator
 {
-    /**
-     * 数据库名称（用于生成配置变量名）
-     */
-    protected string $dbName;
-
-    /**
-     * 数据库名称大写形式
-     */
-    protected string $dbNameUpper;
 
     /**
      * 收集的文件内容 [filePath => content]
      */
     protected array $fileContents = [];
 
-    public function __construct()
-    {
-        $dbName = ConfigEnum::DB_DATABASE;
-        if (is_array($dbName)) {
-            $dbName = $dbName[0];
-        }
-        $this->dbName = $dbName;
-        $this->dbNameUpper = strtoupper($dbName);
-    }
 
     /**
      * 获取保存目录

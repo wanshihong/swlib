@@ -3,7 +3,6 @@
 namespace Swlib\Table\Trait;
 
 
-use Swlib\Table\Interface\TableDtoInterface;
 use Throwable;
 
 /**
@@ -11,12 +10,6 @@ use Throwable;
  */
 trait TableDataListsTrait
 {
-    /**
-     * @var TableDtoInterface[]
-     */
-    private array $__rows = [];
-
-
     /**
      * @throws Throwable
      */
@@ -32,7 +25,7 @@ trait TableDataListsTrait
     }
 
     /**
-     * @return TableDtoInterface[]
+     * @return static[]
      */
     public function getRows(): array
     {

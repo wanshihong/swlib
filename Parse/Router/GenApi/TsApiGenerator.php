@@ -111,6 +111,9 @@ export const {$name}SocketSend = (params: {$requestI}) => {
 
         // 获取方法名称
         $name = ApiGeneratorHelper::getApiMethodName($item->className, $item->methodName);
+        if(str_ends_with($name, 'Run')) {
+            $name = substr($name, 0, -3);
+        }
 
         // 生成接口类型（加 I 前缀）
         $requestI = '';

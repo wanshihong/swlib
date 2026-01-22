@@ -164,7 +164,7 @@ class ProtobufExtEditor extends AbstractController
             }
         }
 
-        $dbCamel = StringConverter::underscoreToCamelCase($dbName);
+        $dbCamel = DatabaseConnect::getNamespace($dbName);
         $protoTypes = $this->scanProtoTypes($dbCamel);
 
         return TwigResponse::render('devtool/protobuf_ext_edit.twig', [

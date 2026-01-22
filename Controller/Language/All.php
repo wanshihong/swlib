@@ -3,11 +3,12 @@
 namespace Swlib\Controller\Language;
 
 
+use Generate\Models\Main\LanguageModel;
 use Generate\Tables\Main\LanguageTable;
+use Protobuf\Main\Language\LanguageListsProto;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Response\JsonResponse;
 use Swlib\Router\Router;
-use Swlib\Table\Db;
 use Throwable;
 
 
@@ -23,30 +24,12 @@ class All extends AbstractController
     {
         $languages = new LanguageTable()->selectAll();
 
-
-        $excludeFields = [LanguageTable::USE_TIME, LanguageTable::ID];
-
-        $ret = [];
+        $nodes = [];
         foreach ($languages as $row) {
-            foreach ($row as $key => $value) {
-
-                // $key 是字段名称
-                // $value 是字段的值
-                if (in_array($key, $excludeFields)) {
-                    continue;
-                }
-
-                $keyName = Db::getFieldNameByAs($key);
-                $keyNameArr = explode('.', $keyName);
-                $keyName = $keyNameArr[1];
-                if (!isset($ret[$keyName])) {
-                    $ret[$keyName] = [];
-                }
-                $ret[$keyName][$row->id] = $value;
-
-            }
-
+            $nodes[] = LanguageModel::formatItem($row);
         }
+        $ret = new LanguageListsProto();
+        $ret->setLists($nodes);
 
         return JsonResponse::success($ret);
     }
