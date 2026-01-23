@@ -258,8 +258,14 @@ class QueryWhereBuild
                     if ($operator === 'like') {
                         $v = trim($v, "\"'");
                     }
-                    $conditionParts[] = "$field $operator ?";
-                    $this->bindParams[] = $v;
+                    if ($v instanceof Expression) {
+                        $expr = $this->formatField($v->value);
+                        $conditionParts[] = "$field $operator $expr";
+                    } else {
+                        $conditionParts[] = "$field $operator ?";
+                        $this->bindParams[] = $v;
+                    }
+
                 }
 
                 if (count($conditionParts) === 1) {
