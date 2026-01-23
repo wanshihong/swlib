@@ -22,23 +22,23 @@ class SaveAndUse extends AbstractController
     public function run(LanguageProto $request): Success
     {
 
-        $zh = $request->getZh();
+        $key = $request->getKey();
 
         $ret = new Success();
         $ret->setSuccess(true);
 
         // 为空 或者 太长了,可能是错误信息 也不必理会
-        if (empty($zh) || strlen($zh) > 120) {
+        if (empty($key) || strlen($key) > 120) {
             return $ret;
         }
 
         $id = new LanguageTable()->where([
-            LanguageTable::ZH => $zh,
+            LanguageTable::KEY => $key,
         ])->selectField(LanguageTable::ID);
 
         if (empty($id)) {
             new LanguageTable()->insert([
-                LanguageTable::ZH => $zh,
+                LanguageTable::KEY => $key,
                 LanguageTable::USE_TIME => time(),
             ]);
         } else {
