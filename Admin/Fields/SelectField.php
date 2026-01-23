@@ -78,7 +78,7 @@ class SelectField extends AbstractField
 
     /**
      * 设置关联表格的主要信息，查询和列表二选一
-     * @param string $tableName 关联的表格名称
+     * @param string $tableName 关联的表格名称  UserTable::class  不是  UserTable::TABLE_NAME
      * @param string $idField 关联的ID字段
      * @param string $textField 关联的文本字段
      * @param string $url 点击关联字段，跳转到对应的详情页面

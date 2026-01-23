@@ -144,7 +144,7 @@ trait SqlTrait
     /**
      * 添加表连接
      *
-     * @param string $table 要连接的表名
+     * @param string $table 要连接的表名 例如 UserTable::TABLE_NAME  不是 UserTable::class
      * @param string $field 当前表的连接字段
      * @param string $field2 要连接表的连接字段
      * @param JoinEnum $joinType 连接类型(INNER/LEFT/RIGHT)
