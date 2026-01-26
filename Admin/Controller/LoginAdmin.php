@@ -9,6 +9,7 @@ use Swlib\Admin\Manager\AdminUserManager;
 use Swlib\Admin\Middleware\AdminInitMiddleware;
 use Swlib\Connect\PoolRedis;
 use Swlib\Controller\Abstract\AbstractController;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
 use Swlib\Response\JsonResponse;
@@ -44,11 +45,13 @@ class LoginAdmin extends AbstractController
 
             $find = new AdminManagerTable()->addWhere(AdminManagerTable::USERNAME, $username)->selectOne();
             if (empty($find)) {
-                throw new AppException("用户名或者密码错误");
+                // 用户名或者密码错误
+                throw new AppException(AppErr::ADMIN_USERNAME_PASSWORD_ERROR);
             }
 
             if (password_verify($password, $find->password) === false) {
-                throw new AppException("用户名或者密码错误");
+                // 用户名或者密码错误
+                throw new AppException(AppErr::ADMIN_USERNAME_PASSWORD_ERROR);
             }
 
 
@@ -83,7 +86,8 @@ class LoginAdmin extends AbstractController
             $password2 = $this->post("password2", '请确认密码');
 
             if ($password !== $password2) {
-                throw new AppException('两次密码不一致');
+                // 两次密码不一致
+                throw new AppException(AppErr::ADMIN_PASSWORD_INCONSISTENT);
             }
 
             $find = AdminUserManager::getUser();
@@ -119,13 +123,15 @@ class LoginAdmin extends AbstractController
             $password2 = Request::post("password2", '请确认密码');
 
             if ($password !== $password2) {
-                throw new AppException('两次密码不一致');
+                // 两次密码不一致
+                throw new AppException(AppErr::ADMIN_PASSWORD_INCONSISTENT);
             }
 
 
             $find = new AdminManagerTable()->addWhere(AdminManagerTable::USERNAME, $username)->selectOne();
             if ($find) {
-                throw new AppException("用户名已存在");
+                // 用户名已存在
+                throw new AppException(AppErr::ADMIN_USERNAME_EXISTS);
             }
 
             $pwd = password_hash($password, PASSWORD_DEFAULT);

@@ -8,6 +8,7 @@ use Generate\DatabaseConnect;
 use Redis;
 use Swlib\Connect\PoolRedis;
 use Swlib\Enum\CtxEnum;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\LangException;
 use Throwable;
 
@@ -47,7 +48,8 @@ class Language
     {
         $lang = CtxEnum::Lang->get('zh');
         if (empty($lang)) {
-            throw new LangException('request header lang is empty');
+            // 请求头语言为空
+            throw new LangException(AppErr::LANG_HEADER_EMPTY);
         }
 
         // 缓存查询

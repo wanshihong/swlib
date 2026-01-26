@@ -8,6 +8,7 @@ use Redis;
 use Swlib\Admin\Interface\PermissionInterface;
 use Swlib\Connect\PoolRedis;
 use Swlib\Enum\CtxEnum;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Response\RedirectResponse;
 use Swlib\Utils\Cookie;
@@ -31,7 +32,8 @@ class AdminUserManager
         return CtxEnum::Data->getSetData('admin-user', function () {
             $token = Cookie::get('admin_token');
             if (empty($token)) {
-                throw new AppException("请登录");
+                // 请登录
+                throw new AppException(AppErr::ADMIN_PLEASE_LOGIN);
             }
             $user = PoolRedis::call(function (Redis $redis) use ($token) {
                 $key = "admin_user:$token";
@@ -57,12 +59,14 @@ class AdminUserManager
             });
 
             if (empty($userId)) {
-                throw new AppException("请登录");
+                // 请登录
+                throw new AppException(AppErr::ADMIN_PLEASE_LOGIN);
             }
 
             $find = new AdminManagerTable()->addWhere(AdminManagerTable::ID, $userId)->selectOne();
             if (empty($find)) {
-                throw new AppException("请登录");
+                // 请登录
+                throw new AppException(AppErr::ADMIN_PLEASE_LOGIN);
             }
 
             PoolRedis::call(function (Redis $redis) use ($token, $find) {

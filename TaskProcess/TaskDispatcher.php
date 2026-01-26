@@ -5,6 +5,7 @@ namespace Swlib\TaskProcess;
 
 use RuntimeException;
 use Swlib\DataManager\WorkerManager;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Proxy\ProxyDispatcher;
 use Swlib\Table\Db;
@@ -35,7 +36,8 @@ final class TaskDispatcher
     public static function dispatchTask(array $callable, array $arguments = []): void
     {
         if (count($callable) !== 2 || !is_string($callable[0]) || !is_string($callable[1])) {
-            throw new AppException('callable 参数必须是 [类名, 方法名] 的数组格式');
+            // callable参数必须是数组格式
+            throw new AppException(AppErr::TASK_CALLABLE_FORMAT_INVALID);
         }
 
         [$className, $methodName] = $callable;
@@ -67,7 +69,8 @@ final class TaskDispatcher
         /** @var Server $server */
         $server = WorkerManager::get('server');
         if ($server === null) {
-            throw new RuntimeException('Swoole Server not initialized');
+            // Swoole Server未初始化
+            throw new RuntimeException(AppErr::TASK_SERVER_NOT_INITIALIZED);
         }
 
         // 如果已经在 Task 进程中，直接执行，避免死锁
@@ -129,11 +132,8 @@ final class TaskDispatcher
         try {
             serialize($data);
         } catch (Throwable $e) {
-            throw new AppException(
-                "Task 参数包含不可序列化的数据类型。" .
-                "Swoole task 不支持传递资源类型（MySQL/Redis连接、文件句柄等）或闭包。" .
-                "错误信息: " . $e->getMessage()
-            );
+            // Task参数包含不可序列化的数据类型
+            throw new AppException(AppErr::TASK_CALLABLE_FORMAT_INVALID . ": " . $e->getMessage());
         }
     }
 }

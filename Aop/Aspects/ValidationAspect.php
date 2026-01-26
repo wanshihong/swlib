@@ -6,6 +6,7 @@ namespace Swlib\Aop\Aspects;
 use Attribute;
 use Swlib\Aop\Abstract\AbstractAspect;
 use Swlib\Aop\JoinPoint;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Proxy\Interface\ProxyAttributeInterface;
 

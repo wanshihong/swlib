@@ -3,6 +3,7 @@
 namespace Swlib\Lock\Trait;
 
 use RuntimeException;
+use Swlib\Exception\AppErr;
 
 trait LockAttributeTrait
 {
@@ -14,7 +15,8 @@ trait LockAttributeTrait
             $params = $ctx['meta']['parameters'] ?? [];
             $index = array_search($this->keyTemplate, $params, true);
             if ($index === false || !array_key_exists($index, $ctx['arguments'])) {
-                throw new RuntimeException("锁 keyTemplate '$this->keyTemplate' 未匹配到方法参数");
+                // 锁keyTemplate未匹配到方法参数
+                throw new RuntimeException(AppErr::LOCK_KEY_TEMPLATE_INVALID . ": $this->keyTemplate");
             }
             $value = $ctx['arguments'][$index];
             return $className . '::' . $ctx['meta']['method'] . ':' . $this->normalizeKeyValue($value);

@@ -18,6 +18,7 @@ use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Parse\ParseCrontab;
 use Swlib\Parse\ParseDevTool;
 use Swlib\Parse\ParseEvent;
+use Swlib\Parse\ParseI18n;
 use Swlib\Parse\ParseProcess;
 use Swlib\Parse\Router\ParseRouter;
 use Swlib\Parse\Table\ParseTable;
@@ -115,6 +116,7 @@ class App
             ['name' => '解析事件管理器', 'action' => static fn() => new ParseEvent()],
             ['name' => '编译 AOP/Transaction 代理类', 'action' => static fn() => new AstCompiler()],
             ['name' => '备份数据库', 'action' => static fn() => new TableBack()],
+            ['name' => '翻译入库', 'action' => static fn() => new  ParseI18n()],
             ['name' => '移动静态文件', 'action' => static fn() => File::copyDirectory(SWLIB_DIR . '/Admin/static', PUBLIC_DIR . '/admin')],
         ];
 

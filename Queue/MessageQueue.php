@@ -6,6 +6,7 @@ namespace Swlib\Queue;
 use Generate\ConfigEnum;
 use Generate\Tables\Main\MessageQueueTable;
 use Swlib\Connect\PoolRedis;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Lock\RedisLock;
 use Swlib\Proxy\ProxyDispatcher;
@@ -73,7 +74,8 @@ class MessageQueue
         ]);
 
         if (empty($id)) {
-            throw new AppException("写入消息队列失败");
+            // 写入消息队列失败
+            throw new AppException(AppErr::QUEUE_WRITE_FAILED);
         }
         self::unLock();
         return $id;

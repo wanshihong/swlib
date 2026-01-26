@@ -3,6 +3,7 @@
 namespace Swlib\Lock;
 
 use RuntimeException;
+use Swlib\Exception\AppErr;
 use Swlib\Coroutine\CoroutineContext;
 use Swlib\DataManager\WorkerManager;
 use Swoole\Coroutine;
@@ -192,7 +193,8 @@ class WorkerLock
         }
 
         if (!$lockValue) {
-            throw new RuntimeException("无法获取进程锁: $lockKey ，已重试 $retryCount 次");
+            // 无法获取进程锁
+            throw new RuntimeException(AppErr::LOCK_ACQUIRE_FAILED . ": $lockKey");
         }
 
         // 自动续期定时器ID

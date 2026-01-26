@@ -4,6 +4,7 @@ namespace Swlib\Utils;
 
 use Generate\ConfigEnum;
 use RuntimeException;
+use Swlib\Exception\AppErr;
 use Swlib\Admin\Controller\Helper\ControllerHelper;
 use Swlib\Admin\Manager\AdminManager;
 use Swlib\Admin\Manager\AdminUserManager;
@@ -41,7 +42,8 @@ class Twig
         }
 
         if (empty($this->templatesDir)) {
-            throw new RuntimeException('未配置模板目录');
+            // 未配置模板目录
+            throw new RuntimeException(AppErr::TEMPLATE_DIR_NOT_CONFIGURED);
         }
 
         $loader = new FilesystemLoader($this->templatesDir);

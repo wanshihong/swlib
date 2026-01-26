@@ -4,6 +4,7 @@ namespace Swlib\Crontab;
 
 use DateTime;
 use InvalidArgumentException;
+use Swlib\Exception\AppErr;
 
 /**
  * Cron 表达式解析器
@@ -31,7 +32,8 @@ class CronExpression
         $parts = preg_split('/\s+/', trim($expression));
 
         if (count($parts) !== 5) {
-            throw new InvalidArgumentException("Invalid cron expression: $expression");
+            // 无效的cron表达式
+            throw new InvalidArgumentException(AppErr::CRON_EXPRESSION_INVALID . ": $expression");
         }
 
         $this->minute = $this->parseField($parts[0], 0, 59);
