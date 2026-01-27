@@ -20,7 +20,7 @@ class All extends AbstractController
      * @throws Throwable
      */
     #[Router(method: ['GET', 'POST'], errorTitle: '获取翻译列表数据失败')]
-    public function run(): JsonResponse
+    public function run(): LanguageListsProto
     {
         $languages = new LanguageTable()->selectAll();
 
@@ -31,7 +31,7 @@ class All extends AbstractController
         $ret = new LanguageListsProto();
         $ret->setLists($nodes);
 
-        return JsonResponse::success($ret);
+        return $ret;
     }
 
 
