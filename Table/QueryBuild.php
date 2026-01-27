@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Swlib\Table;
 
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Table\Interface\TableInterface;
 use Throwable;
@@ -184,7 +185,7 @@ class QueryBuild
                 // 普通的字段排序
                 // 验证排序方向
                 if (!in_array(strtoupper($orderType), ['ASC', 'DESC'])) {
-                    throw new AppException("无效的排序方向: $orderType");
+                    throw new AppException(AppErr::TABLE_ORDER_DIRECTION_INVALID . ": $orderType");
                 }
                 $field = $this->table->formatField($field);
                 $orderArr[] = " $field $orderType";

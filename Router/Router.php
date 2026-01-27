@@ -17,6 +17,7 @@ use Swlib\DataManager\ReflectionManager;
 use Swlib\Exception\AppException;
 use Swlib\Response\ProtobufResponse;
 use Swlib\Response\ResponseInterface;
+use Swlib\Utils\Crypto;
 use Swlib\Utils\Log;
 use Swoole\Http\Request;
 use Throwable;
@@ -167,6 +168,7 @@ class Router
         $random = $request->header['random'] ?? '';
         $time = $request->header['time'] ?? '';
         $token = $request->header['token'] ?? '';
+        $appSecret = ConfigEnum::APP_SECRET;
 
         // 1. 检查必填参数
         if (empty($random) || empty($token) || empty($time)) {
@@ -196,8 +198,8 @@ class Router
             return false;
         }
 
-        // 3. 验证签名
-        $myToken = md5("$url.$random.$time");
+        // 3. 验证签名（使用 HMAC-SHA256，与前端保持一致）
+        $myToken = Crypto::sign($url, $random, $time, $appSecret);
         if ($myToken !== $token) {
             Log::error('签名验证失败', [
                 'random' => $random,
