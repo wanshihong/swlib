@@ -51,6 +51,7 @@ class SwitchField extends AbstractField
                 return $this->enableValue;
             }
         });
+        $this->hideOnForm();
     }
 
 
