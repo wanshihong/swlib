@@ -2,9 +2,10 @@
 
 namespace Swlib\Admin\Trait;
 
-use Exception;
 use Swlib\Admin\Fields\AbstractField;
 use Swlib\Admin\Manager\AdminUserManager;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Table\Interface\TableDtoInterface;
 use Swlib\Table\Interface\TableInterface;
 use Throwable;
@@ -202,7 +203,7 @@ trait PageFrameworkTrait
         foreach ($this->fields as $field) {
             if ($field->field == $fieldName) return $field;
         }
-        throw new Exception("field: $fieldName not config");
+        throw new AppException(AppErr::ADMIN_FIELD_NOT_CONFIGURED_WITH_NAME . ": $fieldName");
     }
 
 

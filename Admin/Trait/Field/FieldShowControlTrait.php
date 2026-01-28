@@ -19,7 +19,7 @@ trait FieldShowControlTrait
     /**
      * 控制整体是否显示
      * @param bool $condition
-     * @return void
+     * @return FieldShowControlTrait
      */
     public function showCondition(bool $condition): static
     {

@@ -3,12 +3,13 @@
 namespace Swlib\Controller\File\Controller;
 
 use Exception;
-use Generate\DatabaseConnect;
 use Generate\RouterPath;
+use Generate\Tables\Main\ImagesTable;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Controller\File\Service\FileUploader;
 use Swlib\Controller\File\Service\ImageService;
 use Swlib\Enum\CtxEnum;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
 use Swlib\Response\JsonResponse;
@@ -60,7 +61,7 @@ class Upload extends AbstractController
         $originalName = $file['name'] ?? '';
 
         if (empty($file) || $file['error'] !== UPLOAD_ERR_OK) {
-            throw new Exception('请指定一个需要上传的文件');
+            throw new AppException(AppErr::FILE_SPECIFY_REQUIRED);
         }
 
         $tempPath = $file['tmp_name'];
@@ -70,22 +71,10 @@ class Upload extends AbstractController
 
 
         // 检查数据库中是否已存在相同 MD5 的文件（秒传）
-        $existingImage = DatabaseConnect::call(function ($mysqli) use ($md5Hash) {
-            $sql = "SELECT id FROM images
-                    WHERE md5_hash = ? AND status = 1
-                    LIMIT 1";
-
-            $stmt = $mysqli->prepare($sql);
-            $stmt->bind_param('s', $md5Hash);
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-            $row = $result->fetch_object();
-            $stmt->close();
-
-            return $row ?: null;
-        });
-
+        $existingImage = new ImagesTable()->where([
+            ImagesTable::MD5_HASH => $md5Hash,
+            ImagesTable::STATUS => 1,
+        ])->selectOne();
         $host = Request::getHost();
 
         // 如果找到相同的文件，直接返回已有的文件 ID（秒传）

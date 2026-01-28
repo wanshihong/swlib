@@ -18,6 +18,7 @@ use Swlib\Admin\Manager\ListRowManager;
 use Swlib\Admin\Middleware\AdminInitMiddleware;
 use Swlib\Admin\Middleware\PermissionsMiddleware;
 use Swlib\Controller\Abstract\AbstractController;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
 use Swlib\Response\JsonResponse;
@@ -115,7 +116,7 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
         ];
 
         if (!in_array($name, $funcNames)) {
-            throw new AppException("%s方法不存在", $name);
+            throw new AppException(AppErr::ADMIN_METHOD_NOT_EXIST_WITH_NAME . ": $name");
         }
     }
 
@@ -316,7 +317,7 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
             return RedirectResponse::url($referer);
         } else {
             if (empty($table)) {
-                throw new AppException('参数错误');
+                throw new AppException(AppErr::PARAM_ERROR);
             }
             $this->fieldsConfig->frameworkFormEditFill($fields, $findDto);
         }
@@ -368,7 +369,7 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
         $ids = $this->post('ids');
 
         if (empty($ids) || !is_array($ids)) {
-            throw new AppException('请选择要删除的数据');
+            throw new AppException(AppErr::ADMIN_SELECT_DELETE_REQUIRED);
         }
 
         /** @var TableInterface $table */
@@ -424,7 +425,7 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
 
         $rowTable = $query->selectOne();
         if (empty($rowTable)) {
-            throw new AppException('参数错误');
+            throw new AppException(AppErr::PARAM_ERROR);
         }
 
         // 查找出来表格中的操作按钮
@@ -505,12 +506,12 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
         $keyword = Request::post('keyword', '请输入关键字');
         $field = $this->fieldsConfig->frameworkGetField($fieldName);
         if (!($field instanceof SelectField)) {
-            throw new AppException('参数错误');
+            throw new AppException(AppErr::PARAM_ERROR);
         }
 
 
         if (empty($field->table)) {
-            throw new AppException('查询未配置');
+            throw new AppException(AppErr::ADMIN_QUERY_NOT_CONFIGURED);
         }
 
         $table = new $field->table;

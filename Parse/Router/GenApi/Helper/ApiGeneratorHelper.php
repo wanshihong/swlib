@@ -138,14 +138,14 @@ class ApiGeneratorHelper
 
         $parts = array_values(array_filter($parts, static fn(string $part): bool => $part !== ''));
         if (empty($parts)) {
-            return StringConverter::underscoreToCamelCase($method, '_', true);
+            return StringConverter::underscoreToCamelCase($method);
         }
 
         $result = '';
         foreach ($parts as $segment) {
             $segment = str_replace(['-', '.'], '_', $segment);
             if (str_contains($segment, '_')) {
-                $result .= StringConverter::underscoreToCamelCase($segment, '_', true);
+                $result .= StringConverter::underscoreToCamelCase($segment);
             } else {
                 $result .= ucfirst($segment);
             }

@@ -75,7 +75,7 @@ class MessageQueue
 
         if (empty($id)) {
             // 写入消息队列失败
-            throw new AppException(AppErr::QUEUE_WRITE_FAILED);
+            throw new AppException(AppErr::EXECUTE_FAILED);
         }
         self::unLock();
         return $id;

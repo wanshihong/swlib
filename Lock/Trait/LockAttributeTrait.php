@@ -2,11 +2,14 @@
 
 namespace Swlib\Lock\Trait;
 
-use RuntimeException;
 use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 
 trait LockAttributeTrait
 {
+    /**
+     * @throws AppException
+     */
     private function buildKey(array $ctx): string
     {
         $className = is_string($ctx['target']) ? $ctx['target'] : ($ctx['meta']['class'] ?? get_class($ctx['target']));
@@ -16,7 +19,7 @@ trait LockAttributeTrait
             $index = array_search($this->keyTemplate, $params, true);
             if ($index === false || !array_key_exists($index, $ctx['arguments'])) {
                 // 锁keyTemplate未匹配到方法参数
-                throw new RuntimeException(AppErr::LOCK_KEY_TEMPLATE_INVALID . ": $this->keyTemplate");
+                throw new AppException(AppErr::PARAM_INVALID . ": $this->keyTemplate");
             }
             $value = $ctx['arguments'][$index];
             return $className . '::' . $ctx['meta']['method'] . ':' . $this->normalizeKeyValue($value);

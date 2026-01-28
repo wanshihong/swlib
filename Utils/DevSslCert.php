@@ -4,6 +4,8 @@ namespace Swlib\Utils;
 
 use Exception;
 use Swlib\App;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 
 /**
  * 开发环境 SSL 证书管理
@@ -90,7 +92,7 @@ class DevSslCert
             exec($command, $output, $returnVar);
 
             if ($returnVar !== 0) {
-                throw new Exception("Failed to generate SSL certificate. \n 请手动执行 \n $command");
+                throw new AppException(AppErr::SSL_GENERATE_FAILED_WITH_COMMAND . ": 请手动执行 $command");
             }
 
             echo "SSL certificate generated successfully for IP: $localIP\n";
@@ -114,7 +116,7 @@ class DevSslCert
         exec($iosCommand, $iosOutput, $iosReturnVar);
 
         if ($iosReturnVar !== 0) {
-            throw new Exception("Failed to generate iOS SSL certificate. \n 请手动执行 \n $iosCommand");
+            throw new AppException(AppErr::SSL_IOS_GENERATE_FAILED_WITH_COMMAND . ": 请手动执行 $iosCommand");
         }
     }
 

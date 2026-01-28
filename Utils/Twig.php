@@ -43,7 +43,7 @@ class Twig
 
         if (empty($this->templatesDir)) {
             // 未配置模板目录
-            throw new RuntimeException(AppErr::TEMPLATE_DIR_NOT_CONFIGURED);
+            throw new RuntimeException('templatesDir ' . AppErr::NOT_INIT);
         }
 
         $loader = new FilesystemLoader($this->templatesDir);

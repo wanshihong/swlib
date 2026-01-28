@@ -6,6 +6,7 @@ use Generate\ConfigEnum;
 use Google\Protobuf\Internal\Message;
 use Swlib\DataManager\WorkerManager;
 use Swlib\Enum\CtxEnum;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Exception\TokenExpiredException;
 use Swlib\Exception\UnauthorizedException;
@@ -138,7 +139,7 @@ class ProtobufResponse implements ResponseInterface
             }
 
             if (empty($server)) {
-                throw new AppException("server is null");
+                throw new AppException('SERVER ' . AppErr::EMPTY);
             }
 
             $fd = $this->fd ?: CtxEnum::Fd->get();

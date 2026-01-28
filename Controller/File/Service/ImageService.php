@@ -3,7 +3,7 @@
 namespace Swlib\Controller\File\Service;
 
 use finfo;
-use Generate\DatabaseConnect;
+use Generate\Tables\Main\ImagesTable;
 use Swlib\Enum\CtxEnum;
 use Swlib\Utils\Ip;
 use Throwable;
@@ -75,32 +75,23 @@ class ImageService
         $uploaderIp = Ip::get();
 
         // 记录图片信息到数据库
-        return DatabaseConnect::call(function ($mysqli) use (
-            $originalName, $storagePath, $fileName, $fileSize, $fileExt,
-            $mimeType, $md5Hash, $width, $height, $uploaderId, $uploaderIp
-        ) {
-            $sql = "INSERT INTO images (
-                original_name, storage_path, file_name, file_size, file_ext,
-                mime_type, md5_hash, width, height, uploader_id, uploader_ip,
-                status, access_count, upload_time
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+        return new ImagesTable()->insert([
+            ImagesTable::ORIGINAL_NAME => $originalName,
+            ImagesTable::STORAGE_PATH => $storagePath,
+            ImagesTable::FILE_NAME => $fileName,
+            ImagesTable::FILE_SIZE => $fileSize,
+            ImagesTable::FILE_EXT => $fileExt,
+            ImagesTable::MIME_TYPE => $mimeType,
+            ImagesTable::MD5_HASH => $md5Hash,
+            ImagesTable::WIDTH => $width,
+            ImagesTable::HEIGHT => $height,
+            ImagesTable::UPLOADER_ID => $uploaderId,
+            ImagesTable::UPLOADER_IP => $uploaderIp,
+            ImagesTable::STATUS => 1,
+            ImagesTable::ACCESS_COUNT => 0,
+            ImagesTable::UPLOAD_TIME => date('Y-m-d H:i:s')
+        ]);
 
-            $stmt = $mysqli->prepare($sql);
-            $status = 1;
-            $accessCount = 0;
-            $stmt->bind_param(
-                'sssssssiiisis',
-                $originalName, $storagePath, $fileName, $fileSize, $fileExt,
-                $mimeType, $md5Hash, $width, $height, $uploaderId, $uploaderIp,
-                $status, $accessCount
-            );
-
-            $stmt->execute();
-            $insertId = $mysqli->insert_id;
-            $stmt->close();
-
-            return (int)$insertId;
-        });
     }
 
 }

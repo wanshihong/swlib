@@ -59,7 +59,7 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
         foreach ($this->rules as $index => $rules) {
             if (!isset($arguments[$index])) {
                 if (in_array('required', $rules)) {
-                    throw new AppException("参数 #$index 是必需的");
+                    throw new AppException("参数 #$index " . AppErr::PARAM_REQUIRED);
                 }
                 continue;
             }
@@ -111,7 +111,7 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
     private function validateRequired(mixed $value, int $index): void
     {
         if (empty($value) && $value !== 0 && $value !== '0') {
-            throw new AppException("参数 #$index 不能为空");
+            throw new AppException("参数 #$index " . AppErr::PARAM_REQUIRED);
         }
     }
 
@@ -122,7 +122,7 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
     private function validateString(mixed $value, int $index): void
     {
         if (!is_string($value)) {
-            throw new AppException("参数 #$index 必须是字符串");
+            throw new AppException("参数 #$index " . AppErr::PARAM_MUST_STRING);
         }
     }
 
@@ -133,7 +133,7 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
     private function validateInt(mixed $value, int $index): void
     {
         if (!is_int($value) && !ctype_digit((string)$value)) {
-            throw new AppException("参数 #$index 必须是整数");
+            throw new AppException("参数 #$index " . AppErr::PARAM_MUST_INT);
         }
     }
 
@@ -144,7 +144,7 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
     private function validateNumeric(mixed $value, int $index): void
     {
         if (!is_numeric($value)) {
-            throw new AppException("参数 #$index 必须是数字");
+            throw new AppException("参数 #$index " . AppErr::PARAM_MUST_NUMBER);
         }
     }
 
@@ -155,7 +155,7 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
     private function validateEmail(mixed $value, int $index): void
     {
         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            throw new AppException("参数 #$index 必须是有效的邮箱地址");
+            throw new AppException("参数 #$index " . AppErr::PARAM_MUST_EMAIL);
         }
     }
 
@@ -166,7 +166,7 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
     private function validateUrl(mixed $value, int $index): void
     {
         if (!filter_var($value, FILTER_VALIDATE_URL)) {
-            throw new AppException("参数 #$index 必须是有效的 URL");
+            throw new AppException("参数 #$index " . AppErr::PARAM_MUST_URL);
         }
     }
 
@@ -184,15 +184,15 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
 
         if (is_string($value)) {
             if (mb_strlen($value) < $minValue) {
-                throw new AppException("参数 #$index 长度不能小于 $minValue");
+                throw new AppException("参数 #$index " . AppErr::PARAM_MIN_LENGTH . " $minValue");
             }
         } elseif (is_numeric($value)) {
             if ($value < $minValue) {
-                throw new AppException("参数 #$index 不能小于 $minValue");
+                throw new AppException("参数 #$index " . AppErr::PARAM_MIN_VALUE . " $minValue");
             }
         } elseif (is_array($value)) {
             if (count($value) < $minValue) {
-                throw new AppException("参数 #$index 元素数量不能小于 $minValue");
+                throw new AppException("参数 #$index " . AppErr::PARAM_MIN_COUNT . " $minValue");
             }
         }
     }
@@ -211,15 +211,15 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
 
         if (is_string($value)) {
             if (mb_strlen($value) > $maxValue) {
-                throw new AppException("参数 #$index 长度不能大于 $maxValue");
+                throw new AppException("参数 #$index " . AppErr::PARAM_MAX_LENGTH . " $maxValue");
             }
         } elseif (is_numeric($value)) {
             if ($value > $maxValue) {
-                throw new AppException("参数 #$index 不能大于 $maxValue");
+                throw new AppException("参数 #$index " . AppErr::PARAM_MAX_VALUE . " $maxValue");
             }
         } elseif (is_array($value)) {
             if (count($value) > $maxValue) {
-                throw new AppException("参数 #$index 元素数量不能大于 $maxValue");
+                throw new AppException("参数 #$index " . AppErr::PARAM_MAX_COUNT . " $maxValue");
             }
         }
     }
@@ -231,7 +231,7 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
     private function validateArray(mixed $value, int $index): void
     {
         if (!is_array($value)) {
-            throw new AppException("参数 #$index 必须是数组");
+            throw new AppException("参数 #$index " . AppErr::PARAM_MUST_ARRAY);
         }
     }
 
@@ -247,7 +247,7 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
 
         $allowedValues = explode(',', $values);
         if (!in_array($value, $allowedValues, true)) {
-            throw new AppException("参数 #$index 必须是以下值之一: " . implode(', ', $allowedValues));
+            throw new AppException("参数 #$index " . AppErr::VALUE_INVALID . ": 必须是以下值之一: " . implode(', ', $allowedValues));
         }
     }
 
@@ -262,7 +262,7 @@ class ValidationAspect extends AbstractAspect implements ProxyAttributeInterface
         }
 
         if (!preg_match($pattern, (string)$value)) {
-            throw new AppException("参数 #$index 格式不正确");
+            throw new AppException("参数 #$index " . AppErr::FORMAT_INVALID);
         }
     }
 

@@ -7,6 +7,7 @@ use Swlib\Admin\Manager\AdminManager;
 use Swlib\Admin\Manager\AdminUserManager;
 use Swlib\Admin\Trait\PermissionTrait;
 use Swlib\Admin\Trait\StaticTrait;
+use Swlib\Exception\AppException;
 use Swlib\Exception\RedirectException;
 use Swlib\Utils\Language;
 use Throwable;
@@ -53,7 +54,7 @@ class PageConfig implements PermissionInterface
     {
         if (AdminUserManager::checkPermissionsByConfig($this) === false) {
             // 没有权限则重定向到无权限页面
-            throw new RedirectException("无权限", AdminManager::getInstance()->noAccessUrl);
+            throw new AppException("无权限", AdminManager::getInstance()->noAccessUrl);
         }
     }
 

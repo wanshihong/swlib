@@ -6,8 +6,9 @@ namespace Swlib\Table\Trait;
 use Exception;
 use Generate\ConfigEnum;
 use mysqli;
-use RuntimeException;
 use Swlib\Enum\CtxEnum;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Table\Connect\MysqlConnect;
 use Swoole\Database\MysqliProxy;
 use Swoole\Database\MysqliPool;
@@ -117,7 +118,7 @@ trait DatabaseConnectTrait
             $count++;
         }
         if (empty($mysqli)) {
-            throw new RuntimeException("从连接池获取连接失败");
+            throw new AppException(AppErr::DB_POOL_GET_CONNECTION_FAILED);
         }
 
         return $mysqli;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Swlib\Controller\Abstract;
 
 use Swlib\Enum\CtxEnum;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
@@ -24,7 +25,7 @@ abstract class  AbstractController
         return match ($name) {
             CtxEnum::Request->value => CtxEnum::Request->get(),
             CtxEnum::Response->value => CtxEnum::Response->get(),
-            default => throw new AppException("属性 %s 未定义", $name),
+            default => throw new AppException($name . AppErr::NOT_FOUND),
         };
     }
 

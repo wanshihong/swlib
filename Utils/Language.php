@@ -49,7 +49,7 @@ class Language
         $lang = CtxEnum::Lang->get('zh');
         if (empty($lang)) {
             // 请求头语言为空
-            throw new LangException(AppErr::LANG_HEADER_EMPTY);
+            throw new LangException('zh' . AppErr::PARAM_EMPTY);
         }
 
         // 缓存查询

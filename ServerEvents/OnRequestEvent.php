@@ -33,6 +33,9 @@ class OnRequestEvent
     public Request $request;
     public Response $response;
 
+    /**
+     * @throws AppException
+     */
     public function handle(Request $request, Response $response): void
     {
         $this->request = $request;

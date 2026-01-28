@@ -10,6 +10,8 @@ use Swlib\Event\Attribute\Event;
 use Swlib\Event\Helper\EventExecutor;
 use Swlib\Event\Helper\EventQueue;
 use Swlib\Event\Helper\EventResponse;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Utils\Log;
 use Swoole\Coroutine;
 use Swoole\Timer;
@@ -30,17 +32,17 @@ trait EventTrait
     {
         if (is_array($listener)) {
             if (count($listener) !== 2) {
-                throw new Exception("listener 参数错误 需要 [className,methodName]");
+                throw new AppException(AppErr::EVENT_LISTENER_FORMAT_NEED_ARRAY);
             }
             [$className, $method] = $listener;
 
             if (!class_exists($className)) {
-                throw new Exception("listener 参数错误: 类 $className 不存在");
+                throw new AppException(AppErr::EVENT_LISTENER_CLASS_NOT_EXIST_WITH_NAME . ": $className");
             }
 
             $reflection = ReflectionManager::getClass($className);
             if (!$reflection->hasMethod($method)) {
-                throw new Exception("listener 参数错误: 方法 $method 不存在于类 $className 中");
+                throw new AppException(AppErr::EVENT_LISTENER_METHOD_NOT_EXIST_IN_CLASS . ": 方法 $method 不存在于类 $className 中");
             }
         }
 

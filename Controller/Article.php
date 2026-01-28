@@ -3,12 +3,12 @@
 namespace Swlib\Controller;
 
 
-use App\Tools\RequestTool;
 use Generate\Models\Main\ArticleModel;
 use Generate\Tables\Main\ArticleTable;
 use Protobuf\Main\Article\ArticleListsProto;
 use Protobuf\Main\Article\ArticleProto;
 use Swlib\Controller\Abstract\AbstractController;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Router\Router;
 use Throwable;
@@ -32,17 +32,15 @@ class Article extends AbstractController
         $page = $request->getPageNumber() ?: 1;
         $size = $request->getPageSize() ?: 10;
         $pos = $request->getGroupPos();
-        $appId = RequestTool::getAppId();
 
         if (empty($appId)) {
-            throw new AppException("缺少参数");
+            throw new AppException(AppErr::PARAM_REQUIRED);
         }
         if (empty($pos)) {
-            throw new AppException("缺少参数");
+            throw new AppException(AppErr::PARAM_REQUIRED);
         }
 
         $where = [
-            [ArticleTable::APP_ID, '=', $appId],
             [ArticleTable::GROUP_POS, 'like', "%$pos%"],
         ];
         $order = [ArticleTable::PRI_KEY => "desc"];
@@ -77,14 +75,14 @@ class Article extends AbstractController
     {
         $id = $request->getId();
         if (empty($id)) {
-            throw new AppException("缺少参数");
+            throw new AppException(AppErr::PARAM_REQUIRED);
         }
 
         $table = new ArticleTable()->where([
             ArticleTable::ID => $id,
         ])->selectOne();
         if (empty($table)) {
-            throw new AppException("参数错误");
+            throw new AppException(AppErr::NOT_FOUND);
         }
 
         return ArticleModel::formatItem($table);

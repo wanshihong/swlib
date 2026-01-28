@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace Swlib\Parse;
 
-use Exception;
 use FilesystemIterator;
 use Generate\ConfigEnum;
 use mysqli;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Redis;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Parse\Helper\ConsoleColor;
 use Throwable;
 
@@ -270,21 +271,21 @@ class ConfigValidator
             $connected = @$redis->connect($host, $port, 2.0);
 
             if (!$connected) {
-                throw new Exception("连接失败");
+                throw new AppException(AppErr::CONFIG_CONNECT_FAILED);
             }
 
             // 如果配置了密码，进行认证
             if (!empty($auth)) {
                 $authed = @$redis->auth($auth);
                 if (!$authed) {
-                    throw new Exception("认证失败，请检查 REDIS_AUTH 配置");
+                    throw new AppException(AppErr::CONFIG_AUTH_FAILED);
                 }
             }
 
             // 测试 PING
             $pong = @$redis->ping();
             if ($pong !== true && $pong !== '+PONG') {
-                throw new Exception("PING 测试失败");
+                throw new AppException(AppErr::CONFIG_PING_FAILED);
             }
 
             $redis->close();

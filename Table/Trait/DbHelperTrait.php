@@ -5,6 +5,8 @@ namespace Swlib\Table\Trait;
 use Exception;
 use Generate\DatabaseConnect;
 use Generate\TableFieldMap;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Table\Expression;
 use Throwable;
 
@@ -25,7 +27,7 @@ trait DbHelperTrait
             return self::_getFieldNameByAs($fieldAs, $dbName);
         } catch (Throwable) {
             // 没有找到，证明有特殊的操作
-            throw new Exception("在别名定义中没有找到 $fieldAs");
+            throw new AppException(AppErr::DB_FIELD_NOT_FOUND_IN_ALIAS . ": $fieldAs");
         }
 
     }
@@ -38,7 +40,7 @@ trait DbHelperTrait
     {
         $dbName = DatabaseConnect::getDbName($dbName);
         if (!isset(TableFieldMap::maps[$dbName][$fieldAs])) {
-            throw new Exception("在字段定义中没有找到$fieldAs");
+            throw new AppException(AppErr::DB_FIELD_NOT_FOUND_IN_DEFINITION . ": $fieldAs");
         }
         return TableFieldMap::maps[$dbName][$fieldAs];
     }
@@ -53,7 +55,7 @@ trait DbHelperTrait
         $dbName = DatabaseConnect::getDbName($dbName);
         $res = array_search($fieldName, TableFieldMap::maps[$dbName]);
         if (empty($res)) {
-            throw new Exception("在别名定义中没有找到$fieldName");
+            throw new AppException(AppErr::DB_FIELD_NOT_FOUND_IN_ALIAS . ": $fieldName");
         }
         return (string)$res;
     }

@@ -14,6 +14,7 @@ use ReflectionException;
 use Swlib\Connect\PoolRedis;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\DataManager\ReflectionManager;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Response\ProtobufResponse;
 use Swlib\Response\ResponseInterface;
@@ -158,7 +159,7 @@ class Router
         } elseif ($res instanceof Message) {
             ProtobufResponse::success($res)->output();
         } else {
-            throw new AppException("返回类型 %s 不支持 需要返回 实现 ResponseInterface 接口的子类", gettype($res));
+            throw new AppException(AppErr::ROUTER_RESPONSE_TYPE_INVALID_WITH_TYPE, gettype($res));
         }
     }
 
@@ -260,6 +261,7 @@ class Router
      *
      * @param string $path
      * @return array{0: ?array, 1: ?string, 2: array<string, string>}
+     * @throws AppException
      */
     public static function parse(string $path): array
     {
@@ -336,6 +338,7 @@ class Router
      *
      * @param array<int, string> $pathInfoSegments
      * @return array<string, string>
+     * @throws AppException
      */
     private static function parsePathInfo(array $pathInfoSegments): array
     {
@@ -360,11 +363,11 @@ class Router
             $value = urldecode($pathInfoSegments[$i + 1]);
 
             if ($key === '') {
-                throw new InvalidArgumentException('PathInfo 参数名不能为空');
+                throw new AppException(AppErr::PARAM_REQUIRED);
             }
 
             if (array_key_exists($key, $pathInfo)) {
-                throw new InvalidArgumentException('PathInfo 参数重复: ' . $key);
+                throw new AppException(AppErr::ROUTER_KEY_ALREADY_EXISTS_WITH_NAME, $key);
             }
 
             $pathInfo[$key] = $value;

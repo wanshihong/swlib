@@ -4,15 +4,13 @@ namespace Swlib\Table\Trait;
 
 
 use Exception;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Table\Db;
 use Throwable;
 
 trait FuncTrait
 {
-
-
-
 
 
     public function inField(string $field): bool
@@ -53,7 +51,7 @@ trait FuncTrait
     public function selectIterator(): iterable
     {
         if ($this->cacheTime > 0) {
-            throw new AppException('迭代器获取查询结果,不支持查询缓存');
+            throw new AppException('selectIterator' . AppErr::NOT_SUPPORTED . ' cacheTime');
         }
         foreach ($this->queryIterator() as $item) {
             $dto = $this->getDto();
@@ -112,8 +110,6 @@ trait FuncTrait
         $res = $this->find();
         return (bool)$res;
     }
-
-
 
 
 }

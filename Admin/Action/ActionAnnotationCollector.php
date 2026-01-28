@@ -10,7 +10,6 @@ use Swlib\Admin\Controller\Attribute\DisableAction;
 use Swlib\Admin\Controller\Interface\AdminControllerInterface;
 use Swlib\Admin\Manager\AdminUserManager;
 use Swlib\DataManager\ReflectionManager;
-use Swlib\Enum\CtxEnum;
 use Swlib\Request\Request;
 use Swlib\Utils\Url;
 use Throwable;

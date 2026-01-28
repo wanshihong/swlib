@@ -2,7 +2,6 @@
 
 namespace Swlib\Utils;
 
-use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
 use ReflectionUnionType;

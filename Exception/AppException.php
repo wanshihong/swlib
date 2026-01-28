@@ -10,7 +10,7 @@ class AppException extends Exception
 {
     /**
      * @param string $message
-     * @param string $arg
+     * @param mixed $arg
      * @throws Throwable
      */
     public function __construct(string $message = "", ...$arg)

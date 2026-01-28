@@ -3,6 +3,8 @@
 namespace Swlib\Table\Operation;
 
 use RuntimeException;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 
 /**
  * 数据库操作事件基类
@@ -79,12 +81,12 @@ class DatabaseOperationContext
      * - insert/update：根据一维数组 writeData 的键判断
      * - insertAll    ：根据二维数组 writeData 中任意一行是否包含该字段判断
      *
-     * @throws RuntimeException 在当前上下文没有写入数据（如 SELECT/DELETE/Db::query）时调用会抛异常
+     * @throws RuntimeException|AppException 在当前上下文没有写入数据（如 SELECT/DELETE/Db::query）时调用会抛异常
      */
     public function hasChangedField(string $field): bool
     {
         if (!$this->operation || !$this->operation->isWriteOperation() || empty($this->writeData)) {
-            throw new RuntimeException('当前数据库操作没有写入数据，无法判断字段是否被修改');
+            throw new AppException(AppErr::DB_CONTEXT_NO_WRITE);
         }
 
         $data = $this->writeData;
@@ -106,14 +108,14 @@ class DatabaseOperationContext
      * - insert/update：返回单个值（mixed）
      * - insertAll    ：返回数组 [行索引 => 值]
      *
-     * @throws RuntimeException
+     * @throws RuntimeException|AppException
      *   - 当前操作没有写入数据（如 SELECT/DELETE/Db::query）
      *   - 或该字段在本次写入中没有被设置
      */
     public function getChangedValue(string $field): mixed
     {
         if (!$this->operation || !$this->operation->isWriteOperation() || empty($this->writeData)) {
-            throw new RuntimeException('当前数据库操作没有写入数据，无法获取字段的新值');
+            throw new AppException(AppErr::DB_CONTEXT_NO_WRITE);
         }
 
         $data = $this->writeData;
@@ -129,7 +131,7 @@ class DatabaseOperationContext
             }
 
             if ($values === []) {
-                throw new RuntimeException(sprintf('字段 %s 在本次写操作中没有被设置', $field));
+                throw new AppException(AppErr::DB_CONTEXT_FIELD_NEW_VALUE . ": 字段 $field 在本次写操作中没有被设置");
             }
 
             return $values;
@@ -137,7 +139,7 @@ class DatabaseOperationContext
 
         // insert / update: 一维数组
         if (!array_key_exists($field, $data)) {
-            throw new RuntimeException(sprintf('字段 %s 在本次写操作中没有被设置', $field));
+            throw new AppException(AppErr::DB_CONTEXT_FIELD_NEW_VALUE . ": 字段 $field 在本次写操作中没有被设置");
         }
 
         return $data[$field];

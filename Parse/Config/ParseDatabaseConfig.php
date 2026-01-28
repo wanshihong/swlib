@@ -5,7 +5,6 @@ namespace Swlib\Parse\Config;
 
 use Generate\ConfigEnum;
 use Swlib\Parse\Helper\ConsoleColor;
-use Swlib\Table\Trait\DatabaseConnectTrait;
 use Swlib\Utils\DataConverter;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;

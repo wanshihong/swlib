@@ -14,7 +14,8 @@ use PhpParser\PrettyPrinter\Standard as PrettyPrinter;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
-use RuntimeException;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Proxy\Interface\ProxyAttributeInterface;
 use Swlib\Utils\File;
@@ -59,6 +60,7 @@ readonly class ClassWeaver
      * 编织当前类/trait，并返回本类相关的代理元数据
      *
      * @return array<string, array{class:string, method:string, proxyMethod:string, isStatic:bool, stages:array}>
+     * @throws AppException
      */
     public function weave(): array
     {
@@ -104,6 +106,7 @@ readonly class ClassWeaver
      *     methods: array<string, array{isStatic: bool, isVoid: bool, constKey: string}>,
      *     map: array<string, array{class:string, method:string, proxyMethod:string, isStatic:bool, stages:array}>
      * }
+     * @throws AppException
      */
     private function collectTargetMethods(): array
     {
@@ -171,6 +174,7 @@ readonly class ClassWeaver
 
     /**
      * 解析方法上的所有可编织注解（实现 StageInterface）
+     * @throws AppException
      */
     private function parseMethodAttributes(ReflectionMethod $method): ?array
     {
@@ -219,11 +223,10 @@ readonly class ClassWeaver
 
             // 检查 priority 是否有重复
             if (count($priorities) !== count($stageMetas)) {
-                throw new RuntimeException("[AST 编译错误] $location 存在多个注解，但 priority 有重复值，请为每个注解指定不同的优先级");
+                throw new AppException(AppErr::PARSE_AST_PRIORITY_DUPLICATE . ": $location 存在多个注解，但 priority 有重复值");
             }
 
             // 检查异步注解执行顺序：异步注解会阻断后续同步注解的执行
-            $hasAsyncBeforeSync = false;
             foreach ($stageMetas as $meta) {
                 if ($meta['async']) {
                     $hasAsyncBeforeSync = true;

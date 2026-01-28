@@ -161,14 +161,14 @@ class ParseTableCRUD
         $saveStr[] = '    {';
         $saveStr[] = '        $id = $request->getId();';
         $saveStr[] = '        if(empty($id)){';
-        $saveStr[] = '            throw new AppException("缺少参数");';
+        $saveStr[] = '            throw new AppException(AppErr::PARAM_REQUIRED);';
         $saveStr[] = '        }';
         $saveStr[] = '';
         $saveStr[] = '        $dto = new ' . $this->tableName . 'Table()->where([';
         $saveStr[] = '            ' . $this->tableName . 'Table::ID=>$id,';
         $saveStr[] = '        ])->selectOne();';
         $saveStr[] = '        if(empty($dto)){';
-        $saveStr[] = '            throw new AppException("参数错误");';
+        $saveStr[] = '            throw new AppException(AppErr::NOT_FOUND);';
         $saveStr[] = '        }';
         $saveStr[] = '';
         $saveStr[] = '        return ' . $this->tableName . 'Model::formatItem($dto);';
@@ -188,7 +188,7 @@ class ParseTableCRUD
         $saveStr[] = '    {';
         $saveStr[] = '        $id = $request->getId();';
         $saveStr[] = '        if(empty($id)){';
-        $saveStr[] = '            throw new AppException("参数错误");';
+        $saveStr[] = '            throw new AppException(AppErr::PARAM_ERROR);';
         $saveStr[] = '        }';
         $saveStr[] = '';
         $saveStr[] = '        $res = new ' . $this->tableName . 'Table()->where([';

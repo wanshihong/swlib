@@ -50,9 +50,9 @@ class ParseI18n
             }
         }
 
-        echo PHP_EOL . "同步完成:" . PHP_EOL;
-        echo "- 新增: {$stats['inserted']}" . PHP_EOL;
-        echo "- 更新: {$stats['updated']}" . PHP_EOL;
+        echo "翻译同步完成:";
+        echo "- 新增: {$stats['inserted']}";
+        echo "- 更新: {$stats['updated']}";
         echo "- 跳过: {$stats['skipped']}" . PHP_EOL;
 
         return $stats;
@@ -78,9 +78,10 @@ class ParseI18n
         foreach ($matches[1] as $index => $_) {
             $key = $matches[2][$index];
             $zh = $matches[3][$index] ?? '';
+            $zh = str_replace(["\r", "\n"], '', $zh);
 
             // 去掉注释末尾的句号、逗号等标点
-            $zh = rtrim($zh, '，。；,;');
+            $zh = mb_rtrim($zh, '，。；,;');
 
             if (!empty($zh)) {
                 $constants[$key] = $zh;
@@ -105,7 +106,7 @@ class ParseI18n
         $zhEscaped = addslashes($zh);
 
         // 先检查 key 是否存在
-        $existing = DatabaseConnect::query("SELECT id FROM `language` WHERE `key` = '$keyEscaped' LIMIT 1")->fetch_assoc();
+        $existing = DatabaseConnect::query("SELECT `id`,`zh` FROM `language` WHERE `key` = '$keyEscaped' LIMIT 1")->fetch_assoc();
 
         $time = time();
 
@@ -123,16 +124,18 @@ class ParseI18n
             }
         } else {
             // 已存在，更新 zh 字段和 use_time
-            $id = (int)$existing['id'];
-            $sql = "UPDATE `language` SET `zh` = '$zhEscaped', `use_time` = $time WHERE id = $id";
-            $result = DatabaseConnect::query($sql);
+            if ($existing['zh'] != $zh) {
+                $id = (int)$existing['id'];
+                $sql = "UPDATE `language` SET `zh` = '$zhEscaped', `use_time` = $time WHERE id = $id";
+                $result = DatabaseConnect::query($sql);
 
-            if ($result) {
-                $stats['updated']++;
-                echo "  [更新] $key: $zh" . PHP_EOL;
-            } else {
-                echo "  [失败] $key: 更新失败" . PHP_EOL;
-                $stats['skipped']++;
+                if ($result) {
+                    $stats['updated']++;
+                    echo "  [更新] $key: $zh" . PHP_EOL;
+                } else {
+                    echo "  [失败] $key: 更新失败" . PHP_EOL;
+                    $stats['skipped']++;
+                }
             }
         }
     }

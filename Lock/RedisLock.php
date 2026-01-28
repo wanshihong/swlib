@@ -5,10 +5,10 @@ namespace Swlib\Lock;
 
 
 use Redis;
-use RuntimeException;
 use Swlib\Connect\PoolRedis;
 use Swlib\Exception\AppErr;
 use Swlib\Coroutine\CoroutineContext;
+use Swlib\Exception\AppException;
 use Swoole\Coroutine;
 use Swoole\Timer;
 use Throwable;
@@ -140,7 +140,7 @@ class RedisLock
 
         if (!$lockValue) {
             // 无法获取Redis锁
-            throw new RuntimeException(AppErr::LOCK_ACQUIRE_FAILED . ": $lockKey");
+            throw new AppException(AppErr::LOCK_FAILED . ": $lockKey");
         }
 
         // 自动续期定时器ID

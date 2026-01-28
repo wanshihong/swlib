@@ -4,7 +4,8 @@ namespace Swlib\Table\Trait;
 
 
 use Exception;
-use InvalidArgumentException;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Table\Db;
 use Throwable;
 
@@ -114,7 +115,7 @@ trait TableDtoTrait
         }
 
         // 5. 无法获取值，抛出异常
-        throw new InvalidArgumentException("$fieldAsName is null ; 请检查字段是否包含在查询字段中");
+        throw new AppException(AppErr::DTO_FIELD_IS_NULL_CHECK . ": $fieldAsName");
     }
 
     /**
@@ -168,7 +169,7 @@ trait TableDtoTrait
         try {
             return $this->getByField(self::TABLE_CLASS::PRI_KEY);
         } catch (Exception $e) {
-            throw new Exception("Failed to get primary value: " . $e->getMessage(), 0, $e);
+            throw new AppException(AppErr::DTO_PRIMARY_VALUE_FAILED_WITH_MSG . ": " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -256,7 +257,7 @@ trait TableDtoTrait
     public function update(array $where): int
     {
         if (empty($where)) {
-            throw new InvalidArgumentException('update 方法必须传入 WHERE 条件');
+            throw new AppException(AppErr::DTO_UPDATE_NEEDS_WHERE);
         }
 
         $className = self::TABLE_CLASS;
@@ -280,7 +281,7 @@ trait TableDtoTrait
     public function delete(array $where): int
     {
         if (empty($where)) {
-            throw new InvalidArgumentException('delete 方法必须传入 WHERE 条件');
+            throw new AppException(AppErr::DTO_DELETE_NEEDS_WHERE);
         }
 
         $className = self::TABLE_CLASS;

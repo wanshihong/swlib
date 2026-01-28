@@ -5,6 +5,7 @@ namespace Swlib\Controller\File\Controller;
 use Exception;
 use Generate\Tables\Main\ImagesTable;
 use Swlib\Controller\Abstract\AbstractController;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
 use Swlib\Response\RedirectResponse;
@@ -47,7 +48,7 @@ class Read extends AbstractController
         ])->selectOne();
 
         if (empty($image)) {
-            throw new Exception('图片不存在或已删除');
+            throw new AppException(AppErr::NOT_FOUND);
         }
 
         // 更新访问次数和最后访问时间

@@ -18,7 +18,7 @@ class ParseTableModel
 
     private array $saveModelStr = [];
 
-    private string $namespace = '';
+    private string $namespace;
 
     /**
      * @throws Exception
@@ -105,7 +105,7 @@ class ParseTableModel
                 $this->saveModelStr[] = "           \$$lcFieldName = strtolower($enumClass::name(\$$lcFieldName));";
                 $this->saveModelStr[] = "           \$dto->$lcFieldName = \$$lcFieldName;";
                 $this->saveModelStr[] = "           if (!isset(self::{$fieldName}TextMaps[\$$lcFieldName])) {";
-                $this->saveModelStr[] = "               throw new AppException('{$lcFieldName}参数错误');";
+                $this->saveModelStr[] = "               throw new AppException(AppErr::PARAM_ERROR . ': {$lcFieldName}参数错误');";
                 $this->saveModelStr[] = "           }";
             } else {
                 $this->saveModelStr[] = "           \$dto->$lcFieldName = \$$lcFieldName;";

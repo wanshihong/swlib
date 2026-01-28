@@ -5,6 +5,7 @@ namespace Swlib\DevTool\Ctrls;
 use Exception;
 use Generate\ConfigEnum;
 use Swlib\Controller\Abstract\AbstractController;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Response\JsonResponse;
 use Swlib\Router\Router;
@@ -30,7 +31,7 @@ class SyncApi extends AbstractController
     {
         try {
             if (!$this->checkDevEnvironment()) {
-                throw new AppException('TypeScript 同步服务仅在开发环境下可用');
+                throw new AppException(AppErr::DEV_ONLY_DEV_ENV);
             }
 
             $this->ensureInitialized();
@@ -59,7 +60,7 @@ class SyncApi extends AbstractController
         try {
 
             if (!$this->checkDevEnvironment()) {
-                throw new AppException('TypeScript 同步服务仅在开发环境下可用');
+                throw new AppException(AppErr::DEV_ONLY_DEV_ENV);
             }
 
             $this->ensureInitialized();
@@ -82,19 +83,19 @@ class SyncApi extends AbstractController
         try {
 
             if (!$this->checkDevEnvironment()) {
-                throw new AppException('TypeScript 同步服务仅在开发环境下可用');
+                throw new AppException(AppErr::DEV_ONLY_DEV_ENV);
             }
 
             $path = $this->get('path');
             if (empty($path)) {
-                throw new AppException('文件路径不能为空');
+                throw new AppException(AppErr::DEV_FILE_PATH_EMPTY);
             }
 
             $this->ensureInitialized();
             $fileData = $this->getFileContent($path);
 
             if ($fileData === null) {
-                throw new AppException('文件不存在或不允许访问');
+                throw new AppException(AppErr::DEV_FILE_NOT_ACCESSIBLE);
             }
 
             return JsonResponse::success($fileData);
@@ -116,7 +117,7 @@ class SyncApi extends AbstractController
     {
         try {
             if (!$this->checkDevEnvironment()) {
-                throw new AppException('TypeScript 同步服务仅在开发环境下可用');
+                throw new AppException(AppErr::DEV_ONLY_DEV_ENV);
             }
 
             $this->ensureInitialized();
@@ -132,12 +133,12 @@ class SyncApi extends AbstractController
                 $targetDir = realpath($targetDir);
 
                 if (!$targetDir || !is_dir($targetDir)) {
-                    throw new AppException("指定的源目录不存在: $sourceDir");
+                    throw new AppException(AppErr::DEV_SOURCE_DIR_NOT_EXIST_WITH_NAME, $sourceDir);
                 }
 
                 // 安全检查：确保目标目录在源目录内
                 if (!str_starts_with($targetDir, realpath(self::$sourceDir))) {
-                    throw new AppException("指定的源目录超出允许范围: $sourceDir");
+                    throw new AppException(AppErr::DEV_SOURCE_DIR_OUT_OF_RANGE_WITH_NAME, $sourceDir);
                 }
 
                 $scanDir = $targetDir;
@@ -240,7 +241,7 @@ class SyncApi extends AbstractController
             }
         }
 
-        throw new Exception('找不到代码同步源目录 runtime/codes');
+        throw new Exception(AppErr::DEV_SYNC_SOURCE_NOT_FOUND);
     }
 
     /**

@@ -33,7 +33,7 @@ class EventQueue
      * 空闲超时时间（秒）
      * 队列空闲超过此时间后自动关闭
      */
-    private const IDLE_TIMEOUT = 5.0;
+    private const float IDLE_TIMEOUT = 5.0;
 
     /**
      * 初始化事件队列

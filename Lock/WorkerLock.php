@@ -194,7 +194,7 @@ class WorkerLock
 
         if (!$lockValue) {
             // 无法获取进程锁
-            throw new RuntimeException(AppErr::LOCK_ACQUIRE_FAILED . ": $lockKey");
+            throw new RuntimeException(AppErr::LOCK_FAILED . ": $lockKey");
         }
 
         // 自动续期定时器ID

@@ -3,6 +3,8 @@
 namespace Swlib\Table\Trait;
 
 use InvalidArgumentException;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Table\Db;
 use Swlib\Table\Interface\TableDtoInterface;
 use Swlib\Utils\StringConverter;
@@ -60,7 +62,7 @@ trait RawQueryTrait
         $rawData = is_array($result[0] ?? null) ? $result[0] : $result;
 
         if (!is_array($rawData)) {
-            throw new InvalidArgumentException("查询结果格式不正确，期望关联数组");
+            throw new AppException(AppErr::DB_QUERY_RESULT_INVALID);
         }
 
         return $this->_convertSingleRawDataToObject($rawData);
@@ -86,7 +88,7 @@ trait RawQueryTrait
         $objects = [];
         foreach ($result as $rawData) {
             if (!is_array($rawData)) {
-                throw new InvalidArgumentException("查询结果中的每一行必须是关联数组");
+                throw new AppException(AppErr::DB_QUERY_ROW_MUST_BE_ARRAY);
             }
             $objects[] = $this->_convertSingleRawDataToObject($rawData);
         }

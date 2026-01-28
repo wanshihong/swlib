@@ -185,7 +185,7 @@ class QueryBuild
                 // 普通的字段排序
                 // 验证排序方向
                 if (!in_array(strtoupper($orderType), ['ASC', 'DESC'])) {
-                    throw new AppException(AppErr::TABLE_ORDER_DIRECTION_INVALID . ": $orderType");
+                    throw new AppException(AppErr::DB_ORDER_TYPE_INVALID_WITH_NAME, $orderType);
                 }
                 $field = $this->table->formatField($field);
                 $orderArr[] = " $field $orderType";
@@ -476,7 +476,7 @@ class QueryBuild
     {
         foreach ($data as $key => $value) {
             if (!is_array($value)) {
-                throw new AppException('insertAll 需要一个二维数组');
+                throw new AppException(AppErr::DB_INSERTALL_DATA_TYPE_INVALID);
             }
             // 检查数据格式
             $data[$key] = $this->_checkSaveDataStructure($value, 'insert-all');
@@ -557,7 +557,7 @@ class QueryBuild
     {
 
         if (empty($this->_where) || $this->_where == '1=1') {
-            throw new AppException('update 必须使用 where 条件');
+            throw new AppException(AppErr::DB_WHERE_REQUIRED);
         }
 
         // 检查数据格式
@@ -603,7 +603,7 @@ class QueryBuild
     public function delete(): string
     {
         if (empty($this->_where) || $this->_where == '1=1') {
-            throw new AppException('delete 操作时必须使用 where 条件');
+            throw new AppException(AppErr::DB_WHERE_REQUIRED);
         }
         $tableName = $this->table::TABLE_NAME;
         $sql = "DELETE FROM `$tableName` WHERE $this->_where";
@@ -666,27 +666,25 @@ class QueryBuild
     {
         $ret = [];
         foreach ($data as $field => $value) {
-
+            // 1. 处理空值且数据库允许NULL的情况 (排除 0/"0")
             if (!is_numeric($value) && empty($value) && ($this->table::DB_ALLOW_NULL[$field] ?? false)) {
                 if ($operation === 'insert') {
-                    // 只有在 insert 操作时，如果值为空且不是数字，数据库也允许是 null，就跳过
-                    continue;
-                } elseif ($operation === 'insert-all') {
-                    // insert-all 不能直接跳过,因为 跳过了导致写入的字段不一致
-                    $ret[$field] = $this->table::DB_DEFAULT[$field];
-                    continue;
+                    continue; // insert 时直接跳过，交由数据库默认处理
                 }
+                // update 或 insert-all 时，强制使用数据库默认值以保持字段完整性
+                $ret[$field] = $this->table::DB_DEFAULT[$field];
+                continue;
             }
 
-
+            // 2. 类型安全检查
             if (is_array($value)) {
-                throw new AppException("%s 是一个数组 不支持直接写入一个数组到数据库", $field);
-            }
-            if (is_object($value) && !($value instanceof Expression)) {
-                throw new AppException("%s 是一个对象 不支持直接写入一个对象到数据库", $field);
+                throw new AppException(AppErr::DB_FIELD_TYPE_INVALID_WITH_NAME, $field);
             }
             if (is_resource($value)) {
-                throw new AppException("%s 是一个资源类型 不支持直接写入到数据库", $field);
+                throw new AppException(AppErr::DB_FIELD_TYPE_INVALID_WITH_NAME, $field);
+            }
+            if (is_object($value) && !($value instanceof Expression)) {
+                throw new AppException(AppErr::DB_FIELD_TYPE_INVALID_WITH_NAME, $field);
             }
 
             $ret[$field] = $value;

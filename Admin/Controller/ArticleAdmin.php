@@ -11,7 +11,6 @@ use Swlib\Admin\Fields\ImageField;
 use Swlib\Admin\Fields\NumberField;
 use Swlib\Admin\Fields\SwitchField;
 use Swlib\Admin\Fields\TextField;
-use Swlib\Table\Db;
 use Throwable;
 
 class ArticleAdmin extends AbstractAdmin

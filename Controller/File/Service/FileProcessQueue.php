@@ -4,6 +4,7 @@ namespace Swlib\Controller\File\Service;
 
 use Exception;
 use Generate\RouterPath;
+use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\TaskProcess\Attribute\TaskAttribute;
 use Swlib\Utils\File as FileUtil;
@@ -47,12 +48,12 @@ class FileProcessQueue
             // 【修复】从info文件中获取MIME类型，为后续处理做准备
             $infoPath = PUBLIC_DIR . $uploadDir . '/temp/' . $fileHash . '.info';
             if (!file_exists($infoPath)) {
-                throw new AppException("找不到文件信息: $infoPath");
+                throw new AppException($infoPath . AppErr::FILE_NOT_FOUND);
             }
             $uploadInfo = json_decode(file_get_contents($infoPath), true);
             $mimeType = $uploadInfo['mime_type'] ?? null;
             if (empty($mimeType)) {
-                throw new AppException('文件信息中缺少MIME类型');
+                throw new AppException(AppErr::FILE_MISSING_MIME_TYPE);
             }
 
             // 更新进度
@@ -68,7 +69,7 @@ class FileProcessQueue
             $imageId = ImageService::saveImage($processedPath, $originalName);
 
             // 生成通过 read API 访问的 URL
-            $url = $host . "/" . RouterPath::ApiFileRead . "?id=$imageId";
+            $url = $host . "/" . RouterPath::FileRead . "?id=$imageId";
 
             // 更新为完成状态
             self::updateProgress($fileHash, 'completed', 100, '处理完成', [

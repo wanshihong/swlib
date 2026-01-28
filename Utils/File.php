@@ -6,7 +6,8 @@ use Exception;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Swoole\Coroutine\System;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 
 /**
  * 通用文件及目录操作工具类
@@ -79,7 +80,7 @@ class File
     {
 
         if (!is_dir($sourceDir)) {
-            throw new Exception('请指定一个需要复制的目录');
+            throw new AppException(AppErr::DIR_NOT_EXIST);
         }
 
         // 检查目标目录是否存在，如果不存在则创建

@@ -46,7 +46,7 @@ class BatchActionCollector
             $batchAction = $attribute->newInstance();
             if ($batchAction->enable && AdminUserManager::hasPermissions($batchAction->allowRoles)) {
                 // 类级别的注解，URL 作为唯一标识，需要格式化 URL 以便比较
-                $normalizedUrl = self::normalizeUrl($batchAction->url, $controllerInstance);
+                $normalizedUrl = self::normalizeUrl($batchAction->url);
                 if (!isset($urlMap[$normalizedUrl])) {
                     $urlMap[$normalizedUrl] = [
                         'action' => $batchAction,
@@ -80,7 +80,7 @@ class BatchActionCollector
                         $batchAction->url = $method->getName();
                     }
 
-                    $normalizedUrl = self::normalizeUrl($batchAction->url, $controllerInstance);
+                    $normalizedUrl = self::normalizeUrl($batchAction->url);
                     $methodClass = $method->getDeclaringClass()->getName();
 
                     // 如果 URL 还没有被记录，或者当前方法来自子类（优先级更高），则更新
@@ -126,10 +126,9 @@ class BatchActionCollector
      * 规范化 URL，将相对路径转换为绝对路径，便于比较
      *
      * @param string $url 原始 URL
-     * @param AdminControllerInterface $controllerInstance 控制器实例
      * @return string 规范化后的 URL
      */
-    private static function normalizeUrl(string $url, AdminControllerInterface $controllerInstance): string
+    private static function normalizeUrl(string $url): string
     {
         if (empty($url)) {
             return '';

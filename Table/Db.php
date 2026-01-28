@@ -13,6 +13,8 @@ use mysqli_stmt;
 use Redis;
 use Swlib\Connect\PoolRedis;
 use Swlib\Enum\CtxEnum;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Table\Aspects\DatabaseOperationEventAspect;
 use Swlib\Table\Trait\DbHelperTrait;
 use Swlib\Table\Trait\TransactionTrait;
@@ -194,7 +196,7 @@ class Db
                 // 当前查询使用的数据库名称（处理 default 别名）
                 $currentDbName = DatabaseConnect::getDbName($this->dbName);
                 if ($transactionDbName !== $currentDbName) {
-                    throw new Exception("事务内部不能跨数据库操作，当前事务数据库为 {$transactionDbName}，本次查询的数据库为 $currentDbName");
+                    throw new AppException(AppErr::DB_TRANSACTION_CROSS_DB . ": 事务数据库为 {$transactionDbName}，本次查询的数据库为 $currentDbName");
                 }
             }
 
@@ -267,11 +269,11 @@ class Db
                     $this->_stmtClose();
                     break;
                 default:
-                    throw new Exception("Unsupported action: " . $this->action);
+                    throw new AppException(AppErr::DB_UNSUPPORTED_ACTION . ": " . $this->action);
             }
 
             if ($execRes === false) {
-                throw new Exception("Execute failed: (" . $this->stmt->errno . ") " . $this->stmt->error);
+                throw new AppException(AppErr::DB_EXECUTE_FAILED . ": ({$this->stmt->errno}) {$this->stmt->error}");
             }
 
         } finally {
@@ -326,7 +328,7 @@ class Db
                     $params[] = json_encode($param, JSON_UNESCAPED_UNICODE);
                     break;
                 default:
-                    throw new Exception("Unsupported parameter type: " . gettype($param) . ' value:' . $param);
+                    throw new AppException(AppErr::DB_UNSUPPORTED_PARAM_TYPE . ": " . gettype($param) . ' value:' . $param);
             }
         }
 

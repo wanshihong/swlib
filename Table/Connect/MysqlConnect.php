@@ -5,6 +5,8 @@ namespace Swlib\Table\Connect;
 
 use Exception;
 use mysqli;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swoole\Database\MysqliConfig;
 use Swoole\Database\MysqliPool;
 
@@ -26,7 +28,7 @@ class MysqlConnect
     {
         $mysqli = new mysqli($host, $user, $pass, $database, $port);
         if ($mysqli->connect_error) {
-            throw new Exception('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
+            throw new AppException(AppErr::DB_CONNECT_ERROR . ": ({$mysqli->connect_errno}) {$mysqli->connect_error}");
         }
         $mysqli->set_charset($charset);
         return $mysqli;

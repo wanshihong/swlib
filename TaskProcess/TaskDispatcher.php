@@ -37,7 +37,7 @@ final class TaskDispatcher
     {
         if (count($callable) !== 2 || !is_string($callable[0]) || !is_string($callable[1])) {
             // callable参数必须是数组格式
-            throw new AppException(AppErr::TASK_CALLABLE_FORMAT_INVALID);
+            throw new AppException('callable' . AppErr::PARAM_ERROR);
         }
 
         [$className, $methodName] = $callable;
@@ -70,7 +70,7 @@ final class TaskDispatcher
         $server = WorkerManager::get('server');
         if ($server === null) {
             // Swoole Server未初始化
-            throw new RuntimeException(AppErr::TASK_SERVER_NOT_INITIALIZED);
+            throw new RuntimeException('server' . AppErr::NOT_INIT);
         }
 
         // 如果已经在 Task 进程中，直接执行，避免死锁
@@ -133,7 +133,7 @@ final class TaskDispatcher
             serialize($data);
         } catch (Throwable $e) {
             // Task参数包含不可序列化的数据类型
-            throw new AppException(AppErr::TASK_CALLABLE_FORMAT_INVALID . ": " . $e->getMessage());
+            throw new AppException(AppErr::PARAM_ERROR . ": " . $e->getMessage());
         }
     }
 }

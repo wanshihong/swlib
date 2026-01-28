@@ -33,7 +33,7 @@ class CronExpression
 
         if (count($parts) !== 5) {
             // 无效的cron表达式
-            throw new InvalidArgumentException(AppErr::CRON_EXPRESSION_INVALID . ": $expression");
+            throw new InvalidArgumentException(AppErr::PARAM_ERROR . ": $expression");
         }
 
         $this->minute = $this->parseField($parts[0], 0, 59);

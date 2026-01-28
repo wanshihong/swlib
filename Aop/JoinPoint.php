@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace Swlib\Aop;
 
 use OutOfBoundsException;
+use ReflectionException;
 use ReflectionMethod;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 
 /**
  * 连接点类
@@ -44,6 +47,9 @@ class JoinPoint
      * @var ReflectionMethod|null 反射方法对象
      */
     private ?ReflectionMethod $reflectionMethod = null {
+        /**
+         * @throws ReflectionException
+         */
         get {
             if ($this->reflectionMethod === null) {
                 $this->reflectionMethod = new ReflectionMethod($this->target, $this->methodName);
@@ -56,8 +62,8 @@ class JoinPoint
      * 构造函数
      *
      * @param object|string $target 目标对象
-     * @param string        $methodName 方法名称
-     * @param array         $arguments 方法参数
+     * @param string $methodName 方法名称
+     * @param array $arguments 方法参数
      */
     public function __construct(object|string $target, string $methodName, array $arguments = [])
     {
@@ -82,12 +88,12 @@ class JoinPoint
      *
      * @param int $index 参数索引
      * @return mixed
-     * @throws OutOfBoundsException
+     * @throws OutOfBoundsException|AppException
      */
     public function getArgument(int $index): mixed
     {
         if (!isset($this->arguments[$index])) {
-            throw new OutOfBoundsException("参数索引 $index 不存在");
+            throw new AppException($index . AppErr::NOT_FOUND);
         }
         return $this->arguments[$index];
     }

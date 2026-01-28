@@ -9,6 +9,8 @@ use Generate\DatabaseConnect;
 use mysqli;
 use Swlib\Enum\CtxEnum;
 use Swlib\Event\EventEnum;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Table\Event\DatabaseTransactionEvent;
 use Swlib\Table\Helper\InnodbLockWaitTimeout;
 use Swoole\Database\MysqliProxy;
@@ -55,7 +57,7 @@ trait TransactionTrait
         if ($existingDbh = CtxEnum::TransactionDbh->get()) {
             $existingDbName = CtxEnum::TransactionDbName->get($resolvedDbName);
             if ($existingDbName !== $resolvedDbName) {
-                throw new Exception("事务内部不能跨数据库操作，当前事务数据库为 {$existingDbName}，本次请求的数据库为 $resolvedDbName");
+                throw new AppException(AppErr::DB_TRANSACTION_CROSS_DB . ": 事务数据库为 {$existingDbName}，本次请求的数据库为 $resolvedDbName");
             }
 
             return call_user_func($call, $existingDbh);
@@ -231,7 +233,7 @@ trait TransactionTrait
             self::ISOLATION_READ_COMMITTED => 'READ COMMITTED',
             self::ISOLATION_REPEATABLE_READ => 'REPEATABLE READ',
             self::ISOLATION_SERIALIZABLE => 'SERIALIZABLE',
-            default => throw new Exception('Invalid isolation level'),
+            default => throw new AppException(AppErr::DB_INVALID_ISOLATION_LEVEL),
         };
     }
 
