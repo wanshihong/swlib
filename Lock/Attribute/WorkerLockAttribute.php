@@ -16,8 +16,8 @@ class WorkerLockAttribute implements ProxyAttributeInterface
 
     public function __construct(
         private readonly ?string $keyTemplate = null,
-        private readonly int     $timeout = 3,
-        private readonly int     $ttl = 60,
+        private readonly int     $timeout = 3000,
+        private readonly int     $ttl = 60000,
         private readonly int     $retryCount = 3,
         private readonly int     $retryDelay = 200,
         public int               $priority = 0,

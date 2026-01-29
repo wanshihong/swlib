@@ -40,11 +40,11 @@ class WorkerLock
      * 获取锁
      *
      * @param string $lockKey 锁的键名
-     * @param int $timeout 获取锁的超时时间（秒）
-     * @param int $ttl 锁的有效期（秒），防止死锁
+     * @param int $timeout 获取锁的超时时间（毫秒）
+     * @param int $ttl 锁的有效期（毫秒），防止死锁
      * @return string|false 成功返回锁值，失败返回 false
      */
-    public static function lock(string $lockKey, int $timeout = 3, int $ttl = 60): string|false
+    public static function lock(string $lockKey, int $timeout = 3000, int $ttl = 60000): string|false
     {
         $key = self::getLockKey($lockKey);
         $startTime = microtime(true);
@@ -54,12 +54,12 @@ class WorkerLock
         while (true) {
             // 原子性地检查并设置锁
             $existingLock = WorkerManager::get($key);
-            $now = time();
+            $now = microtime(true);
 
             // 如果锁不存在或已过期，尝试获取锁
             if (!$existingLock || (isset($existingLock['expire_time']) && $existingLock['expire_time'] < $now)) {
                 // 设置锁（包含过期时间和锁值）
-                $expireTime = $now + $ttl;
+                $expireTime = $now + ($ttl / 1000);
                 WorkerManager::set($key, [
                     'value' => $lockValue,
                     'expire_time' => $expireTime,
@@ -71,7 +71,7 @@ class WorkerLock
                 $verifyLock = WorkerManager::get($key);
                 if (!$verifyLock || $verifyLock['value'] !== $lockValue) {
                     // 锁被其他协程抢占，继续重试
-                    if (microtime(true) - $startTime >= $timeout) {
+                    if (microtime(true) - $startTime >= ($timeout / 1000)) {
                         return false;
                     }
                     self::safeSleep(10); // 10ms
@@ -85,7 +85,7 @@ class WorkerLock
             }
 
             // 检查是否超时
-            if (microtime(true) - $startTime >= $timeout) {
+            if (microtime(true) - $startTime >= ($timeout / 1000)) {
                 return false;
             }
 
@@ -126,10 +126,10 @@ class WorkerLock
      *
      * @param string $lockKey 锁的键名
      * @param string $lockValue 锁值（必须传入加锁时返回的值）
-     * @param int $ttl 新的超时时间（秒）
+     * @param int $ttl 新的超时时间（毫秒）
      * @return bool 是否成功续期
      */
-    public static function renew(string $lockKey, string $lockValue, int $ttl = 60): bool
+    public static function renew(string $lockKey, string $lockValue, int $ttl = 60000): bool
     {
         $key = self::getLockKey($lockKey);
         $existingLock = WorkerManager::get($key);
@@ -137,7 +137,7 @@ class WorkerLock
         // 只续期自己加的锁
         if ($existingLock && isset($existingLock['value']) && $existingLock['value'] === $lockValue) {
             // 更新过期时间
-            $existingLock['expire_time'] = time() + $ttl;
+            $existingLock['expire_time'] = microtime(true) + ($ttl / 1000);
             WorkerManager::set($key, $existingLock);
 
             // 清除旧的定时器并创建新的
@@ -161,8 +161,8 @@ class WorkerLock
      *
      * @param string $lockKey 锁的键名
      * @param callable $callback 获取锁后要执行的回调函数（会传入锁值作为参数）
-     * @param int $timeout 获取锁的超时时间（秒）
-     * @param int $ttl 锁的有效期（秒）
+     * @param int $timeout 获取锁的超时时间（毫秒）
+     * @param int $ttl 锁的有效期（毫秒）
      * @param int $retryCount 获取锁失败时的重试次数
      * @param int $retryDelay 重试间隔（毫秒）
      * @param bool $autoRenew 是否自动续期（当业务执行时间可能超过TTL时启用）
@@ -172,8 +172,8 @@ class WorkerLock
     public static function withLock(
         string $lockKey,
         callable $callback,
-        int $timeout = 3,
-        int $ttl = 60,
+        int $timeout = 3000,
+        int $ttl = 60000,
         int $retryCount = 3,
         int $retryDelay = 200,
         bool $autoRenew = false
@@ -204,7 +204,7 @@ class WorkerLock
             // 如果启用自动续期，创建定时器
             if ($autoRenew) {
                 // 在 TTL 的 2/3 时间时续期
-                $renewInterval = (int)($ttl * 1000 * 2 / 3);
+                $renewInterval = (int)($ttl * 2 / 3);
                 if ($renewInterval > 0) {
                     $renewTimerId = Timer::tick($renewInterval, function () use ($lockKey, $lockValue, $ttl) {
                         self::renew($lockKey, $lockValue, $ttl);
@@ -239,7 +239,7 @@ class WorkerLock
         if (CoroutineContext::inCoroutine()) {
             Coroutine::sleep($milliseconds / 1000);
         } else {
-            usleep($milliseconds * 1000);
+            usleep($milliseconds);
         }
     }
 
@@ -248,7 +248,7 @@ class WorkerLock
      *
      * @param string $lockKey 锁的键名
      * @param string $lockValue 锁值
-     * @param int $ttl 超时时间（秒）
+     * @param int $ttl 超时时间（毫秒）
      * @return void
      */
     private static function createExpireTimer(string $lockKey, string $lockValue, int $ttl): void
@@ -256,7 +256,7 @@ class WorkerLock
         $key = self::getLockKey($lockKey);
 
         // 创建定时器，在锁到期时自动释放
-        $timerId = Timer::after($ttl * 1000, function () use ($lockKey, $lockValue, $key) {
+        $timerId = Timer::after($ttl, function () use ($lockKey, $lockValue, $key) {
             // 检查锁是否仍然存在且是当前锁
             $existingLock = WorkerManager::get($key);
             if ($existingLock && isset($existingLock['value']) && $existingLock['value'] === $lockValue) {
