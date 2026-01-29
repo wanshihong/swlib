@@ -7,6 +7,8 @@ namespace Swlib\Parse\Table;
 use Generate\DatabaseConnect;
 use mysqli;
 use RuntimeException;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Parse\Helper\FieldConflictDetector;
 use Swlib\Utils\File;
@@ -50,7 +52,7 @@ class ParseTable
         $sqlFile = ROOT_DIR . 'Swlib' . DIRECTORY_SEPARATOR . 'create_tab.sql';
 
         if (!file_exists($sqlFile)) {
-            throw new RuntimeException("SQL file not found: $sqlFile");
+            throw new AppException(AppErr::PARSE_SQL_FILE_NOT_FOUND_WITH_PATH, $sqlFile);
         }
 
         $sql = file_get_contents($sqlFile);

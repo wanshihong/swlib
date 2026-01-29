@@ -3,6 +3,8 @@
 namespace Swlib\Admin\Fields;
 
 use Generate\RouterPath;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use InvalidArgumentException;
 use Swlib\Admin\Manager\OptionManager;
 use Swlib\Enum\CtxEnum;
@@ -89,7 +91,7 @@ class SelectField extends AbstractField
     public function setRelation(string $tableName, string $idField, string $textField, string $url = '', string $dbName = 'default'): static
     {
         if (!class_exists($tableName)) {
-            throw new InvalidArgumentException("Class $tableName does not exist.");
+            throw new AppException(AppErr::FORM_CLASS_NOT_EXIST_WITH_NAME, $tableName);
         }
         $this->table = $tableName;
         $this->idField = $idField;

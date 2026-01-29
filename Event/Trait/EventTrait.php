@@ -42,7 +42,7 @@ trait EventTrait
 
             $reflection = ReflectionManager::getClass($className);
             if (!$reflection->hasMethod($method)) {
-                throw new AppException(AppErr::EVENT_LISTENER_METHOD_NOT_EXIST_IN_CLASS . ": 方法 $method 不存在于类 $className 中");
+                throw new AppException(AppErr::EVENT_LISTENER_METHOD_NOT_FOUND_WITH_CLASS . ": $className::$method");
             }
         }
 

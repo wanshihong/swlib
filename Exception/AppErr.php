@@ -21,33 +21,6 @@ class AppErr
     // 基础语义常量（保留兼容性）
     // ============================================================
 
-    #[I18nAttribute(zh: '参数', en: 'Parameter')]
-    public const string PARAM = 'param';
-
-    #[I18nAttribute(zh: '必填', en: 'Required')]
-    public const string REQUIRED = 'required';
-
-    #[I18nAttribute(zh: '不可用', en: 'Unavailable')]
-    public const string UNAVAILABLE = 'unavailable';
-
-    #[I18nAttribute(zh: '超时', en: 'Timeout')]
-    public const string TIMEOUT = 'timeout';
-
-    #[I18nAttribute(zh: '错误', en: 'Error')]
-    public const string ERROR = 'error';
-
-    #[I18nAttribute(zh: '失败', en: 'Failed')]
-    public const string FAILED = 'failed';
-
-    #[I18nAttribute(zh: '创建', en: 'Create')]
-    public const string CREATE = 'create';
-
-    #[I18nAttribute(zh: '更新', en: 'Update')]
-    public const string UPDATE = 'update';
-
-    #[I18nAttribute(zh: '删除', en: 'Delete')]
-    public const string DELETE = 'delete';
-
     #[I18nAttribute(zh: '为空', en: 'Empty')]
     public const string EMPTY = 'empty';
 
@@ -57,15 +30,12 @@ class AppErr
     #[I18nAttribute(zh: '未初始化', en: 'Not initialized')]
     public const string NOT_INIT = 'not.init';
 
-    #[I18nAttribute(zh: '无效', en: 'Invalid')]
-    public const string INVALID = 'invalid';
-
-    #[I18nAttribute(zh: '已存在', en: 'Already exists')]
-    public const string ALREADY_EXISTS = 'already.exists';
-
+    // ============================================================
     // 参数错误语义
+    // ============================================================
+
     #[I18nAttribute(zh: '参数错误', en: 'Parameter error')]
-    public const string PARAM_ERROR = self::PARAM . '.' . self::ERROR;
+    public const string PARAM_ERROR = 'param.error';
 
     #[I18nAttribute(zh: '参数为空', en: 'Parameter is empty')]
     public const string PARAM_EMPTY = 'param.empty';
@@ -112,178 +82,68 @@ class AppErr
     #[I18nAttribute(zh: '参数最大数量错误', en: 'Parameter maximum count error')]
     public const string PARAM_MAX_COUNT = 'param.max_count';
 
-    // 记录/资源不存在语义
+    // ============================================================
+    // 通用语义常量
+    // ============================================================
+
     #[I18nAttribute(zh: '不存在', en: 'Not found')]
     public const string NOT_FOUND = 'not_found';
-
-    // 操作失败语义
-    #[I18nAttribute(zh: '操作失败', en: 'Operation failed')]
-    public const string OPERATION_FAILED = 'operation.failed';
 
     #[I18nAttribute(zh: '执行失败', en: 'Execution failed')]
     public const string EXECUTE_FAILED = 'execute.failed';
 
-    // 权限/认证语义
-    #[I18nAttribute(zh: '拒绝访问', en: 'Access denied')]
-    public const string ACCESS_DENIED = 'access.denied';
-
-    #[I18nAttribute(zh: '未认证', en: 'Not authenticated')]
-    public const string NOT_AUTHENTICATED = 'not.authenticated';
-
-    // 格式/类型错误语义
     #[I18nAttribute(zh: '格式无效', en: 'Invalid format')]
     public const string FORMAT_INVALID = 'format.invalid';
-
-    #[I18nAttribute(zh: '类型无效', en: 'Invalid type')]
-    public const string TYPE_INVALID = 'type.invalid';
 
     #[I18nAttribute(zh: '值无效', en: 'Invalid value')]
     public const string VALUE_INVALID = 'value.invalid';
 
-    // 配置语义
-    #[I18nAttribute(zh: '未配置', en: 'Not configured')]
-    public const string NOT_CONFIGURED = 'not.configured';
+    #[I18nAttribute(zh: '加锁失败', en: 'Lock failed')]
+    public const string LOCK_FAILED = 'lock.failed';
 
-    #[I18nAttribute(zh: '配置错误', en: 'Configuration error')]
-    public const string CONFIG_ERROR = 'config.error';
+    // ============================================================
+    // 文件语义
+    // ============================================================
 
-    // 连接/网络语义
-    #[I18nAttribute(zh: '连接失败', en: 'Connection failed')]
-    public const string CONNECT_FAILED = 'connect.failed';
-
-    #[I18nAttribute(zh: '请求失败', en: 'Request failed')]
-    public const string REQUEST_FAILED = 'request.failed';
-
-    // 文件基础语义
     #[I18nAttribute(zh: '文件不存在', en: 'File not found')]
     public const string FILE_NOT_FOUND = 'file.not_found';
-
-    #[I18nAttribute(zh: '不支持的文件类型', en: 'File type not supported')]
-    public const string FILE_TYPE_NOT_SUPPORTED = 'file.type_not_supported';
 
     #[I18nAttribute(zh: '请指定文件', en: 'File must be specified')]
     public const string FILE_SPECIFY_REQUIRED = 'file.specify_required';
 
-    // 数据库基础语义
-    #[I18nAttribute(zh: '数据库操作失败', en: 'Database operation failed')]
-    public const string DB_OPERATION_FAILED = 'db.operation_failed';
-
-    #[I18nAttribute(zh: '事务错误', en: 'Transaction error')]
-    public const string DB_TRANSACTION_ERROR = 'db.transaction_error';
-
-    #[I18nAttribute(zh: '数据库连接失败', en: 'Database connection failed')]
-    public const string DB_CONNECT_FAILED = 'db.connect_failed';
-
-    #[I18nAttribute(zh: '数据库连接错误', en: 'Database connection error')]
-    public const string DB_CONNECT_ERROR = 'db.connect_error';
-
-    #[I18nAttribute(zh: '数据库需要WHERE条件', en: 'Database requires WHERE clause')]
-    public const string DB_WHERE_REQUIRED = 'db.where_required';
-
-    #[I18nAttribute(zh: '数据库字段不存在', en: 'Database field not found')]
-    public const string DB_FIELD_NOT_FOUND = 'db.field_not_found';
-
-    // 其他基础语义
-    #[I18nAttribute(zh: '加锁失败', en: 'Lock failed')]
-    public const string LOCK_FAILED = 'lock.failed';
-
-    #[I18nAttribute(zh: '目录必填', en: 'Directory is required')]
-    public const string DIR_REQUIRED = 'dir.required';
-
-    #[I18nAttribute(zh: '类不存在', en: 'Class does not exist')]
-    public const string CLASS_NOT_EXIST = 'class.not_exist';
-
-    #[I18nAttribute(zh: '方法不存在', en: 'Method does not exist')]
-    public const string METHOD_NOT_EXIST = 'method.not_exist';
-
-    #[I18nAttribute(zh: '服务器未初始化', en: 'Server not initialized')]
-    public const string SERVER_NOT_INITIALIZED = 'server.not_initialized';
-
-    // ============================================================
-    // 验证器模块 (validation.*)
-    // ============================================================
-
-    #[I18nAttribute(zh: '参数索引不能为空', en: 'Parameter index cannot be empty')]
-    public const string VALIDATION_PARAM_INDEX_REQUIRED = 'validation.param_index_required';
-
-    #[I18nAttribute(zh: '参数必须是字符串', en: 'Parameter must be a string')]
-    public const string VALIDATION_PARAM_MUST_STRING = 'validation.param_must_string';
-
-    #[I18nAttribute(zh: '参数必须是整数', en: 'Parameter must be an integer')]
-    public const string VALIDATION_PARAM_MUST_INT = 'validation.param_must_int';
-
-    #[I18nAttribute(zh: '参数必须是数字', en: 'Parameter must be a number')]
-    public const string VALIDATION_PARAM_MUST_NUMBER = 'validation.param_must_number';
-
-    #[I18nAttribute(zh: '参数必须是邮箱', en: 'Parameter must be an email')]
-    public const string VALIDATION_PARAM_MUST_EMAIL = 'validation.param_must_email';
-
-    #[I18nAttribute(zh: '参数必须是URL', en: 'Parameter must be a URL')]
-    public const string VALIDATION_PARAM_MUST_URL = 'validation.param_must_url';
-
-    #[I18nAttribute(zh: '参数必须是数组', en: 'Parameter must be an array')]
-    public const string VALIDATION_PARAM_MUST_ARRAY = 'validation.param_must_array';
-
-    #[I18nAttribute(zh: '参数最小长度错误', en: 'Parameter minimum length error')]
-    public const string VALIDATION_PARAM_MIN_LENGTH = 'validation.param_min_length';
-
-    #[I18nAttribute(zh: '参数最小值错误', en: 'Parameter minimum value error')]
-    public const string VALIDATION_PARAM_MIN_VALUE = 'validation.param_min_value';
-
-    #[I18nAttribute(zh: '参数最小元素数错误', en: 'Parameter minimum element count error')]
-    public const string VALIDATION_PARAM_MIN_COUNT = 'validation.param_min_count';
-
-    #[I18nAttribute(zh: '参数最大长度错误', en: 'Parameter maximum length error')]
-    public const string VALIDATION_PARAM_MAX_LENGTH = 'validation.param_max_length';
-
-    #[I18nAttribute(zh: '参数最大值错误', en: 'Parameter maximum value error')]
-    public const string VALIDATION_PARAM_MAX_VALUE = 'validation.param_max_value';
-
-    #[I18nAttribute(zh: '参数最大元素数错误', en: 'Parameter maximum element count error')]
-    public const string VALIDATION_PARAM_MAX_COUNT = 'validation.param_max_count';
-
-    #[I18nAttribute(zh: '参数值不在允许列表', en: 'Parameter value not in allowed list')]
-    public const string VALIDATION_PARAM_VALUE_NOT_ALLOWED = 'validation.param_value_not_allowed';
-
-    #[I18nAttribute(zh: '参数格式无效', en: 'Parameter format is invalid')]
-    public const string VALIDATION_PARAM_FORMAT_INVALID = 'validation.param_format_invalid';
+    #[I18nAttribute(zh: '目录不存在', en: 'Directory does not exist')]
+    public const string DIR_NOT_EXIST = 'dir_not_exist';
 
     // ============================================================
     // 数据库模块 (db.*)
     // ============================================================
 
-    #[I18nAttribute(zh: '数据库连接错误(含消息)', en: 'Database connection error (with message)')]
-    public const string DB_CONNECT_ERROR_WITH_MSG = 'db.connect_error_with_msg';
-
-    #[I18nAttribute(zh: '事务跨数据库操作(含数据库名)', en: 'Transaction cross-database operation (with database names)')]
-    public const string DB_TRANSACTION_CROSS_DB_WITH_NAMES = 'db.transaction_cross_db_with_names';
-
     #[I18nAttribute(zh: '事务跨数据库操作', en: 'Transaction cross-database operation')]
     public const string DB_TRANSACTION_CROSS_DB = 'db.transaction_cross_db';
 
+    #[I18nAttribute(zh: '不支持的数据库操作', en: 'Unsupported database operation')]
+    public const string DB_UNSUPPORTED_ACTION = 'db.unsupported_action';
+
     #[I18nAttribute(zh: '不支持的数据库操作(含操作名)', en: 'Unsupported database operation (with operation name)')]
     public const string DB_UNSUPPORTED_ACTION_WITH_NAME = 'db.unsupported_action_with_name';
+
+    #[I18nAttribute(zh: '数据库执行失败', en: 'Database execution failed')]
+    public const string DB_EXECUTE_FAILED = 'db.execute_failed';
 
     #[I18nAttribute(zh: '数据库执行失败(含消息)', en: 'Database execution failed (with message)')]
     public const string DB_EXECUTE_FAILED_WITH_MSG = 'db.execute_failed_with_msg';
 
     #[I18nAttribute(zh: '不支持的参数类型(含类型和值)', en: 'Unsupported parameter type (with type and value)')]
-    public const string DB_UNSUPPORTED_PARAM_TYPE_WITH_VALUE = 'db.unsupported_param_type_with_value';
+    public const string DB_UNSUPPORTED_PARAM_TYPE = 'db.unsupported_param_type';
 
-    #[I18nAttribute(zh: '别名字段不存在(含字段名)', en: 'Alias field not found (with field name)')]
-    public const string DB_FIELD_NOT_FOUND_IN_ALIAS_WITH_NAME = 'db.field_not_found_in_alias_with_name';
+    #[I18nAttribute(zh: '别名字段不存在', en: 'Alias field not found')]
+    public const string DB_FIELD_NOT_FOUND_IN_ALIAS = 'db.field_not_found_in_alias';
 
-    #[I18nAttribute(zh: '定义字段不存在(含字段名)', en: 'Definition field not found (with field name)')]
-    public const string DB_FIELD_NOT_FOUND_IN_DEFINITION_WITH_NAME = 'db.field_not_found_in_definition_with_name';
+    #[I18nAttribute(zh: '定义字段不存在', en: 'Definition field not found')]
+    public const string DB_FIELD_NOT_FOUND_IN_DEFINITION = 'db.field_not_found_in_definition';
 
     #[I18nAttribute(zh: '上下文无写入数据', en: 'Context has no write data')]
     public const string DB_CONTEXT_NO_WRITE = 'db.context_no_write';
-
-    #[I18nAttribute(zh: '上下文无写入数据(含提示)', en: 'Context has no write data (with hint)')]
-    public const string DB_CONTEXT_NO_WRITE_WITH_HINT = 'db.context_no_write_with_hint';
-
-    #[I18nAttribute(zh: '上下文字段无新值(含字段名)', en: 'Context field has no new value (with field name)')]
-    public const string DB_CONTEXT_FIELD_NO_NEW_VALUE_WITH_NAME = 'db.context_field_no_new_value_with_name';
 
     #[I18nAttribute(zh: '上下文字段无新值', en: 'Context field has no new value')]
     public const string DB_CONTEXT_FIELD_NEW_VALUE = 'db.context_field_new_value';
@@ -308,6 +168,12 @@ class AppErr
 
     #[I18nAttribute(zh: '连接池获取连接失败', en: 'Connection pool failed to get connection')]
     public const string DB_POOL_GET_CONNECTION_FAILED = 'db.pool_get_connection_failed';
+
+    #[I18nAttribute(zh: '数据库需要WHERE条件', en: 'Database requires WHERE clause')]
+    public const string DB_WHERE_REQUIRED = 'db.where_required';
+
+    #[I18nAttribute(zh: '数据库连接错误', en: 'Database connection error')]
+    public const string DB_CONNECT_ERROR = 'db.connect_error';
 
     // ============================================================
     // 文件上传模块 (file.*)
@@ -334,23 +200,14 @@ class AppErr
     #[I18nAttribute(zh: '上传信息不存在', en: 'Upload information not found')]
     public const string FILE_UPLOAD_INFO_NOT_FOUND = 'file.upload_info_not_found';
 
-    #[I18nAttribute(zh: '上传信息不存在(含路径)', en: 'Upload information not found (with path)')]
-    public const string FILE_UPLOAD_INFO_NOT_FOUND_WITH_PATH = 'file.upload_info_not_found_with_path';
-
     #[I18nAttribute(zh: 'MIME类型丢失', en: 'MIME type lost')]
     public const string FILE_MIME_TYPE_LOST = 'file.mime_type_lost';
 
     #[I18nAttribute(zh: '创建最终文件失败', en: 'Failed to create final file')]
     public const string FILE_CREATE_FAILED = 'file.create_failed';
 
-    #[I18nAttribute(zh: '分片不存在(含索引)', en: 'Chunk does not exist (with index)')]
-    public const string FILE_CHUNK_NOT_EXIST_WITH_INDEX = 'file.chunk_not_exist_with_index';
-
     #[I18nAttribute(zh: '分片不存在', en: 'Chunk does not exist')]
     public const string FILE_CHUNK_NOT_EXIST = 'file.chunk_not_exist';
-
-    #[I18nAttribute(zh: '读取分片失败(含索引)', en: 'Failed to read chunk (with index)')]
-    public const string FILE_CHUNK_READ_FAILED_WITH_INDEX = 'file.chunk_read_failed_with_index';
 
     #[I18nAttribute(zh: '读取分片失败', en: 'Failed to read chunk')]
     public const string FILE_CHUNK_READ_FAILED = 'file.chunk_read_failed';
@@ -425,17 +282,11 @@ class AppErr
     #[I18nAttribute(zh: '文件不存在或不允许访问', en: 'File does not exist or is not accessible')]
     public const string DEV_FILE_NOT_ACCESSIBLE = 'dev.file_not_accessible';
 
-    #[I18nAttribute(zh: '源目录不存在', en: 'Source directory does not exist')]
-    public const string DIR_NOT_EXIST = 'dir_not_exist';
-
     #[I18nAttribute(zh: '源目录不存在(含目录名)', en: 'Source directory does not exist (with directory name)')]
     public const string DEV_SOURCE_DIR_NOT_EXIST_WITH_NAME = 'dev.source_dir_not_exist_with_name';
 
     #[I18nAttribute(zh: '源目录超出范围(含目录名)', en: 'Source directory out of range (with directory name)')]
     public const string DEV_SOURCE_DIR_OUT_OF_RANGE_WITH_NAME = 'dev.source_dir_out_of_range_with_name';
-
-    #[I18nAttribute(zh: '源目录超出范围', en: 'Source directory out of range')]
-    public const string DEV_SOURCE_DIR_OUT_OF_RANGE = 'dev.source_dir_out_of_range';
 
     #[I18nAttribute(zh: '找不到代码同步源目录', en: 'Code sync source directory not found')]
     public const string DEV_SYNC_SOURCE_NOT_FOUND = 'dev.sync_source_not_found';
@@ -465,13 +316,6 @@ class AppErr
 
     #[I18nAttribute(zh: 'iOS SSL生成失败(含命令)', en: 'iOS SSL generation failed (with command)')]
     public const string SSL_IOS_GENERATE_FAILED_WITH_COMMAND = 'ssl.ios_generate_failed_with_command';
-
-    // ============================================================
-    // 锁模块 (lock.*)
-    // ============================================================
-
-    #[I18nAttribute(zh: '锁失败(含Key)', en: 'Lock failed (with key)')]
-    public const string LOCK_FAILED_WITH_KEY = 'lock.failed_with_key';
 
     // ============================================================
     // WebSocket模块 (ws.*)
@@ -507,9 +351,6 @@ class AppErr
     // DTO模块 (dto.*)
     // ============================================================
 
-    #[I18nAttribute(zh: '字段为空检查(含字段名)', en: 'Field is null check (with field name)')]
-    public const string DTO_FIELD_IS_NULL_WITH_NAME = 'dto.field_is_null_with_name';
-
     #[I18nAttribute(zh: '字段为null检查', en: 'Field is null check')]
     public const string DTO_FIELD_IS_NULL_CHECK = 'dto.field_is_null_check';
 
@@ -523,20 +364,66 @@ class AppErr
     public const string DTO_DELETE_NEEDS_WHERE = 'dto.delete_needs_where';
 
     // ============================================================
-    // 其他模块
+    // 日志模块 (log.*)
     // ============================================================
 
-    #[I18nAttribute(zh: '任务调度callable参数错误', en: 'Task scheduler callable parameter error')]
-    public const string TASK_CALLABLE_PARAM_ERROR = 'task.callable_param_error';
+    #[I18nAttribute(zh: '创建目录失败(含目录)', en: 'Failed to create directory (with directory)')]
+    public const string LOG_CREATE_DIR_FAILED_WITH_DIR = 'log.create_dir_failed_with_dir';
 
-    #[I18nAttribute(zh: '任务调度执行失败(含消息)', en: 'Task scheduler execution failed (with message)')]
-    public const string TASK_EXECUTE_FAILED_WITH_MSG = 'task.execute_failed_with_msg';
+    // ============================================================
+    // 缓存模块 (cache.*)
+    // ============================================================
 
-    #[I18nAttribute(zh: '参数模板无效(含模板)', en: 'Parameter template is invalid (with template)')]
-    public const string LOCK_PARAM_TEMPLATE_INVALID_WITH_NAME = 'lock.param_template_invalid_with_name';
+    #[I18nAttribute(zh: '散列值长度不足', en: 'Hash value length is insufficient')]
+    public const string CACHE_HASH_LENGTH_INSUFFICIENT = 'cache.hash_length_insufficient';
 
-    #[I18nAttribute(zh: 'SERVER为空', en: 'SERVER is empty')]
-    public const string RESPONSE_SERVER_EMPTY = 'response.server_empty';
+    // ============================================================
+    // 路由路径模块 (router_path.*)
+    // ============================================================
+
+    #[I18nAttribute(zh: '路由路径解析失败', en: 'Route path parsing failed')]
+    public const string ROUTER_PATH_PARSE_FAILED = 'router_path.parse_failed';
+
+    // ============================================================
+    // 表单字段模块 (form_field.*)
+    // ============================================================
+
+    #[I18nAttribute(zh: '开始日期格式无效', en: 'Start date format is invalid')]
+    public const string FORM_FIELD_START_DATE_FORMAT_INVALID = 'form_field.start_date_format_invalid';
+
+    #[I18nAttribute(zh: '结束日期格式无效', en: 'End date format is invalid')]
+    public const string FORM_FIELD_END_DATE_FORMAT_INVALID = 'form_field.end_date_format_invalid';
+
+    #[I18nAttribute(zh: '日期格式无效', en: 'Date format is invalid')]
+    public const string FORM_FIELD_DATE_FORMAT_INVALID = 'form_field.date_format_invalid';
+
+    // ============================================================
+    // 后台权限模块 (admin_permission.*)
+    // ============================================================
+
+    #[I18nAttribute(zh: '无权限', en: 'Access denied')]
+    public const string ADMIN_PERMISSION_DENIED = 'admin.permission_denied';
+
+    #[I18nAttribute(zh: '禁止访问', en: 'Access forbidden')]
+    public const string ADMIN_ACCESS_FORBIDDEN = 'admin.access_forbidden';
+
+    // ============================================================
+    // 表单模块 (form.*)
+    // ============================================================
+
+    #[I18nAttribute(zh: '类不存在(含类名)', en: 'Class does not exist (with class name)')]
+    public const string FORM_CLASS_NOT_EXIST_WITH_NAME = 'form.class_not_exist_with_name';
+
+    // ============================================================
+    // 解析SQL模块 (parse_sql.*)
+    // ============================================================
+
+    #[I18nAttribute(zh: 'SQL文件不存在(含路径)', en: 'SQL file not found (with path)')]
+    public const string PARSE_SQL_FILE_NOT_FOUND_WITH_PATH = 'parse_sql.file_not_found_with_path';
+
+    // ============================================================
+    // 功能支持模块 (feature.*)
+    // ============================================================
 
     #[I18nAttribute(zh: '功能不支持(含功能名)', en: 'Feature not supported (with feature name)')]
     public const string FEATURE_NOT_SUPPORTED_WITH_NAME = 'feature.not_supported_with_name';

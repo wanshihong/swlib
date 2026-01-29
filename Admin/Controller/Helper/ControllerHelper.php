@@ -11,6 +11,7 @@ use Swlib\Admin\Fields\AbstractField;
 use Swlib\Admin\Fields\SelectField;
 use Swlib\Admin\Manager\OptionManager;
 use Swlib\Enum\CtxEnum;
+use Swlib\Exception\AppErr;
 use Swlib\Router\Router;
 use Swlib\Table\Interface\TableDtoInterface;
 use Throwable;
@@ -123,7 +124,7 @@ class ControllerHelper
                 $enum = AdminActionEnum::from($currentAction);
                 throw new DisabledActionException($enum->getDefaultMessage());
             } catch (Throwable) {
-                throw new DisabledActionException($currentAction . '禁止访问');
+                throw new DisabledActionException(AppErr::ADMIN_ACCESS_FORBIDDEN . ": $currentAction");
             }
         }
     }

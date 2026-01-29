@@ -99,7 +99,7 @@ class Request
         }
 
         if ($def === null) {
-            throw new AppException($errTip ?: "参数错误");
+            throw new AppException($errTip ?: AppErr::PARAM_ERROR);
         }
         return $def;
     }
@@ -128,7 +128,7 @@ class Request
         }
 
         if ($def === null) {
-            throw new AppException($errTip ?: '参数错误');
+            throw new AppException($errTip ?: AppErr::PARAM_ERROR);
         }
         return $def;
     }

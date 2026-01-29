@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Swlib\Utils;
 
 use FilesystemIterator;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use InvalidArgumentException;
 
 
@@ -82,9 +84,7 @@ class FileCache
 
         // 如果散列值长度不足，抛出异常
         if ($totalCharsNeeded > $hashLength) {
-            throw new InvalidArgumentException(
-                "散列值长度不足：需要 $totalCharsNeeded 个字符，但散列值只有 $hashLength 个字符"
-            );
+            throw new AppException(AppErr::CACHE_HASH_LENGTH_INSUFFICIENT);
         }
 
         // 将散列值拆分成指定级数的目录

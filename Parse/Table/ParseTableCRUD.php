@@ -95,7 +95,7 @@ class ParseTableCRUD
             $fieldName = StringConverter::underscoreToCamelCase($field);
             $lcFieldName = lcfirst($fieldName);
             $saveStr[] = "        if (empty(\$dto->$lcFieldName)){";
-            $saveStr[] = '            throw new AppException(\'请输入' . ($comment ?: $lcFieldName) . '\');';
+            $saveStr[] = '            throw new AppException(AppErr::PARAM_REQUIRED);';
             $saveStr[] = '        }';
         }
         $saveStr[] = '';

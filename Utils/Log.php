@@ -6,6 +6,8 @@ namespace Swlib\Utils;
 use Exception;
 use Generate\ConfigEnum;
 use Swlib\Enum\CtxEnum;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use Throwable;
 
 class Log
@@ -110,8 +112,7 @@ class Log
 
         if (!is_dir($dir)) {
             if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
-                // 创建日志目录失败
-                throw new Exception("创建目录失败 $dir");
+                throw new AppException(AppErr::LOG_CREATE_DIR_FAILED_WITH_DIR, $dir);
             }
         }
         return $dir;

@@ -4,6 +4,8 @@ namespace Swlib\Admin\Fields;
 
 
 use DateTime;
+use Swlib\Exception\AppErr;
+use Swlib\Exception\AppException;
 use InvalidArgumentException;
 use Swlib\Table\Interface\TableInterface;
 use Throwable;
@@ -60,8 +62,7 @@ class Int2TimeField extends AbstractField
                 try {
                     $start = new DateTime($this->value[0]);
                 } catch (Throwable) {
-                    // 处理无效日期输入
-                    throw new InvalidArgumentException('Invalid start date format');
+                    throw new AppException(AppErr::FORM_FIELD_START_DATE_FORMAT_INVALID);
                 }
             }
 
@@ -71,8 +72,7 @@ class Int2TimeField extends AbstractField
                     $end = new DateTime($this->value[1]);
                     $end->modify('+1 day'); // 加一天以包含结束日的全部时间
                 } catch (Throwable) {
-                    // 处理无效日期输入
-                    throw new InvalidArgumentException('Invalid end date format');
+                    throw new AppException(AppErr::FORM_FIELD_END_DATE_FORMAT_INVALID);
                 }
             }
 
@@ -87,7 +87,7 @@ class Int2TimeField extends AbstractField
         } else {
             // 验证并转换单个时间值
             if (empty($this->value) || !is_string($this->value) || strtotime($this->value) === false) {
-                throw new InvalidArgumentException('Invalid date format');
+                throw new AppException(AppErr::FORM_FIELD_DATE_FORMAT_INVALID);
             }
 
             $timestamp = strtotime($this->value);

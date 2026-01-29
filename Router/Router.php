@@ -350,11 +350,7 @@ class Router
 
         // 必须是成对的 key/value
         if ($pathInfoCount % 2 !== 0) {
-            $error = 'PathInfo 参数必须成对出现';
-            if (ConfigEnum::APP_PROD === false) {
-                $error .= ' ' . implode('/', $pathInfoSegments);
-            }
-            throw new InvalidArgumentException($error);
+            throw new AppException(AppErr::ROUTER_PATH_PARSE_FAILED);
         }
 
         for ($i = 0; $i < $pathInfoCount; $i += 2) {
