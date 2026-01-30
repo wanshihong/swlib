@@ -151,7 +151,7 @@ class ParseI18n
 
                 if ($result) {
                     $stats['updated']++;
-                    echo "  [更新] $key: {$langData['zh']}" . PHP_EOL;
+//                    echo "  [更新] $key: {$langData['zh']}" . PHP_EOL;
                 } else {
                     echo "  [失败] $key: 更新失败" . PHP_EOL;
                     $stats['skipped']++;

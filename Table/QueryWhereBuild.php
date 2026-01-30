@@ -136,6 +136,7 @@ class QueryWhereBuild
 
     /**
      * 构建单个查询条件
+     * @throws \Exception
      */
     private function buildSingleCondition(array $condition): string
     {
@@ -258,7 +259,14 @@ class QueryWhereBuild
                     if ($operator === 'like') {
                         $v = trim($v, "\"'");
                     }
-                    if ($v instanceof Expression) {
+
+
+                    if (Db::checkAsExists($v)) {
+                        // 如果 value 是某一个数据库字段的别名; 那么可能用户就是想要直接使用这个数据库字段
+                        $v = Db::getFieldNameByAs($v);
+                        $conditionParts[] = "$field $operator $v";
+                    } elseif ($v instanceof Expression) {
+                        // 如果是使用的  Expression 原始sql 对象,也是直接使用
                         $expr = $this->formatField($v->value);
                         $conditionParts[] = "$field $operator $expr";
                     } else {

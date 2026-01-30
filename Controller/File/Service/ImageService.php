@@ -2,9 +2,9 @@
 
 namespace Swlib\Controller\File\Service;
 
+use App\Service\UserService;
 use finfo;
 use Generate\Tables\Main\ImagesTable;
-use Swlib\Enum\CtxEnum;
 use Swlib\Utils\Ip;
 use Throwable;
 
@@ -71,7 +71,7 @@ class ImageService
         }
 
         // 获取上传者信息
-        $uploaderId = CtxEnum::Data->getData('userId');
+        $uploaderId = UserService::tryGetUserId();
         $uploaderIp = Ip::get();
 
         // 记录图片信息到数据库

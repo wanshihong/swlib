@@ -6,6 +6,7 @@ namespace Swlib\Table;
 use DateInterval;
 use DateTime;
 use Exception;
+use Generate\ConfigEnum;
 use Generate\DatabaseConnect;
 use mysqli;
 use mysqli_result;
@@ -236,6 +237,10 @@ class Db
     private function _mysqlExecSql(MysqliProxy|mysqli $dbh): void
     {
         try {
+            // 调试模式, SQL 语句出错,打印到终端
+            if (ConfigEnum::APP_PROD === false && $this->debugSql) {
+                var_dump($this->sql, implode(',',$this->bindParams));
+            }
 
             // 执行SQL 预处理
             $this->stmt = $dbh->prepare($this->sql);

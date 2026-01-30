@@ -80,6 +80,7 @@ trait DbHelperTrait
      */
     public static function checkAsExists(string $asName, string $dbName = 'default'): bool
     {
+        $dbName = DatabaseConnect::getDbName($dbName);
         return isset(TableFieldMap::maps[$dbName][$asName]);
     }
 

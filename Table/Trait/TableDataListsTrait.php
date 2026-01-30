@@ -3,6 +3,7 @@
 namespace Swlib\Table\Trait;
 
 
+use Swlib\Table\Interface\TableDtoInterface;
 use Throwable;
 
 /**
@@ -109,6 +110,34 @@ trait TableDataListsTrait
             $ret[$val] = true; // 使用关联数组来去重
         }
         return array_keys($ret); // 转换为值数组;
+    }
+
+    /**
+     * 根据关联字段查询关联表格的数据
+     * 例如 user  user_score 表
+     * 在   user_score 结果列表上 调用  getJoinDto(UserTable::class,USER_SCORE::USER::ID)
+     * 返回的数据是
+     * [
+     *   id1 => UserTableDto
+     *   id2 => UserTableDto
+     * ]
+     * @param string $table
+     * @param string $joinField
+     * @param array $queryFiled
+     * @return array
+     * @throws Throwable
+     */
+    public function getJoinDto(string $table, string $joinField, array $queryFiled = []): array
+    {
+        if (empty($queryFiled)) {
+            $queryFiled = $table::FIELD_ALL;
+        } else {
+            $queryFiled[] = $table::PRI_KEY;
+        }
+        $ids = $this->getArrayByField($joinField);
+        return new $table()->field($queryFiled)->where([
+            [$table::PRI_KEY, 'in', $ids]
+        ])->selectAll()->formatId2Array($table::PRI_KEY);
     }
 
 
