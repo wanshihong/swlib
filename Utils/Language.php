@@ -10,6 +10,7 @@ use Swlib\Connect\PoolRedis;
 use Swlib\Enum\CtxEnum;
 use Swlib\Exception\AppErr;
 use Swlib\Exception\LangException;
+use Swlib\Request\Request;
 use Throwable;
 
 class Language
@@ -46,7 +47,7 @@ class Language
      */
     public static function get(string $str, ...$arg): string
     {
-        $lang = CtxEnum::Lang->get('zh');
+        CtxEnum::Lang->get(Request::getHeader('lang', Request::get('lang', 'en')));
         if (empty($lang)) {
             // 请求头语言为空
             throw new LangException('zh' . AppErr::PARAM_EMPTY);
