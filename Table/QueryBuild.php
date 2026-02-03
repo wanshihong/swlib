@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Swlib\Table;
 
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Table\Interface\TableInterface;
 use Throwable;
@@ -185,7 +185,7 @@ class QueryBuild
                 // 普通的字段排序
                 // 验证排序方向
                 if (!in_array(strtoupper($orderType), ['ASC', 'DESC'])) {
-                    throw new AppException(AppErr::DB_ORDER_TYPE_INVALID_WITH_NAME, $orderType);
+                    throw new AppException(LanguageEnum::DB_ORDER_TYPE_INVALID_WITH_NAME, $orderType);
                 }
                 $field = $this->table->formatField($field);
                 $orderArr[] = " $field $orderType";
@@ -476,7 +476,7 @@ class QueryBuild
     {
         foreach ($data as $key => $value) {
             if (!is_array($value)) {
-                throw new AppException(AppErr::DB_INSERTALL_DATA_TYPE_INVALID);
+                throw new AppException(LanguageEnum::DB_INSERTALL_DATA_TYPE_INVALID);
             }
             // 检查数据格式
             $data[$key] = $this->_checkSaveDataStructure($value, 'insert-all');
@@ -557,7 +557,7 @@ class QueryBuild
     {
 
         if (empty($this->_where) || $this->_where == '1=1') {
-            throw new AppException(AppErr::DB_WHERE_REQUIRED);
+            throw new AppException(LanguageEnum::DB_WHERE_REQUIRED);
         }
 
         // 检查数据格式
@@ -603,7 +603,7 @@ class QueryBuild
     public function delete(): string
     {
         if (empty($this->_where) || $this->_where == '1=1') {
-            throw new AppException(AppErr::DB_WHERE_REQUIRED);
+            throw new AppException(LanguageEnum::DB_WHERE_REQUIRED);
         }
         $tableName = $this->table::TABLE_NAME;
         $sql = "DELETE FROM `$tableName` WHERE $this->_where";
@@ -678,13 +678,13 @@ class QueryBuild
 
             // 2. 类型安全检查
             if (is_array($value)) {
-                throw new AppException(AppErr::DB_FIELD_TYPE_INVALID_WITH_NAME, $field);
+                throw new AppException(LanguageEnum::DB_FIELD_TYPE_INVALID_WITH_NAME, $field);
             }
             if (is_resource($value)) {
-                throw new AppException(AppErr::DB_FIELD_TYPE_INVALID_WITH_NAME, $field);
+                throw new AppException(LanguageEnum::DB_FIELD_TYPE_INVALID_WITH_NAME, $field);
             }
             if (is_object($value) && !($value instanceof Expression)) {
-                throw new AppException(AppErr::DB_FIELD_TYPE_INVALID_WITH_NAME, $field);
+                throw new AppException(LanguageEnum::DB_FIELD_TYPE_INVALID_WITH_NAME, $field);
             }
 
             $ret[$field] = $value;

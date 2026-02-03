@@ -6,7 +6,7 @@ use Exception;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 
 /**
@@ -80,7 +80,7 @@ class File
     {
 
         if (!is_dir($sourceDir)) {
-            throw new AppException(AppErr::DIR_NOT_EXIST);
+            throw new AppException(LanguageEnum::DIR_NOT_EXIST);
         }
 
         // 检查目标目录是否存在，如果不存在则创建

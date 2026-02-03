@@ -7,8 +7,8 @@ use Generate\TablesDto\Main\AdminManagerTableDto;
 use Redis;
 use Swlib\Admin\Interface\PermissionInterface;
 use Swlib\Connect\PoolRedis;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Enum\CtxEnum;
-use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Response\RedirectResponse;
 use Swlib\Utils\Cookie;
@@ -33,7 +33,7 @@ class AdminUserManager
             $token = Cookie::get('admin_token');
             if (empty($token)) {
                 // 请登录
-                throw new AppException(AppErr::ADMIN_PLEASE_LOGIN);
+                throw new AppException(LanguageEnum::ADMIN_PLEASE_LOGIN);
             }
             $user = PoolRedis::call(function (Redis $redis) use ($token) {
                 $key = "admin_user:$token";
@@ -60,13 +60,13 @@ class AdminUserManager
 
             if (empty($userId)) {
                 // 请登录
-                throw new AppException(AppErr::ADMIN_PLEASE_LOGIN);
+                throw new AppException(LanguageEnum::ADMIN_PLEASE_LOGIN);
             }
 
             $find = new AdminManagerTable()->addWhere(AdminManagerTable::ID, $userId)->selectOne();
             if (empty($find)) {
                 // 请登录
-                throw new AppException(AppErr::ADMIN_PLEASE_LOGIN);
+                throw new AppException(LanguageEnum::ADMIN_PLEASE_LOGIN);
             }
 
             PoolRedis::call(function (Redis $redis) use ($token, $find) {

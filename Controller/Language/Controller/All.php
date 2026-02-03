@@ -1,6 +1,6 @@
 <?php
 
-namespace Swlib\Controller\Language;
+namespace Swlib\Controller\Language\Controller;
 
 
 use Generate\Models\Main\LanguageModel;

@@ -4,18 +4,18 @@ declare(strict_types=1);
 namespace Swlib\ServerEvents;
 
 use Exception;
+use Protobuf\Common\Request;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\DataManager\FdManager;
 use Swlib\DataManager\WorkerManager;
 use Swlib\Enum\CtxEnum;
 use Swlib\Event\EventEnum;
-use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Response\JsonResponse;
 use Swlib\Response\ProtobufResponse;
 use Swlib\Router\Router;
 use Swlib\Utils\Ip;
 use Swlib\Utils\Log;
-use Protobuf\Common\Request;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 use Throwable;
@@ -48,7 +48,7 @@ class OnMessageEvent
             } catch (Exception) {
                 $jsonRequest = json_decode($frame->data, true);
                 if (empty($jsonRequest)) {
-                    throw new AppException(AppErr::WS_PAGE_NOT_FOUND);
+                    throw new AppException(LanguageEnum::WS_PAGE_NOT_FOUND);
                 }
                 $uri = $jsonRequest['uri'];
                 $data = $jsonRequest['data'];
@@ -84,12 +84,12 @@ class OnMessageEvent
             // 获取路由配置
             $routeConfig = Router::get($uri);
             if (empty($routeConfig)) {
-                throw new AppException(AppErr::WS_PAGE_NOT_FOUND);
+                throw new AppException(LanguageEnum::WS_PAGE_NOT_FOUND);
             }
 
             // 检查请求类型
             if (!in_array('WS', $routeConfig['method']) && !in_array('WSS', $routeConfig['method'])) {
-                throw new AppException(AppErr::WS_ACCESS_NOT_ALLOWED);
+                throw new AppException(LanguageEnum::WS_ACCESS_NOT_ALLOWED);
             }
 
 

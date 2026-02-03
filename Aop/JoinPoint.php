@@ -6,7 +6,7 @@ namespace Swlib\Aop;
 use OutOfBoundsException;
 use ReflectionException;
 use ReflectionMethod;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 
 /**
@@ -93,7 +93,7 @@ class JoinPoint
     public function getArgument(int $index): mixed
     {
         if (!isset($this->arguments[$index])) {
-            throw new AppException($index . AppErr::NOT_FOUND);
+            throw new AppException($index . LanguageEnum::NOT_FOUND);
         }
         return $this->arguments[$index];
     }

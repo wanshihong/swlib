@@ -9,7 +9,7 @@ use mysqli;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Redis;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Parse\Helper\ConsoleColor;
 use Throwable;
@@ -271,21 +271,21 @@ class ConfigValidator
             $connected = @$redis->connect($host, $port, 2.0);
 
             if (!$connected) {
-                throw new AppException(AppErr::CONFIG_CONNECT_FAILED);
+                throw new AppException(LanguageEnum::CONFIG_CONNECT_FAILED);
             }
 
             // 如果配置了密码，进行认证
             if (!empty($auth)) {
                 $authed = @$redis->auth($auth);
                 if (!$authed) {
-                    throw new AppException(AppErr::CONFIG_AUTH_FAILED);
+                    throw new AppException(LanguageEnum::CONFIG_AUTH_FAILED);
                 }
             }
 
             // 测试 PING
             $pong = @$redis->ping();
             if ($pong !== true && $pong !== '+PONG') {
-                throw new AppException(AppErr::CONFIG_PING_FAILED);
+                throw new AppException(LanguageEnum::CONFIG_PING_FAILED);
             }
 
             $redis->close();

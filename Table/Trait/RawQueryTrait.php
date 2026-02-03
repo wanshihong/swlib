@@ -3,7 +3,7 @@
 namespace Swlib\Table\Trait;
 
 use InvalidArgumentException;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Table\Db;
 use Swlib\Table\Interface\TableDtoInterface;
@@ -62,7 +62,7 @@ trait RawQueryTrait
         $rawData = is_array($result[0] ?? null) ? $result[0] : $result;
 
         if (!is_array($rawData)) {
-            throw new AppException(AppErr::DB_QUERY_RESULT_INVALID);
+            throw new AppException(LanguageEnum::DB_QUERY_RESULT_INVALID);
         }
 
         return $this->_convertSingleRawDataToObject($rawData);
@@ -88,7 +88,7 @@ trait RawQueryTrait
         $objects = [];
         foreach ($result as $rawData) {
             if (!is_array($rawData)) {
-                throw new AppException(AppErr::DB_QUERY_ROW_MUST_BE_ARRAY);
+                throw new AppException(LanguageEnum::DB_QUERY_ROW_MUST_BE_ARRAY);
             }
             $objects[] = $this->_convertSingleRawDataToObject($rawData);
         }

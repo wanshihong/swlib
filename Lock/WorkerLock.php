@@ -3,7 +3,7 @@
 namespace Swlib\Lock;
 
 use RuntimeException;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Coroutine\CoroutineContext;
 use Swlib\DataManager\WorkerManager;
 use Swoole\Coroutine;
@@ -194,7 +194,7 @@ class WorkerLock
 
         if (!$lockValue) {
             // 无法获取进程锁
-            throw new RuntimeException(AppErr::LOCK_FAILED . ": $lockKey");
+            throw new RuntimeException(LanguageEnum::LOCK_FAILED . ": $lockKey");
         }
 
         // 自动续期定时器ID

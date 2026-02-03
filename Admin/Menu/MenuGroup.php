@@ -4,7 +4,7 @@ namespace Swlib\Admin\Menu;
 
 use Swlib\Admin\Interface\PermissionInterface;
 use Swlib\Admin\Trait\PermissionTrait;
-use Swlib\Utils\Language;
+use Swlib\Controller\Language\Service\Language;
 use Throwable;
 
 class MenuGroup implements PermissionInterface

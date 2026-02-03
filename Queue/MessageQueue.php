@@ -5,14 +5,14 @@ namespace Swlib\Queue;
 
 use Generate\ConfigEnum;
 use Generate\Tables\Main\MessageQueueTable;
+use Redis;
 use Swlib\Connect\PoolRedis;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Lock\RedisLock;
 use Swlib\Proxy\ProxyDispatcher;
 use Swlib\Table\Db;
 use Swlib\Utils\Log;
-use Redis;
 use Swoole\Timer;
 use Throwable;
 
@@ -75,7 +75,7 @@ class MessageQueue
 
         if (empty($id)) {
             // 写入消息队列失败
-            throw new AppException(AppErr::EXECUTE_FAILED);
+            throw new AppException(LanguageEnum::EXECUTE_FAILED);
         }
         self::unLock();
         return $id;

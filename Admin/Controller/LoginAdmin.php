@@ -9,7 +9,8 @@ use Swlib\Admin\Manager\AdminUserManager;
 use Swlib\Admin\Middleware\AdminInitMiddleware;
 use Swlib\Connect\PoolRedis;
 use Swlib\Controller\Abstract\AbstractController;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
+use Swlib\Controller\Language\Service\Language;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
 use Swlib\Response\JsonResponse;
@@ -17,7 +18,6 @@ use Swlib\Response\RedirectResponse;
 use Swlib\Response\TwigResponse;
 use Swlib\Router\Router;
 use Swlib\Utils\Cookie;
-use Swlib\Utils\Language;
 use Swlib\Utils\Url;
 use Throwable;
 
@@ -46,12 +46,12 @@ class LoginAdmin extends AbstractController
             $find = new AdminManagerTable()->addWhere(AdminManagerTable::USERNAME, $username)->selectOne();
             if (empty($find)) {
                 // 用户名或者密码错误
-                throw new AppException(AppErr::ADMIN_USERNAME_PASSWORD_ERROR);
+                throw new AppException(LanguageEnum::ADMIN_USERNAME_PASSWORD_ERROR);
             }
 
             if (password_verify($password, $find->password) === false) {
                 // 用户名或者密码错误
-                throw new AppException(AppErr::ADMIN_USERNAME_PASSWORD_ERROR);
+                throw new AppException(LanguageEnum::ADMIN_USERNAME_PASSWORD_ERROR);
             }
 
 
@@ -87,7 +87,7 @@ class LoginAdmin extends AbstractController
 
             if ($password !== $password2) {
                 // 两次密码不一致
-                throw new AppException(AppErr::ADMIN_PASSWORD_INCONSISTENT);
+                throw new AppException(LanguageEnum::ADMIN_PASSWORD_INCONSISTENT);
             }
 
             $find = AdminUserManager::getUser();
@@ -124,14 +124,14 @@ class LoginAdmin extends AbstractController
 
             if ($password !== $password2) {
                 // 两次密码不一致
-                throw new AppException(AppErr::ADMIN_PASSWORD_INCONSISTENT);
+                throw new AppException(LanguageEnum::ADMIN_PASSWORD_INCONSISTENT);
             }
 
 
             $find = new AdminManagerTable()->addWhere(AdminManagerTable::USERNAME, $username)->selectOne();
             if ($find) {
                 // 用户名已存在
-                throw new AppException(AppErr::ADMIN_USERNAME_EXISTS);
+                throw new AppException(LanguageEnum::ADMIN_USERNAME_EXISTS);
             }
 
             $pwd = password_hash($password, PASSWORD_DEFAULT);

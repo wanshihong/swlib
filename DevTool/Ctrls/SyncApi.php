@@ -5,7 +5,7 @@ namespace Swlib\DevTool\Ctrls;
 use Exception;
 use Generate\ConfigEnum;
 use Swlib\Controller\Abstract\AbstractController;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Response\JsonResponse;
 use Swlib\Router\Router;
@@ -31,7 +31,7 @@ class SyncApi extends AbstractController
     {
         try {
             if (!$this->checkDevEnvironment()) {
-                throw new AppException(AppErr::DEV_ONLY_DEV_ENV);
+                throw new AppException(LanguageEnum::DEV_ONLY_DEV_ENV);
             }
 
             $this->ensureInitialized();
@@ -60,7 +60,7 @@ class SyncApi extends AbstractController
         try {
 
             if (!$this->checkDevEnvironment()) {
-                throw new AppException(AppErr::DEV_ONLY_DEV_ENV);
+                throw new AppException(LanguageEnum::DEV_ONLY_DEV_ENV);
             }
 
             $this->ensureInitialized();
@@ -83,19 +83,19 @@ class SyncApi extends AbstractController
         try {
 
             if (!$this->checkDevEnvironment()) {
-                throw new AppException(AppErr::DEV_ONLY_DEV_ENV);
+                throw new AppException(LanguageEnum::DEV_ONLY_DEV_ENV);
             }
 
             $path = $this->get('path');
             if (empty($path)) {
-                throw new AppException(AppErr::DEV_FILE_PATH_EMPTY);
+                throw new AppException(LanguageEnum::DEV_FILE_PATH_EMPTY);
             }
 
             $this->ensureInitialized();
             $fileData = $this->getFileContent($path);
 
             if ($fileData === null) {
-                throw new AppException(AppErr::DEV_FILE_NOT_ACCESSIBLE);
+                throw new AppException(LanguageEnum::DEV_FILE_NOT_ACCESSIBLE);
             }
 
             return JsonResponse::success($fileData);
@@ -117,7 +117,7 @@ class SyncApi extends AbstractController
     {
         try {
             if (!$this->checkDevEnvironment()) {
-                throw new AppException(AppErr::DEV_ONLY_DEV_ENV);
+                throw new AppException(LanguageEnum::DEV_ONLY_DEV_ENV);
             }
 
             $this->ensureInitialized();
@@ -133,12 +133,12 @@ class SyncApi extends AbstractController
                 $targetDir = realpath($targetDir);
 
                 if (!$targetDir || !is_dir($targetDir)) {
-                    throw new AppException(AppErr::DEV_SOURCE_DIR_NOT_EXIST_WITH_NAME, $sourceDir);
+                    throw new AppException(LanguageEnum::DEV_SOURCE_DIR_NOT_EXIST_WITH_NAME, $sourceDir);
                 }
 
                 // 安全检查：确保目标目录在源目录内
                 if (!str_starts_with($targetDir, realpath(self::$sourceDir))) {
-                    throw new AppException(AppErr::DEV_SOURCE_DIR_OUT_OF_RANGE_WITH_NAME, $sourceDir);
+                    throw new AppException(LanguageEnum::DEV_SOURCE_DIR_OUT_OF_RANGE_WITH_NAME, $sourceDir);
                 }
 
                 $scanDir = $targetDir;
@@ -241,7 +241,7 @@ class SyncApi extends AbstractController
             }
         }
 
-        throw new Exception(AppErr::DEV_SYNC_SOURCE_NOT_FOUND);
+        throw new Exception(LanguageEnum::DEV_SYNC_SOURCE_NOT_FOUND);
     }
 
     /**

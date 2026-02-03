@@ -8,8 +8,8 @@ use Generate\Tables\Main\ImagesTable;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Controller\File\Service\FileUploader;
 use Swlib\Controller\File\Service\ImageService;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Enum\CtxEnum;
-use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
 use Swlib\Response\JsonResponse;
@@ -61,7 +61,7 @@ class Upload extends AbstractController
         $originalName = $file['name'] ?? '';
 
         if (empty($file) || $file['error'] !== UPLOAD_ERR_OK) {
-            throw new AppException(AppErr::FILE_SPECIFY_REQUIRED);
+            throw new AppException(LanguageEnum::FILE_SPECIFY_REQUIRED);
         }
 
         $tempPath = $file['tmp_name'];

@@ -7,10 +7,9 @@ use Swlib\Admin\Manager\AdminManager;
 use Swlib\Admin\Manager\AdminUserManager;
 use Swlib\Admin\Trait\PermissionTrait;
 use Swlib\Admin\Trait\StaticTrait;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
+use Swlib\Controller\Language\Service\Language;
 use Swlib\Exception\AppException;
-use Swlib\Exception\RedirectException;
-use Swlib\Utils\Language;
 use Throwable;
 
 class PageConfig implements PermissionInterface
@@ -54,7 +53,7 @@ class PageConfig implements PermissionInterface
     public function frameworkCheckFieldsPermissions(): void
     {
         if (AdminUserManager::checkPermissionsByConfig($this) === false) {
-            throw new AppException(AppErr::ADMIN_PERMISSION_DENIED, AdminManager::getInstance()->noAccessUrl);
+            throw new AppException(LanguageEnum::ADMIN_PERMISSION_DENIED, AdminManager::getInstance()->noAccessUrl);
         }
     }
 

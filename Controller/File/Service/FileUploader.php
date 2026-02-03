@@ -6,8 +6,8 @@ use finfo;
 use Redis;
 use Swlib\Connect\PoolRedis;
 use Swlib\Controller\Config\Service\ConfigService;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Enum\CtxEnum;
-use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
 use Swlib\Utils\File as FileUtil;
@@ -307,7 +307,7 @@ class FileUploader
     private function _getExtensionFromMimeType(string $mimeType): string
     {
         if (!isset($this->mimeToExtensionMap[$mimeType])) {
-            throw new AppException(AppErr::FILE_TYPE_NOT_SUPPORTED_WITH_MIME . ": $mimeType");
+            throw new AppException(LanguageEnum::FILE_TYPE_NOT_SUPPORTED_WITH_MIME . ": $mimeType");
         }
         return $this->mimeToExtensionMap[$mimeType];
     }
@@ -369,7 +369,7 @@ class FileUploader
         $file = $request->files[$uploadKey] ?? null;
 
         if (empty($file) || $file['error'] !== UPLOAD_ERR_OK) {
-            throw new AppException(AppErr::FILE_UPLOAD_KEY_NOT_FOUND_WITH_KEY, $uploadKey);
+            throw new AppException(LanguageEnum::FILE_UPLOAD_KEY_NOT_FOUND_WITH_KEY, $uploadKey);
         }
 
         $tempPath = $file['tmp_name'];
@@ -386,7 +386,7 @@ class FileUploader
         $pathInfo = $this->_generateFinalPath($fileHash, $mimeType);
 
         if (!move_uploaded_file($tempPath, $pathInfo['absolute_path'])) {
-            throw new AppException(AppErr::FILE_SAVE_FAILED);
+            throw new AppException(LanguageEnum::FILE_SAVE_FAILED);
         }
 
         // 统一处理，例如视频转码
@@ -495,7 +495,7 @@ class FileUploader
         $file = $request->files['chunk'] ?? null;
 
         if (empty($file) || $file['error'] !== UPLOAD_ERR_OK) {
-            throw new AppException(AppErr::FILE_CHUNK_UPLOAD_FAILED);
+            throw new AppException(LanguageEnum::FILE_CHUNK_UPLOAD_FAILED);
         }
 
         // 每次上传时清理过期文件（异步清理，不影响当前上传）
@@ -507,13 +507,13 @@ class FileUploader
         $chunkPath = $tempDir . '/' . $chunkIndex;
 
         if (!move_uploaded_file($file['tmp_name'], $chunkPath)) {
-            throw new AppException(AppErr::FILE_CHUNK_SAVE_FAILED);
+            throw new AppException(LanguageEnum::FILE_CHUNK_SAVE_FAILED);
         }
 
         // 在第一个分片时，必须提供MIME类型，并将其存入info文件
         if ($chunkIndex === 0) {
             if (empty($mimeType)) {
-                throw new AppException(AppErr::FILE_MIME_TYPE_REQUIRED);
+                throw new AppException(LanguageEnum::FILE_MIME_TYPE_REQUIRED);
             }
             // 校验MIME类型是否在白名单内
             $this->_getExtensionFromMimeType($mimeType);
@@ -605,13 +605,13 @@ class FileUploader
         $uploadInfo = $this->getUploadInfo($fileHash);
 
         if (!$uploadInfo) {
-            throw new AppException(AppErr::FILE_UPLOAD_INFO_NOT_FOUND);
+            throw new AppException(LanguageEnum::FILE_UPLOAD_INFO_NOT_FOUND);
         }
 
         $totalChunks = $uploadInfo['total_chunks'];
         $clientMimeType = $uploadInfo['mime_type'];
         if (!$clientMimeType) {
-            throw new AppException(AppErr::FILE_MIME_TYPE_LOST);
+            throw new AppException(LanguageEnum::FILE_MIME_TYPE_LOST);
         }
 
         // 生成最终文件路径
@@ -621,7 +621,7 @@ class FileUploader
         // 【优化】使用流式合并，降低内存占用
         $finalFileStream = fopen($finalPath, 'wb');
         if (!$finalFileStream) {
-            throw new AppException(AppErr::FILE_CREATE_FAILED);
+            throw new AppException(LanguageEnum::FILE_CREATE_FAILED);
         }
 
         for ($i = 0; $i < $totalChunks; $i++) {
@@ -629,14 +629,14 @@ class FileUploader
             if (!file_exists($chunkPath)) {
                 fclose($finalFileStream);
                 unlink($finalPath); // 清理不完整的文件
-                throw new AppException(AppErr::FILE_CHUNK_NOT_EXIST . ": 分片 $i");
+                throw new AppException(LanguageEnum::FILE_CHUNK_NOT_EXIST . ": 分片 $i");
             }
 
             $chunkStream = fopen($chunkPath, 'rb');
             if (!$chunkStream) {
                 fclose($finalFileStream);
                 unlink($finalPath);
-                throw new AppException(AppErr::FILE_CHUNK_READ_FAILED . ": 分片 $i");
+                throw new AppException(LanguageEnum::FILE_CHUNK_READ_FAILED . ": 分片 $i");
             }
 
             // 将分片流直接拷贝到最终文件流
@@ -670,7 +670,7 @@ class FileUploader
         // 算法升级：使用SHA256进行文件完整性验证
         if (!$this->verifyFileIntegrity($finalPath, $fileHash)) {
             unlink($finalPath);
-            throw new AppException(AppErr::FILE_INTEGRITY_FAILED);
+            throw new AppException(LanguageEnum::FILE_INTEGRITY_FAILED);
         }
 
         // 检测文件类型并进行视频转换

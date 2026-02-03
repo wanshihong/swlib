@@ -5,11 +5,10 @@ namespace Swlib\DevTool\Ctrls;
 use Generate\ConfigEnum;
 use Generate\DatabaseConnect;
 use Swlib\Controller\Abstract\AbstractController;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Response\TwigResponse;
 use Swlib\Router\Router;
-use Swlib\Utils\StringConverter;
 use Throwable;
 
 /**
@@ -89,7 +88,7 @@ class ProtobufExtEditor extends AbstractController
             $res = $mysqli->query($sql);
             $row = $res?->fetch_assoc();
             if (!$row) {
-                throw new AppException(AppErr::DEV_TABLE_NO_ID_FIELD_WITH_NAME . ": $tableEscaped");
+                throw new AppException(LanguageEnum::DEV_TABLE_NO_ID_FIELD_WITH_NAME . ": $tableEscaped");
             }
             $type = $row['Type'];
             $null = $row['Null'] === 'NO' ? 'NOT NULL' : '';
@@ -198,7 +197,7 @@ class ProtobufExtEditor extends AbstractController
                 continue;
             }
             if ($pos !== 'item' && $pos !== 'lists') {
-                throw new AppException(AppErr::DEV_POSITION_INVALID);
+                throw new AppException(LanguageEnum::DEV_POSITION_INVALID);
             }
             $rows[] = ['pos' => $pos, 'field' => $field, 'type' => $type];
         }

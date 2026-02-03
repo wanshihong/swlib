@@ -8,13 +8,12 @@ use Exception;
 use Generate\ConfigEnum;
 use Generate\RouterPath;
 use Google\Protobuf\Internal\Message;
-use InvalidArgumentException;
 use Redis;
 use ReflectionException;
 use Swlib\Connect\PoolRedis;
 use Swlib\Controller\Abstract\AbstractController;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\DataManager\ReflectionManager;
-use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Response\ProtobufResponse;
 use Swlib\Response\ResponseInterface;
@@ -159,7 +158,7 @@ class Router
         } elseif ($res instanceof Message) {
             ProtobufResponse::success($res)->output();
         } else {
-            throw new AppException(AppErr::ROUTER_RESPONSE_TYPE_INVALID_WITH_TYPE, gettype($res));
+            throw new AppException(LanguageEnum::ROUTER_RESPONSE_TYPE_INVALID_WITH_TYPE, gettype($res));
         }
     }
 
@@ -350,7 +349,7 @@ class Router
 
         // 必须是成对的 key/value
         if ($pathInfoCount % 2 !== 0) {
-            throw new AppException(AppErr::ROUTER_PATH_PARSE_FAILED);
+            throw new AppException(LanguageEnum::ROUTER_PATH_PARSE_FAILED);
         }
 
         for ($i = 0; $i < $pathInfoCount; $i += 2) {
@@ -359,11 +358,11 @@ class Router
             $value = urldecode($pathInfoSegments[$i + 1]);
 
             if ($key === '') {
-                throw new AppException(AppErr::PARAM_REQUIRED);
+                throw new AppException(LanguageEnum::PARAM_REQUIRED);
             }
 
             if (array_key_exists($key, $pathInfo)) {
-                throw new AppException(AppErr::ROUTER_KEY_ALREADY_EXISTS_WITH_NAME, $key);
+                throw new AppException(LanguageEnum::ROUTER_KEY_ALREADY_EXISTS_WITH_NAME, $key);
             }
 
             $pathInfo[$key] = $value;

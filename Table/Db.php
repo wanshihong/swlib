@@ -13,8 +13,8 @@ use mysqli_result;
 use mysqli_stmt;
 use Redis;
 use Swlib\Connect\PoolRedis;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Enum\CtxEnum;
-use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Table\Aspects\DatabaseOperationEventAspect;
 use Swlib\Table\Trait\DbHelperTrait;
@@ -197,7 +197,7 @@ class Db
                 // 当前查询使用的数据库名称（处理 default 别名）
                 $currentDbName = DatabaseConnect::getDbName($this->dbName);
                 if ($transactionDbName !== $currentDbName) {
-                    throw new AppException(AppErr::DB_TRANSACTION_CROSS_DB . ": 事务数据库为 {$transactionDbName}，本次查询的数据库为 $currentDbName");
+                    throw new AppException(LanguageEnum::DB_TRANSACTION_CROSS_DB . ": 事务数据库为 {$transactionDbName}，本次查询的数据库为 $currentDbName");
                 }
             }
 
@@ -274,11 +274,11 @@ class Db
                     $this->_stmtClose();
                     break;
                 default:
-                    throw new AppException(AppErr::DB_UNSUPPORTED_ACTION . ": " . $this->action);
+                    throw new AppException(LanguageEnum::DB_UNSUPPORTED_ACTION . ": " . $this->action);
             }
 
             if ($execRes === false) {
-                throw new AppException(AppErr::DB_EXECUTE_FAILED . ": ({$this->stmt->errno}) {$this->stmt->error}");
+                throw new AppException(LanguageEnum::DB_EXECUTE_FAILED . ": ({$this->stmt->errno}) {$this->stmt->error}");
             }
 
         } finally {
@@ -333,7 +333,7 @@ class Db
                     $params[] = json_encode($param, JSON_UNESCAPED_UNICODE);
                     break;
                 default:
-                    throw new AppException(AppErr::DB_UNSUPPORTED_PARAM_TYPE . ": " . gettype($param) . ' value:' . $param);
+                    throw new AppException(LanguageEnum::DB_UNSUPPORTED_PARAM_TYPE . ": " . gettype($param) . ' value:' . $param);
             }
         }
 

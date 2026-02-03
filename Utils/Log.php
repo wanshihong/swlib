@@ -5,8 +5,8 @@ namespace Swlib\Utils;
 
 use Exception;
 use Generate\ConfigEnum;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Enum\CtxEnum;
-use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Throwable;
 
@@ -112,7 +112,7 @@ class Log
 
         if (!is_dir($dir)) {
             if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
-                throw new AppException(AppErr::LOG_CREATE_DIR_FAILED_WITH_DIR, $dir);
+                throw new AppException(LanguageEnum::LOG_CREATE_DIR_FAILED_WITH_DIR, $dir);
             }
         }
         return $dir;

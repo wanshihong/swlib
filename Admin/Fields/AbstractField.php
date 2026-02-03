@@ -9,8 +9,8 @@ use Swlib\Admin\Trait\Field\FieldShowControlTrait;
 use Swlib\Admin\Trait\Field\FieldTemplateTrait;
 use Swlib\Admin\Trait\PermissionTrait;
 use Swlib\Admin\Trait\StaticTrait;
+use Swlib\Controller\Language\Service\Language;
 use Swlib\Table\Db;
-use Swlib\Utils\Language;
 use Throwable;
 
 abstract class AbstractField implements PermissionInterface

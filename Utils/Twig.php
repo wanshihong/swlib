@@ -4,10 +4,11 @@ namespace Swlib\Utils;
 
 use Generate\ConfigEnum;
 use RuntimeException;
-use Swlib\Exception\AppErr;
 use Swlib\Admin\Controller\Helper\ControllerHelper;
 use Swlib\Admin\Manager\AdminManager;
 use Swlib\Admin\Manager\AdminUserManager;
+use Swlib\Controller\Language\Enum\LanguageEnum;
+use Swlib\Controller\Language\Service\Language;
 use Swlib\Table\Db;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
@@ -43,7 +44,7 @@ class Twig
 
         if (empty($this->templatesDir)) {
             // 未配置模板目录
-            throw new RuntimeException('templatesDir ' . AppErr::NOT_INIT);
+            throw new RuntimeException('templatesDir ' . LanguageEnum::NOT_INIT);
         }
 
         $loader = new FilesystemLoader($this->templatesDir);

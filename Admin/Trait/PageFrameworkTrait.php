@@ -4,7 +4,7 @@ namespace Swlib\Admin\Trait;
 
 use Swlib\Admin\Fields\AbstractField;
 use Swlib\Admin\Manager\AdminUserManager;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Table\Interface\TableDtoInterface;
 use Swlib\Table\Interface\TableInterface;
@@ -203,7 +203,7 @@ trait PageFrameworkTrait
         foreach ($this->fields as $field) {
             if ($field->field == $fieldName) return $field;
         }
-        throw new AppException(AppErr::ADMIN_FIELD_NOT_CONFIGURED_WITH_NAME . ": $fieldName");
+        throw new AppException(LanguageEnum::ADMIN_FIELD_NOT_CONFIGURED_WITH_NAME . ": $fieldName");
     }
 
 

@@ -5,7 +5,7 @@ namespace Swlib\Controller\File\Controller;
 use Exception;
 use Generate\Tables\Main\ImagesTable;
 use Swlib\Controller\Abstract\AbstractController;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Request\Request;
 use Swlib\Response\RedirectResponse;
@@ -48,7 +48,7 @@ class Read extends AbstractController
         ])->selectOne();
 
         if (empty($image)) {
-            throw new AppException(AppErr::NOT_FOUND);
+            throw new AppException(LanguageEnum::NOT_FOUND);
         }
 
         // 更新访问次数和最后访问时间

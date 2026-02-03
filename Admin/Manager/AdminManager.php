@@ -5,9 +5,9 @@ namespace Swlib\Admin\Manager;
 use Generate\ConfigEnum;
 use Swlib\Admin\Menu\Menu;
 use Swlib\Admin\Menu\MenuGroup;
+use Swlib\Controller\Language\Service\Language;
 use Swlib\DataManager\WorkerSingleton;
 use Swlib\Enum\CtxEnum;
-use Swlib\Utils\Language;
 use Throwable;
 
 class AdminManager extends WorkerSingleton

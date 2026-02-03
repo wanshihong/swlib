@@ -4,7 +4,7 @@ namespace Swlib\Controller\File\Service;
 
 use Exception;
 use Generate\RouterPath;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\TaskProcess\Attribute\TaskAttribute;
 use Swlib\Utils\File as FileUtil;
@@ -48,12 +48,12 @@ class FileProcessQueue
             // 【修复】从info文件中获取MIME类型，为后续处理做准备
             $infoPath = PUBLIC_DIR . $uploadDir . '/temp/' . $fileHash . '.info';
             if (!file_exists($infoPath)) {
-                throw new AppException($infoPath . AppErr::FILE_NOT_FOUND);
+                throw new AppException($infoPath . LanguageEnum::FILE_NOT_FOUND);
             }
             $uploadInfo = json_decode(file_get_contents($infoPath), true);
             $mimeType = $uploadInfo['mime_type'] ?? null;
             if (empty($mimeType)) {
-                throw new AppException(AppErr::FILE_MISSING_MIME_TYPE);
+                throw new AppException(LanguageEnum::FILE_MISSING_MIME_TYPE);
             }
 
             // 更新进度

@@ -14,7 +14,7 @@ use PhpParser\PrettyPrinter\Standard as PrettyPrinter;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Proxy\Interface\ProxyAttributeInterface;
@@ -223,7 +223,7 @@ readonly class ClassWeaver
 
             // 检查 priority 是否有重复
             if (count($priorities) !== count($stageMetas)) {
-                throw new AppException(AppErr::PARSE_AST_PRIORITY_DUPLICATE . ": $location 存在多个注解，但 priority 有重复值");
+                throw new AppException(LanguageEnum::PARSE_AST_PRIORITY_DUPLICATE . ": $location 存在多个注解，但 priority 有重复值");
             }
 
             // 检查异步注解执行顺序：异步注解会阻断后续同步注解的执行

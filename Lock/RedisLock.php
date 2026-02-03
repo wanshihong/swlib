@@ -6,7 +6,7 @@ namespace Swlib\Lock;
 
 use Redis;
 use Swlib\Connect\PoolRedis;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Coroutine\CoroutineContext;
 use Swlib\Exception\AppException;
 use Swoole\Coroutine;
@@ -140,7 +140,7 @@ class RedisLock
 
         if (!$lockValue) {
             // 无法获取Redis锁
-            throw new AppException(AppErr::LOCK_FAILED . ": $lockKey");
+            throw new AppException(LanguageEnum::LOCK_FAILED . ": $lockKey");
         }
 
         // 自动续期定时器ID

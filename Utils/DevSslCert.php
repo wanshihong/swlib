@@ -4,7 +4,7 @@ namespace Swlib\Utils;
 
 use Exception;
 use Swlib\App;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 
 /**
@@ -92,7 +92,7 @@ class DevSslCert
             exec($command, $output, $returnVar);
 
             if ($returnVar !== 0) {
-                throw new AppException(AppErr::SSL_GENERATE_FAILED_WITH_COMMAND . ": 请手动执行 $command");
+                throw new AppException(LanguageEnum::SSL_GENERATE_FAILED_WITH_COMMAND . ": 请手动执行 $command");
             }
 
             echo "SSL certificate generated successfully for IP: $localIP\n";
@@ -116,7 +116,7 @@ class DevSslCert
         exec($iosCommand, $iosOutput, $iosReturnVar);
 
         if ($iosReturnVar !== 0) {
-            throw new AppException(AppErr::SSL_IOS_GENERATE_FAILED_WITH_COMMAND . ": 请手动执行 $iosCommand");
+            throw new AppException(LanguageEnum::SSL_IOS_GENERATE_FAILED_WITH_COMMAND . ": 请手动执行 $iosCommand");
         }
     }
 

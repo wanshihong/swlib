@@ -6,12 +6,12 @@ namespace Swlib\Table\Trait;
 use Exception;
 use Generate\ConfigEnum;
 use mysqli;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Enum\CtxEnum;
-use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Table\Connect\MysqlConnect;
-use Swoole\Database\MysqliProxy;
 use Swoole\Database\MysqliPool;
+use Swoole\Database\MysqliProxy;
 use Throwable;
 
 trait DatabaseConnectTrait
@@ -118,7 +118,7 @@ trait DatabaseConnectTrait
             $count++;
         }
         if (empty($mysqli)) {
-            throw new AppException(AppErr::DB_POOL_GET_CONNECTION_FAILED);
+            throw new AppException(LanguageEnum::DB_POOL_GET_CONNECTION_FAILED);
         }
 
         return $mysqli;

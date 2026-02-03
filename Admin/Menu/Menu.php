@@ -4,8 +4,8 @@ namespace Swlib\Admin\Menu;
 
 use Swlib\Admin\Interface\PermissionInterface;
 use Swlib\Admin\Trait\PermissionTrait;
+use Swlib\Controller\Language\Service\Language;
 use Swlib\Enum\CtxEnum;
-use Swlib\Utils\Language;
 use Swlib\Utils\Url;
 use Swoole\Http\Request;
 use Throwable;

@@ -3,6 +3,7 @@
 namespace Swlib\Request;
 
 use Generate\ConfigEnum;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Enum\CtxEnum;
 use Swlib\Exception\AppException;
 use Swoole\Http\Request as SwooleRequest;
@@ -99,7 +100,7 @@ class Request
         }
 
         if ($def === null) {
-            throw new AppException($errTip ?: AppErr::PARAM_ERROR);
+            throw new AppException($errTip ?: LanguageEnum::PARAM_ERROR);
         }
         return $def;
     }
@@ -128,7 +129,7 @@ class Request
         }
 
         if ($def === null) {
-            throw new AppException($errTip ?: AppErr::PARAM_ERROR);
+            throw new AppException($errTip ?: LanguageEnum::PARAM_ERROR);
         }
         return $def;
     }

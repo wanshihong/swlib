@@ -4,7 +4,7 @@ namespace Swlib\Admin\Manager;
 
 use Swlib\Admin\Action\Attribute\ActionButton;
 use Swlib\Admin\Fields\AbstractField;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Table\Interface\TableDtoInterface;
 use Swlib\Table\Interface\TableInterface;
@@ -70,7 +70,7 @@ class ListRowManager
         // 循环一行的数据，遍历所有的字段，进行字段配置
         foreach ($configFields as $field) {
             if (!array_key_exists($field->field, $data)) {
-                throw new AppException(AppErr::ADMIN_FIELD_NOT_CONFIGURED_WITH_NAME . ": $field->field");
+                throw new AppException(LanguageEnum::ADMIN_FIELD_NOT_CONFIGURED_WITH_NAME . ": $field->field");
             }
             // 克隆一个字段,不然会影响其他字段
             $newField = clone $field;

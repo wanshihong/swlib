@@ -6,8 +6,7 @@ namespace Swlib\Parse\Table;
 
 use Generate\DatabaseConnect;
 use mysqli;
-use RuntimeException;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Parse\Helper\FieldConflictDetector;
@@ -52,7 +51,7 @@ class ParseTable
         $sqlFile = ROOT_DIR . 'Swlib' . DIRECTORY_SEPARATOR . 'create_tab.sql';
 
         if (!file_exists($sqlFile)) {
-            throw new AppException(AppErr::PARSE_SQL_FILE_NOT_FOUND_WITH_PATH, $sqlFile);
+            throw new AppException(LanguageEnum::PARSE_SQL_FILE_NOT_FOUND_WITH_PATH, $sqlFile);
         }
 
         $sql = file_get_contents($sqlFile);

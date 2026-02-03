@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Swlib\Utils;
 
 use FilesystemIterator;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
-use InvalidArgumentException;
 
 
 class FileCache
@@ -84,7 +83,7 @@ class FileCache
 
         // 如果散列值长度不足，抛出异常
         if ($totalCharsNeeded > $hashLength) {
-            throw new AppException(AppErr::CACHE_HASH_LENGTH_INSUFFICIENT);
+            throw new AppException(LanguageEnum::CACHE_HASH_LENGTH_INSUFFICIENT);
         }
 
         // 将散列值拆分成指定级数的目录

@@ -4,14 +4,14 @@ namespace Swlib\Response;
 
 use Generate\ConfigEnum;
 use Google\Protobuf\Internal\Message;
+use Protobuf\Common\Response;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\DataManager\WorkerManager;
 use Swlib\Enum\CtxEnum;
-use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Exception\TokenExpiredException;
 use Swlib\Exception\UnauthorizedException;
 use Swlib\Utils\Log;
-use Protobuf\Common\Response;
 use Swoole\WebSocket\Server;
 use Throwable;
 
@@ -139,7 +139,7 @@ class ProtobufResponse implements ResponseInterface
             }
 
             if (empty($server)) {
-                throw new AppException('SERVER ' . AppErr::EMPTY);
+                throw new AppException('SERVER ' . LanguageEnum::EMPTY);
             }
 
             $fd = $this->fd ?: CtxEnum::Fd->get();

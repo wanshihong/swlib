@@ -4,13 +4,13 @@ namespace Swlib\Event\Trait;
 
 use Exception;
 use Generate\EventMap;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Coroutine\CoroutineContext;
 use Swlib\DataManager\ReflectionManager;
 use Swlib\Event\Attribute\Event;
 use Swlib\Event\Helper\EventExecutor;
 use Swlib\Event\Helper\EventQueue;
 use Swlib\Event\Helper\EventResponse;
-use Swlib\Exception\AppErr;
 use Swlib\Exception\AppException;
 use Swlib\Utils\Log;
 use Swoole\Coroutine;
@@ -32,17 +32,17 @@ trait EventTrait
     {
         if (is_array($listener)) {
             if (count($listener) !== 2) {
-                throw new AppException(AppErr::EVENT_LISTENER_FORMAT_NEED_ARRAY);
+                throw new AppException(LanguageEnum::EVENT_LISTENER_FORMAT_NEED_ARRAY);
             }
             [$className, $method] = $listener;
 
             if (!class_exists($className)) {
-                throw new AppException(AppErr::EVENT_LISTENER_CLASS_NOT_EXIST_WITH_NAME . ": $className");
+                throw new AppException(LanguageEnum::EVENT_LISTENER_CLASS_NOT_EXIST_WITH_NAME . ": $className");
             }
 
             $reflection = ReflectionManager::getClass($className);
             if (!$reflection->hasMethod($method)) {
-                throw new AppException(AppErr::EVENT_LISTENER_METHOD_NOT_FOUND_WITH_CLASS . ": $className::$method");
+                throw new AppException(LanguageEnum::EVENT_LISTENER_METHOD_NOT_FOUND_WITH_CLASS . ": $className::$method");
             }
         }
 

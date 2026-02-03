@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Swlib\Exception;
+namespace Swlib\Controller\Language\Enum;
 
 use Swlib\Attribute\I18nAttribute;
+use Swlib\Controller\Language\Interface\LanguageInterface;
 
 /**
  * 框架异常消息 Key 定义
@@ -15,7 +16,7 @@ use Swlib\Attribute\I18nAttribute;
  * 3. 完整语义常量，消除运行时拼接，确保翻译完整性
  * 4. 保留基础语义常量以确保向后兼容
  */
-class AppErr
+class LanguageEnum implements LanguageInterface
 {
     // ============================================================
     // 基础语义常量（保留兼容性）

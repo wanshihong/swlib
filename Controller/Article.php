@@ -8,7 +8,7 @@ use Generate\Tables\Main\ArticleTable;
 use Protobuf\Main\Article\ArticleListsProto;
 use Protobuf\Main\Article\ArticleProto;
 use Swlib\Controller\Abstract\AbstractController;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Router\Router;
 use Throwable;
@@ -34,10 +34,10 @@ class Article extends AbstractController
         $pos = $request->getGroupPos();
 
         if (empty($appId)) {
-            throw new AppException(AppErr::PARAM_REQUIRED);
+            throw new AppException(LanguageEnum::PARAM_REQUIRED);
         }
         if (empty($pos)) {
-            throw new AppException(AppErr::PARAM_REQUIRED);
+            throw new AppException(LanguageEnum::PARAM_REQUIRED);
         }
 
         $where = [
@@ -75,14 +75,14 @@ class Article extends AbstractController
     {
         $id = $request->getId();
         if (empty($id)) {
-            throw new AppException(AppErr::PARAM_REQUIRED);
+            throw new AppException(LanguageEnum::PARAM_REQUIRED);
         }
 
         $table = new ArticleTable()->where([
             ArticleTable::ID => $id,
         ])->selectOne();
         if (empty($table)) {
-            throw new AppException(AppErr::NOT_FOUND);
+            throw new AppException(LanguageEnum::NOT_FOUND);
         }
 
         return ArticleModel::formatItem($table);

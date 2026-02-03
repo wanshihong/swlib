@@ -2,7 +2,7 @@
 
 namespace Swlib\Lock\Trait;
 
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 
 trait LockAttributeTrait
@@ -19,7 +19,7 @@ trait LockAttributeTrait
             $index = array_search($this->keyTemplate, $params, true);
             if ($index === false || !array_key_exists($index, $ctx['arguments'])) {
                 // 锁keyTemplate未匹配到方法参数
-                throw new AppException(AppErr::PARAM_INVALID . ": $this->keyTemplate");
+                throw new AppException(LanguageEnum::PARAM_INVALID . ": $this->keyTemplate");
             }
             $value = $ctx['arguments'][$index];
             return $className . '::' . $ctx['meta']['method'] . ':' . $this->normalizeKeyValue($value);

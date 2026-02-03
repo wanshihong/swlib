@@ -7,7 +7,7 @@ namespace Swlib\Utils;
 
 use CurlHandle;
 use Exception;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 
 class Http
@@ -113,7 +113,7 @@ class Http
         //curl_error==0 表示没有错误
         if ($errno !== 0) {
             $errorMsg = curl_error($this->ch);
-            throw new AppException(AppErr::HTTP_REQUEST_FAILED_WITH_MSG, "error_no:$errno;error_msg:$errorMsg");
+            throw new AppException(LanguageEnum::HTTP_REQUEST_FAILED_WITH_MSG, "error_no:$errno;error_msg:$errorMsg");
         }
 
         curl_close($this->ch);
@@ -141,7 +141,7 @@ class Http
         $response = json_decode($responseStr, true);
         if (empty($response)) {
             Log::save($this->url . " response:" . $responseStr, 'curl');
-            throw new AppException(AppErr::HTTP_RESPONSE_TYPE_INVALID);
+            throw new AppException(LanguageEnum::HTTP_RESPONSE_TYPE_INVALID);
         }
         return $response;
     }

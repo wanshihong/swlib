@@ -6,10 +6,10 @@ use Swlib\Admin\Manager\AdminManager;
 use Swlib\Admin\Middleware\AdminInitMiddleware;
 use Swlib\Admin\Middleware\PermissionsMiddleware;
 use Swlib\Controller\Abstract\AbstractController;
+use Swlib\Controller\Language\Service\Language;
 use Swlib\Request\Request;
 use Swlib\Response\TwigResponse;
 use Swlib\Router\Router;
-use Swlib\Utils\Language;
 use Throwable;
 
 #[Router(middleware: AdminInitMiddleware::class)]

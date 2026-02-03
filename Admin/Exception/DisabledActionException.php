@@ -5,8 +5,8 @@ namespace Swlib\Admin\Exception;
 
 use Exception;
 use Swlib\Admin\Manager\AdminManager;
+use Swlib\Controller\Language\Service\Language;
 use Swlib\Response\TwigResponse;
-use Swlib\Utils\Language;
 use Throwable;
 
 /**

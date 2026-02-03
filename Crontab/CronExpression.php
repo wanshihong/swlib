@@ -4,7 +4,7 @@ namespace Swlib\Crontab;
 
 use DateTime;
 use InvalidArgumentException;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 
 /**
  * Cron 表达式解析器
@@ -33,7 +33,7 @@ class CronExpression
 
         if (count($parts) !== 5) {
             // 无效的cron表达式
-            throw new InvalidArgumentException(AppErr::PARAM_ERROR . ": $expression");
+            throw new InvalidArgumentException(LanguageEnum::PARAM_ERROR . ": $expression");
         }
 
         $this->minute = $this->parseField($parts[0], 0, 59);

@@ -2,9 +2,9 @@
 
 namespace Swlib\Utils;
 
-use Swlib\Exception\AppErr;
-use Swlib\Exception\AppException;
 use InvalidArgumentException;
+use Swlib\Controller\Language\Enum\LanguageEnum;
+use Swlib\Exception\AppException;
 use Throwable;
 
 /**
@@ -142,7 +142,7 @@ class DataConverter
                 }
                 return "[\n" . $body . $pad . ']';
             default:
-                throw new AppException(AppErr::FEATURE_NOT_SUPPORTED_WITH_NAME, gettype($var));
+                throw new AppException(LanguageEnum::FEATURE_NOT_SUPPORTED_WITH_NAME, gettype($var));
         }
     }
 }

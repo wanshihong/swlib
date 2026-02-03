@@ -3,7 +3,7 @@
 namespace Swlib\Exception;
 
 use Exception;
-use Swlib\Utils\Language;
+use Swlib\Controller\Language\Service\Language;
 use Throwable;
 
 /**

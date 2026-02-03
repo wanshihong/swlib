@@ -3,7 +3,7 @@
 namespace Swlib\Table\Operation;
 
 use RuntimeException;
-use Swlib\Exception\AppErr;
+use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 
 /**
@@ -86,7 +86,7 @@ class DatabaseOperationContext
     public function hasChangedField(string $field): bool
     {
         if (!$this->operation || !$this->operation->isWriteOperation() || empty($this->writeData)) {
-            throw new AppException(AppErr::DB_CONTEXT_NO_WRITE);
+            throw new AppException(LanguageEnum::DB_CONTEXT_NO_WRITE);
         }
 
         $data = $this->writeData;
@@ -115,7 +115,7 @@ class DatabaseOperationContext
     public function getChangedValue(string $field): mixed
     {
         if (!$this->operation || !$this->operation->isWriteOperation() || empty($this->writeData)) {
-            throw new AppException(AppErr::DB_CONTEXT_NO_WRITE);
+            throw new AppException(LanguageEnum::DB_CONTEXT_NO_WRITE);
         }
 
         $data = $this->writeData;
@@ -131,7 +131,7 @@ class DatabaseOperationContext
             }
 
             if ($values === []) {
-                throw new AppException(AppErr::DB_CONTEXT_FIELD_NEW_VALUE . ": 字段 $field 在本次写操作中没有被设置");
+                throw new AppException(LanguageEnum::DB_CONTEXT_FIELD_NEW_VALUE . ": 字段 $field 在本次写操作中没有被设置");
             }
 
             return $values;
@@ -139,7 +139,7 @@ class DatabaseOperationContext
 
         // insert / update: 一维数组
         if (!array_key_exists($field, $data)) {
-            throw new AppException(AppErr::DB_CONTEXT_FIELD_NEW_VALUE . ": 字段 $field 在本次写操作中没有被设置");
+            throw new AppException(LanguageEnum::DB_CONTEXT_FIELD_NEW_VALUE . ": 字段 $field 在本次写操作中没有被设置");
         }
 
         return $data[$field];
