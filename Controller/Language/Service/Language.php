@@ -38,30 +38,49 @@ class Language
 
     /**
      * 获取翻译后的文本
-     * 如果占位需要替换请参考 sprintf 函数
+     * 支持命名占位符替换，如：{code}
      * @param string $str 翻译 key
-     * @param mixed ...$arg sprintf 参数
+     * @param array<string, mixed> $params 参数数组，如 ['code' => '123456']
      * @return string
      * @throws AppException
      */
-    public static function get(string $str, ...$arg): string
+    public static function get(string $str, array $params = []): string
     {
         $lang = self::getLang();
 
         // 1. 优先从静态文件读取
         $translation = self::getFromStaticFile($str, $lang);
         if ($translation !== null) {
-            return sprintf($translation, ...$arg);
+            return self::replacePlaceholders($translation, $params);
         }
 
         // 2. 兜底：从注解读取默认中文
         $default = self::getDefaultFromAnnotation($str);
         if ($default !== null) {
-            return sprintf($default, ...$arg);
+            return self::replacePlaceholders($default, $params);
         }
 
         // 3. 最终兜底：返回 key 本身
         return $str;
+    }
+
+    /**
+     * 替换命名占位符 {key} 为实际值
+     * @param string $text 翻译文本
+     * @param array<string, mixed> $params 参数数组
+     * @return string
+     */
+    private static function replacePlaceholders(string $text, array $params): string
+    {
+        if (empty($params)) {
+            return $text;
+        }
+
+        foreach ($params as $key => $value) {
+            $text = str_replace('{' . $key . '}', (string)$value, $text);
+        }
+
+        return $text;
     }
 
     /**
