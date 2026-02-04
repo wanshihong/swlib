@@ -7,7 +7,7 @@ namespace Swlib\Parse\Config;
 use Swlib\Parse\Helper\ConsoleColor;
 use Swlib\Utils\File;
 
-class ParseConfig
+class ParseEnvConfig
 {
 
     public array $data = [];

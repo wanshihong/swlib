@@ -9,7 +9,10 @@ use Swlib\Utils\DataConverter;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
 
-class ParseDatabaseConfig
+/**
+ * 验证数据库配置是否可用
+ */
+class ValidationDatabaseConfig
 {
 
     public function __construct()

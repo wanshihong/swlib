@@ -10,8 +10,9 @@ use Swlib\Connect\PoolRedis;
 use Swlib\Crontab\CrontabScheduler;
 use Swlib\Parse\Admin\ParseAdminScaffold;
 use Swlib\Parse\ast\AstCompiler;
-use Swlib\Parse\Config\ParseConfig;
-use Swlib\Parse\Config\ParseDatabaseConfig;
+use Swlib\Parse\Config\ParseDatabasesConfig;
+use Swlib\Parse\Config\ParseEnvConfig;
+use Swlib\Parse\Config\ValidationDatabaseConfig;
 use Swlib\Parse\ConfigValidator;
 use Swlib\Parse\CopyProtoFile;
 use Swlib\Parse\Helper\ConsoleColor;
@@ -43,8 +44,8 @@ class App
         $stepStartTime = microtime(true);
 
         run(fn: function () {
-            new ParseConfig();
-            new ParseDatabaseConfig();
+            new ParseEnvConfig();
+            new ValidationDatabaseConfig();
         });
 
         echo "解析配置文件完成，耗时: " . round(microtime(true) - $stepStartTime, 4) . "秒" . PHP_EOL;
@@ -117,6 +118,7 @@ class App
             ['name' => '编译 AOP/Transaction 代理类', 'action' => static fn() => new AstCompiler()],
             ['name' => '备份数据库', 'action' => static fn() => new TableBack()],
             ['name' => '翻译入库', 'action' => static fn() => new  ParseI18n()],
+            ['name' => '解析配置到静态文件', 'action' => static fn() => new  ParseDatabasesConfig()],
             ['name' => '移动静态文件', 'action' => static fn() => File::copyDirectory(SWLIB_DIR . '/Admin/static', PUBLIC_DIR . '/admin')],
         ];
 
