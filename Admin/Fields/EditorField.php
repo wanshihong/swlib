@@ -3,6 +3,7 @@
 namespace Swlib\Admin\Fields;
 
 
+use Generate\RouterPath;
 use Swlib\Admin\Manager\AdminManager;
 
 class EditorField extends AbstractField
@@ -20,10 +21,13 @@ class EditorField extends AbstractField
     {
         parent::__construct($field, $label);
         $this->url = AdminManager::getInstance()->uploadUrl;
+        if (empty($this->url)) {
+            $this->url = RouterPath::FileUpload;
+        }
         $this->hideOnFilter();
-        $this->addCssFile("https://cdn.staticfile.net/wangeditor5/5.1.23/css/style.min.css");
+        $this->addCssFile("/admin/wangeditor5.1.23/style.min.css");
         $this->addCssFile("/admin/css/form-editor.css");
-        $this->addJsFile("https://cdn.staticfile.net/wangeditor5/5.1.23/index.min.js");
+        $this->addJsFile("/admin/wangeditor5.1.23/index.min.js");
         $this->addJsFile("/admin/js/field-editor.js");
     }
 

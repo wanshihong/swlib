@@ -238,4 +238,23 @@ abstract class AbstractField implements PermissionInterface
     }
 
 
+    public function getValue(string $field)
+    {
+        foreach ($this->rowVar as $k => $v) {
+            if ($k == $field) {
+                return $v;
+            }
+        }
+
+        foreach ($this->rowVar as $k => $v) {
+            $kArr = explode('.', $k);
+            if ($kArr[1] == $field) {
+                return $v;
+            }
+        }
+
+        return array_find($this->row, fn($v, $k) => $k == $field);
+
+    }
+
 }

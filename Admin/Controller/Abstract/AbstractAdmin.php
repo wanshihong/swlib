@@ -68,14 +68,13 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
     public string $listRefreshUrl = "";
 
 
-
     /**
      * 初始化控制器
      * 检查禁用的操作、配置页面和字段
      *
      * @throws Throwable
      */
-    public  function initController(): void
+    public function initController(): void
     {
         // 检查当前方法是否被禁用
         ControllerHelper::checkDisabledAction($this);
@@ -276,7 +275,22 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
         $table = new $this->pageConfig->tableName();
 
         $priName = $table->getPrimaryKey();
-        $priValue = $this->get($table->getPrimaryKeyOriginal());
+        $idName = $table->getPrimaryKeyOriginal();
+        $method = $this->request->getMethod();
+
+        if ($method === 'POST') {
+            try {
+                $priValue = $this->post($priName);
+            } catch (Throwable) {
+                $priValue = $this->post($idName);
+            }
+        } else {
+            try {
+                $priValue = $this->get($priName);
+            } catch (Throwable) {
+                $priValue = $this->get($idName);
+            }
+        }
 
         list($fields, $queryFields) = $this->fieldsConfig->frameworkGetFormFields();
 
@@ -285,7 +299,7 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
         $this->join($query);
         $this->editQuery($query);
         $findDto = $query->selectOne();
-        $method = $this->request->getMethod();
+
         if ($method === 'POST') {
             /** @var TableInterface $table */
             $table = new $this->pageConfig->tableName();

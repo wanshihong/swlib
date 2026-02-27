@@ -1,0 +1,35 @@
+{% if getCurrentAction()=='lists' %}
+    <div class="input-group input-group-sm list-text-inline-wrap" style="min-width: 90px;">
+        <input type="text"
+               class="form-control list-text-inline-input rounded-0"
+               value="{{ value|default('') }}"
+               data-original-value="{{ value|default('') }}"
+               data-field="{{ field.field }}"
+               data-pri-field-name="{{ row.priFieldName }}"
+               data-pri-field-value="{{ field.getValue('id') }}"
+               data-url="{{ field.listInlineEditUrl }}"
+        >
+        <span class="input-group-text list-text-inline-save-icon d-none" role="button" title="保存">
+            <i class="bi bi-check-lg text-success"></i>
+        </span>
+    </div>
+{% else %}
+    {% if value is empty %}
+        <span class="badge user-select-none rounded-0">未赋值</span>
+    {% else %}
+        {% if field.tooltip is empty %}
+            <pre style="max-width: 60vw;">{{ value }}</pre>
+        {% else %}
+            <span class="d-inline-block text-truncate {% for class in field.classes %}{{ class }}{% endfor %}"
+                  onclick="copyText('{{ value }}')" style="max-width: {{ field.listMaxWidth }}px;"
+                  data-bs-toggle="tooltip" data-bs-title='{{ value }}'
+                  {% for attrKey,attrValue in field.attributes %}data-{{ attrKey }}="{{ attrValue }}"{% endfor %}
+            >
+                {{ value|raw }}
+            </span>
+        {% endif %}
+    {% endif %}
+    {% if getCurrentAction()=='detail' and field.helpText %}
+        <div class="form-text">{{ field.helpText|raw }}</div>
+    {% endif %}
+{% endif %}

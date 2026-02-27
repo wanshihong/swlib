@@ -4,7 +4,7 @@ namespace Swlib\Admin\Fields;
 
 use InvalidArgumentException;
 
-class NumberField extends AbstractField
+class NumberField extends TextField
 {
 
     // 列表页面自定义模板
