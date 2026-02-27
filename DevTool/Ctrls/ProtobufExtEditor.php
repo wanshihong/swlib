@@ -3,7 +3,7 @@
 namespace Swlib\DevTool\Ctrls;
 
 use Generate\ConfigEnum;
-use Generate\DatabaseConnect;
+use Swlib\Connect\PoolMysqli;
 use Swlib\Controller\Abstract\AbstractController;
 use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
@@ -81,7 +81,7 @@ class ProtobufExtEditor extends AbstractController
             $comment = 'protobuf:ext:json:' . $json;
         }
 
-        DatabaseConnect::call(function ($mysqli) use ($table, $comment) {
+        PoolMysqli::call(function ($mysqli) use ($table, $comment) {
             $tableEscaped = $mysqli->real_escape_string($table);
             $commentEscaped = $mysqli->real_escape_string($comment);
             $sql = "SHOW FULL COLUMNS FROM `$tableEscaped` WHERE Field = 'id'";
@@ -113,12 +113,12 @@ class ProtobufExtEditor extends AbstractController
     {
         $dbTables = [];
 
-        DatabaseConnect::eachDbName(
+        PoolMysqli::eachDbName(
         /**
          * @throws Throwable
          */ function ($dbName) use (&$dbTables) {
             $tables = [];
-            DatabaseConnect::call(function ($mysqli) use (&$tables) {
+            PoolMysqli::call(function ($mysqli) use (&$tables) {
                 $res = $mysqli->query('SHOW TABLES');
                 while ($row = $res->fetch_array()) {
                     $tables[] = $row[0];
@@ -137,7 +137,7 @@ class ProtobufExtEditor extends AbstractController
      */
     private function renderEditForm(string $dbName, string $table): TwigResponse
     {
-        $fields = DatabaseConnect::query('SHOW FULL COLUMNS FROM `' . $table . '`', $dbName)->fetch_all(MYSQLI_ASSOC);
+        $fields = PoolMysqli::query('SHOW FULL COLUMNS FROM `' . $table . '`', $dbName)->fetch_all(MYSQLI_ASSOC);
         $idComment = '';
         foreach ($fields as $field) {
             if ($field['Field'] === 'id') {
@@ -164,7 +164,7 @@ class ProtobufExtEditor extends AbstractController
             }
         }
 
-        $dbCamel = DatabaseConnect::getNamespace($dbName);
+        $dbCamel = PoolMysqli::getNamespace($dbName);
         $protoTypes = $this->scanProtoTypes($dbCamel);
 
         return TwigResponse::render('devtool/protobuf_ext_edit.twig', [

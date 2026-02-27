@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Swlib\Table\Trait;
+namespace Swlib\Connect;
 
 use Exception;
 use Generate\ConfigEnum;
+use Generate\DatabaseConnect;
 use mysqli;
 use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Enum\CtxEnum;
@@ -14,7 +15,7 @@ use Swoole\Database\MysqliPool;
 use Swoole\Database\MysqliProxy;
 use Throwable;
 
-trait DatabaseConnectTrait
+class PoolMysqli
 {
     use PoolConnectionTrait;
 
@@ -23,7 +24,7 @@ trait DatabaseConnectTrait
     public static function getDbName(string $dbName = "default"): string
     {
         if ($dbName === 'default') {
-            foreach (self::config as $name => $config) {
+            foreach (DatabaseConnect::config as $name => $config) {
                 return $name;
             }
         }
@@ -33,7 +34,7 @@ trait DatabaseConnectTrait
     public static function getConfig(string $dbName = "default"): array
     {
         $dbName = self::getDbName($dbName);
-        return self::config[$dbName];
+        return DatabaseConnect::config[$dbName];
     }
 
     public static function getPool(string $dbName = "default")
@@ -197,12 +198,11 @@ trait DatabaseConnectTrait
             }
         }
         self::$pools = [];
-
     }
 
     public static function eachDbName(callable $call): void
     {
-        foreach (self::config as $dbName => $config) {
+        foreach (DatabaseConnect::config as $dbName => $config) {
             $call($dbName);
         }
     }

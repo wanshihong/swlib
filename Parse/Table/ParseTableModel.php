@@ -5,7 +5,7 @@ namespace Swlib\Parse\Table;
 
 
 use Exception;
-use Generate\DatabaseConnect;
+use Swlib\Connect\PoolMysqli;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
 
@@ -27,7 +27,7 @@ class ParseTableModel
     {
         $this->tableName = StringConverter::underscoreToCamelCase($this->tableName);
 
-        $this->namespace = DatabaseConnect::getNamespace($this->database);
+        $this->namespace = PoolMysqli::getNamespace($this->database);
 
         $this->saveModelStr[] = "<?php //$this->tableName";
         $this->saveModelStr[] = 'namespace Generate\Models\\' . $this->namespace . ';';

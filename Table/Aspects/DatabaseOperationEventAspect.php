@@ -6,9 +6,9 @@ namespace Swlib\Table\Aspects;
 use Attribute;
 use Exception;
 use Generate\ConfigEnum;
-use Generate\DatabaseConnect;
 use Swlib\Aop\Abstract\AbstractAspect;
 use Swlib\Aop\JoinPoint;
+use Swlib\Connect\PoolMysqli;
 use Swlib\Enum\CtxEnum;
 use Swlib\Event\Attribute\Event;
 use Swlib\Event\EventEnum;
@@ -112,7 +112,7 @@ class DatabaseOperationEventAspect extends AbstractAspect implements ProxyAttrib
             $bindParams = $joinPoint->arguments[1] ?? [];
             $bindParams = is_array($bindParams) ? $bindParams : [$bindParams];
 
-            $database = DatabaseConnect::getDbName();
+            $database = PoolMysqli::getDbName();
 
             $this->databaseOperation = new DatabaseOperationContext(
                 database: $database,

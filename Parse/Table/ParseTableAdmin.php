@@ -6,7 +6,7 @@ namespace Swlib\Parse\Table;
 
 use Exception;
 use Generate\ConfigEnum;
-use Generate\DatabaseConnect;
+use Swlib\Connect\PoolMysqli;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
 
@@ -30,7 +30,7 @@ class ParseTableAdmin
         $adminNamespace = ConfigEnum::get('ADMIN_NAMESPACE');
 
 
-        $namespace = DatabaseConnect::getNamespace($this->database);
+        $namespace = PoolMysqli::getNamespace($this->database);
 
         $this->saveStr[] = "<?php //$this->tableName";
         $this->saveStr[] = "namespace $adminNamespace\\Controller\\$this->pathPrefix;";

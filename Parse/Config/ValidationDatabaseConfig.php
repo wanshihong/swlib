@@ -76,11 +76,9 @@ declare(strict_types=1);
 
 namespace Generate;
 
-use Swlib\Table\Trait\DatabaseConnectTrait;
 
 class DatabaseConnect
 {
-    use DatabaseConnectTrait;
 
     public const array config = $export;
 }

@@ -5,7 +5,7 @@ namespace Swlib;
 
 use Exception;
 use Generate\ConfigEnum;
-use Generate\DatabaseConnect;
+use Swlib\Connect\PoolMysqli;
 use Swlib\Connect\PoolRedis;
 use Swlib\Crontab\CrontabScheduler;
 use Swlib\Parse\Admin\ParseAdminScaffold;
@@ -143,7 +143,7 @@ class App
         ConsoleColor::writeSuccess("所有解析操作完成，总耗时: {$totalDuration}秒");
 
 
-        DatabaseConnect::close();
+        PoolMysqli::close();
         PoolRedis::close();
     }
 

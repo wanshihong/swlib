@@ -6,7 +6,6 @@ namespace Swlib\Connect;
 
 use Generate\ConfigEnum;
 use Redis;
-use Swlib\Table\Trait\PoolConnectionTrait;
 use Swoole\Coroutine;
 use Swoole\Database\RedisConfig;
 use Swoole\Database\RedisPool;
@@ -47,35 +46,7 @@ class PoolRedis
             self::createPool();
         }
 
-        $startTime = microtime(true);
-        $getCount = 0;
-        $poolSize = max(ConfigEnum::REDIS_POOL_NUM, self::MIN_POOL_SIZE);
-
-        while (self::$num >= $poolSize) {
-            Coroutine::sleep(0.11);
-            $getCount++;
-
-            // 检查是否超时
-            $elapsed = self::checkTimeout($startTime);
-            if ($elapsed >= self::GET_TIMEOUT) {
-                self::throwTimeoutException(
-                    $elapsed,
-                    'Redis',
-                    'redis_call_depth',
-                    $poolSize
-                );
-            }
-
-            if ($getCount >= 10) {
-                self::$pool->fill();
-                break;
-            }
-        }
-
-        // 获取连接
-        $redis = self::$pool->get();
-        self::$num++;
-        return $redis;
+        return self::waitForConnection();
     }
 
     public static function put(Redis|null $redis): void
@@ -92,26 +63,19 @@ class PoolRedis
     {
         // 获取连接池大小
         $poolSize = max(ConfigEnum::REDIS_POOL_NUM, self::MIN_POOL_SIZE);
-
-        // 检测嵌套深度（如果 >= 连接池大小会直接抛出异常）
         $depth = self::checkNestDepth('redis_call_depth', $poolSize, 'Redis');
-
-        // 如果嵌套深度过大，记录警告
         if ($depth > self::MAX_NEST_DEPTH) {
             self::logNestWarning($depth, 'Redis', 'redis_pool');
         }
 
+        $redis = null;
         try {
             $redis = self::get();
-            try {
-                $ret = $call($redis);
-                self::put($redis);
-            } catch (Throwable $e) {
-                self::put($redis);
-                throw $e;
-            }
-            return $ret;
+            return $call($redis);
         } finally {
+            if ($redis !== null) {
+                self::put($redis);
+            }
             self::decreaseNestDepth('redis_call_depth', $depth);
         }
     }
@@ -125,26 +89,22 @@ class PoolRedis
      */
     public static function getSet(string $key, callable $call, int $expire = -1, bool $forceRefresh = false): mixed
     {
-        // 如果不强制刷新，先尝试从缓存获取
         if ($forceRefresh === false) {
             $cacheData = self::call(function (Redis $redis) use ($key) {
                 return $redis->get($key);
             });
 
             if ($cacheData && !ConfigEnum::get('DISABLED_REDIS_CACHE')) {
-                // 尝试反序列化，如果失败说明数据格式不对，需要重新生成
                 try {
                     $arr = unserialize($cacheData);
                     if (is_array($arr) && isset($arr['d'])) {
                         return $arr['d'];
                     }
                 } catch (Throwable) {
-                    // 反序列化失败，继续执行回调重新生成缓存
                 }
             }
         }
 
-        // 执行回调获取数据并写入缓存
         return self::call(function (Redis $redis) use ($key, $call, $expire) {
             $res = $call();
             if ($res) {
@@ -161,5 +121,34 @@ class PoolRedis
         self::$pool = null;
     }
 
+    private static function waitForConnection(): Redis
+    {
+        $startTime = microtime(true);
+        $getCount = 0;
+        $poolSize = max(ConfigEnum::REDIS_POOL_NUM, self::MIN_POOL_SIZE);
 
+        while (self::$num >= $poolSize) {
+            Coroutine::sleep(0.11);
+            $getCount++;
+
+            $elapsed = self::checkTimeout($startTime);
+            if ($elapsed >= self::GET_TIMEOUT) {
+                self::throwTimeoutException(
+                    $elapsed,
+                    'Redis',
+                    'redis_call_depth',
+                    $poolSize
+                );
+            }
+
+            if ($getCount >= 10) {
+                self::$pool->fill();
+                $getCount = 0;
+            }
+        }
+
+        $redis = self::$pool->get();
+        self::$num++;
+        return $redis;
+    }
 }

@@ -16,21 +16,18 @@ class Get extends AbstractController
      * @throws Throwable
      */
     #[Router(errorTitle: '获取配置信息失败')]
-    public function run(ConfigProto $request): ConfigListsProto
+    public function run(ConfigListsProto $request): ConfigListsProto
     {
-        $key = $request->getKey();
-        $keyArr = explode(',', $key);
-        $desc = $this->post('desc');
-        $arr = ConfigService::get(
-            key: $keyArr,
-            allowQuery: 1,
-            description: $desc
-        );
+        $arr = $request->getLists();
+        var_dump($arr);
         $nodes = [];
-        foreach ($arr as $k => $v) {
+        foreach ($arr as $item) {
+            $key = $item->getKey();
+            $desc = $item->getDesc();
+            $value = ConfigService::get(key: $key, desc: $desc);
             $proto = new ConfigProto();
-            $proto->setKey($k);
-            $proto->setValue($v);
+            $proto->setKey($key);
+            $proto->setValue($value);
 
             $nodes[] = $proto;
         }

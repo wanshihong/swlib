@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Swlib\Parse\Table;
 
 
-use Generate\DatabaseConnect;
 use mysqli;
+use Swlib\Connect\PoolMysqli;
 use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Parse\Helper\ConsoleColor;
@@ -51,13 +51,13 @@ class ParseTable
         $sqlFile = ROOT_DIR . 'Swlib' . DIRECTORY_SEPARATOR . 'create_tab.sql';
 
         if (!file_exists($sqlFile)) {
-            throw new AppException(LanguageEnum::PARSE_SQL_FILE_NOT_FOUND_WITH_PATH, $sqlFile);
+            throw new AppException(LanguageEnum::PARSE_SQL_FILE_NOT_FOUND_WITH_PATH, ['sqlPath'=>$sqlFile]);
         }
 
         $sql = file_get_contents($sqlFile);
 
         // 执行 SQL 语句
-        DatabaseConnect::call(function (MysqliProxy|mysqli $mysqli) use ($sql) {
+        PoolMysqli::call(function (MysqliProxy|mysqli $mysqli) use ($sql) {
             $mysqli->multi_query($sql);
         });
     }
@@ -77,7 +77,7 @@ class ParseTable
         ParseTableTable::createDir();
         ParseTableTableDto::createDir();
 
-        DatabaseConnect::eachDbName(function ($dbName) {
+        PoolMysqli::eachDbName(function ($dbName) {
             $tempDbName = StringConverter::underscoreToCamelCase($dbName);
             if (isset($this->tableNames[$tempDbName])) {
                 $this->tableNames[$tempDbName] = [];
@@ -87,7 +87,7 @@ class ParseTable
             $this->selectTables($dbName, $parseTableMap);
         });
 
-        DatabaseConnect::eachDbName(function ($dbName) {
+        PoolMysqli::eachDbName(function ($dbName) {
             $tempDbName = StringConverter::underscoreToCamelCase($dbName);
             $this->clearFile(RUNTIME_DIR . "Generate/Tables/$tempDbName");
             $this->clearFile(ROOT_DIR . "protos/$tempDbName", '.proto', [
@@ -106,7 +106,7 @@ class ParseTable
      */
     private function selectTables(string $dbName, ParseTableMap $parseTableMap): void
     {
-        $tables = DatabaseConnect::query("SHOW TABLES", $dbName)->fetch_all();
+        $tables = PoolMysqli::query("SHOW TABLES", $dbName)->fetch_all();
         if (empty($tables)) {
             ConsoleColor::writeWarning("数据库 '$dbName' 中没有找到任何表");
             return;
@@ -120,8 +120,8 @@ class ParseTable
             while ($item = array_pop($tables)) {
                 $tableName = $item[0];
                 $lastCount = count($tables);
-                $fields = DatabaseConnect::query("SHOW FULL COLUMNS FROM `" . $tableName . "`", $dbName)->fetch_all(MYSQLI_ASSOC);
-                $tableComment = DatabaseConnect::query("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '$tableName';", $dbName)->fetch_column();
+                $fields = PoolMysqli::query("SHOW FULL COLUMNS FROM `" . $tableName . "`", $dbName)->fetch_all(MYSQLI_ASSOC);
+                $tableComment = PoolMysqli::query("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '$tableName';", $dbName)->fetch_column();
 
                 // 检测字段冲突
                 $conflicts = FieldConflictDetector::detect($fields);
@@ -133,7 +133,6 @@ class ParseTable
                     $fields[$key]['Field'] = $this->renameReservedFields($item['Field']);
                 }
 
-                $database = StringConverter::underscoreToCamelCase($dbName);
                 new ParseTableProtoc($dbName, $tableName, $fields, $tableComment);
 
                 // map 和 table  不要改变 数据库名称的 大小写 配置中是啥就是啥，否则容易混淆，
@@ -239,7 +238,7 @@ class ParseTable
             mkdir($baseDir, 0777, true);
         }
 
-        DatabaseConnect::eachDbName(function ($dbName) use ($baseDir, $delBase) {
+        PoolMysqli::eachDbName(function ($dbName) use ($baseDir, $delBase) {
             $dbName = StringConverter::underscoreToCamelCase($dbName);
             if ($delBase) {
                 File::delDirectory($baseDir . $dbName);

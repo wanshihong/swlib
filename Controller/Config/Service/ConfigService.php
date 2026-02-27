@@ -34,10 +34,12 @@ class ConfigService
      * @param string|array $key 配置键名，可以是单个字符串或者字符串数组
      * @param mixed $default 默认值
      * @param bool $checkEnable 是否检查启用状态（默认 true）
+     * @param string $desc 默认说明（仅在未提供 descMap 时使用）
+     * @param array<string,string> $descMap 每个 key 对应的说明
      * @return mixed 如果$key是字符串，返回单个配置值；如果$key是数组，返回关联数组[key=>value]
      * @throws Throwable
      */
-    public static function get(string|array $key, mixed $default = null, bool $checkEnable = true, string $desc = ''): mixed
+    public static function get(string|array $key, mixed $default = null, bool $checkEnable = true, string $desc = '', array $descMap = []): mixed
     {
         $keys = is_string($key) ? [$key] : $key;
         $ret = [];
@@ -47,7 +49,8 @@ class ConfigService
 
             if ($config === null) {
                 // 静态文件不存在，尝试从数据库创建
-                $ret[$k] = self::createConfigFromDb($k, $default, $desc);
+                $descForKey = $descMap[$k] ?? $desc;
+                $ret[$k] = self::createConfigFromDb($k, $default, $descForKey);
             } elseif ($checkEnable && $config['is_enable'] != 1) {
                 $ret[$k] = $default;
             } else {
@@ -69,6 +72,11 @@ class ConfigService
         return ConfigMap::$configs[$key] ?? null;
     }
 
+    public static function clearCache(): void
+    {
+        ConfigMap::$configs = [];
+    }
+
     /**
      * 从数据库创建配置并重新生成静态文件
      * @param string $key 配置键名
@@ -78,7 +86,7 @@ class ConfigService
      * @throws Throwable
      */
     #[RedisLockAttribute]
-    private static function createConfigFromDb(string $key, mixed $default, string $desc): mixed
+    private static function createConfigFromDb(string $key, mixed $default, string $desc = ''): mixed
     {
         $config = new ConfigTable()->where([ConfigTable::KEY => $key])->selectOne();
 

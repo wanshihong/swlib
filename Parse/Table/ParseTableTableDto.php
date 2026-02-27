@@ -5,7 +5,7 @@ namespace Swlib\Parse\Table;
 
 
 use Exception;
-use Generate\DatabaseConnect;
+use Swlib\Connect\PoolMysqli;
 use Swlib\Parse\Helper\FieldDefaultValueHelper;
 use Swlib\Utils\File;
 use Swlib\Utils\StringConverter;
@@ -28,7 +28,7 @@ class ParseTableTableDto
     )
     {
         $this->tableName = StringConverter::underscoreToCamelCase($tableName);
-        $this->namespace = DatabaseConnect::getNamespace($this->database);
+        $this->namespace = PoolMysqli::getNamespace($this->database);
 
         $this->saveStr[] = '<?php';
         $this->saveStr[] = "namespace Generate\TablesDto\\$this->namespace;";

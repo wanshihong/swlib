@@ -3,8 +3,8 @@
 namespace Swlib\Table\Trait;
 
 use Exception;
-use Generate\DatabaseConnect;
 use Generate\TableFieldMap;
+use Swlib\Connect\PoolMysqli;
 use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Table\Expression;
@@ -38,7 +38,7 @@ trait DbHelperTrait
      */
     private static function _getFieldNameByAs(string $fieldAs, string $dbName = 'default'): string
     {
-        $dbName = DatabaseConnect::getDbName($dbName);
+        $dbName = PoolMysqli::getDbName($dbName);
         if (!isset(TableFieldMap::maps[$dbName][$fieldAs])) {
             throw new AppException(LanguageEnum::DB_FIELD_NOT_FOUND_IN_DEFINITION . ": $fieldAs");
         }
@@ -52,7 +52,7 @@ trait DbHelperTrait
      */
     public static function getFieldAsByName(string $fieldName, string $dbName = 'default'): string
     {
-        $dbName = DatabaseConnect::getDbName($dbName);
+        $dbName = PoolMysqli::getDbName($dbName);
         $res = array_search($fieldName, TableFieldMap::maps[$dbName]);
         if (empty($res)) {
             throw new AppException(LanguageEnum::DB_FIELD_NOT_FOUND_IN_ALIAS . ": $fieldName");
@@ -80,7 +80,7 @@ trait DbHelperTrait
      */
     public static function checkAsExists(string $asName, string $dbName = 'default'): bool
     {
-        $dbName = DatabaseConnect::getDbName($dbName);
+        $dbName = PoolMysqli::getDbName($dbName);
         return isset(TableFieldMap::maps[$dbName][$asName]);
     }
 

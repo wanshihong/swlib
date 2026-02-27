@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Swlib\Parse\Config;
 
-use Generate\DatabaseConnect;
+use Swlib\Connect\PoolMysqli;
 use Swlib\Utils\DataConverter;
 use Swlib\Utils\File;
 use Throwable;
@@ -31,7 +31,7 @@ class ParseDatabasesConfig
     private static function generateConfigMapFromDb(): void
     {
         // 查询所有配置
-        $rows = DatabaseConnect::query("SELECT * FROM `config`")->fetch_all(MYSQLI_ASSOC);
+        $rows = PoolMysqli::query("SELECT * FROM `config`")->fetch_all(MYSQLI_ASSOC);
 
         // 构建配置数组
         $configs = [];

@@ -21,7 +21,7 @@ use Attribute;
  * public const string USER_USERNAME_REQUIRED = 'user.username.required';
  */
 #[Attribute(Attribute::TARGET_CLASS_CONSTANT)]
-class I18nAttribute
+readonly class I18nAttribute
 {
     /**
      * @param string $zh 中文-简体（必填）
@@ -63,43 +63,43 @@ class I18nAttribute
      * @param string|null $sw 斯瓦希里语
      */
     public function __construct(
-        public readonly string $zh,
-        public readonly string $en,
-        public readonly ?string $zh_tw = null,
-        public readonly ?string $zh_hk = null,
-        public readonly ?string $ja = null,
-        public readonly ?string $ko = null,
-        public readonly ?string $fr = null,
-        public readonly ?string $es = null,
-        public readonly ?string $it = null,
-        public readonly ?string $de = null,
-        public readonly ?string $tr = null,
-        public readonly ?string $ru = null,
-        public readonly ?string $pt = null,
-        public readonly ?string $pt_br = null,
-        public readonly ?string $vi = null,
-        public readonly ?string $ina = null,
-        public readonly ?string $th = null,
-        public readonly ?string $ms = null,
-        public readonly ?string $ar = null,
-        public readonly ?string $hi = null,
-        public readonly ?string $nl = null,
-        public readonly ?string $pl = null,
-        public readonly ?string $sv = null,
-        public readonly ?string $da = null,
-        public readonly ?string $fi = null,
-        public readonly ?string $no = null,
-        public readonly ?string $he = null,
-        public readonly ?string $el = null,
-        public readonly ?string $cs = null,
-        public readonly ?string $ro = null,
-        public readonly ?string $hu = null,
-        public readonly ?string $uk = null,
-        public readonly ?string $fa = null,
-        public readonly ?string $fil = null,
-        public readonly ?string $bn = null,
-        public readonly ?string $ur = null,
-        public readonly ?string $sw = null,
+        public string  $zh,
+        public string  $en,
+        public ?string $zh_tw = null,
+        public ?string $zh_hk = null,
+        public ?string $ja = null,
+        public ?string $ko = null,
+        public ?string $fr = null,
+        public ?string $es = null,
+        public ?string $it = null,
+        public ?string $de = null,
+        public ?string $tr = null,
+        public ?string $ru = null,
+        public ?string $pt = null,
+        public ?string $pt_br = null,
+        public ?string $vi = null,
+        public ?string $ina = null,
+        public ?string $th = null,
+        public ?string $ms = null,
+        public ?string $ar = null,
+        public ?string $hi = null,
+        public ?string $nl = null,
+        public ?string $pl = null,
+        public ?string $sv = null,
+        public ?string $da = null,
+        public ?string $fi = null,
+        public ?string $no = null,
+        public ?string $he = null,
+        public ?string $el = null,
+        public ?string $cs = null,
+        public ?string $ro = null,
+        public ?string $hu = null,
+        public ?string $uk = null,
+        public ?string $fa = null,
+        public ?string $fil = null,
+        public ?string $bn = null,
+        public ?string $ur = null,
+        public ?string $sw = null,
     ) {
     }
 
@@ -110,9 +110,7 @@ class I18nAttribute
      */
     public function getTranslations(): array
     {
-        $translations = [];
-
-        foreach ([
+        return array_filter([
             'zh' => $this->zh,
             'en' => $this->en,
             'zh_tw' => $this->zh_tw,
@@ -150,12 +148,8 @@ class I18nAttribute
             'bn' => $this->bn,
             'ur' => $this->ur,
             'sw' => $this->sw,
-        ] as $lang => $value) {
-            if ($value !== null) {
-                $translations[$lang] = $value;
-            }
-        }
-
-        return $translations;
+        ], function ($value) {
+            return $value !== null;
+        });
     }
 }

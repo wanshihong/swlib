@@ -419,7 +419,7 @@ class LanguageEnum implements LanguageInterface
     // 解析SQL模块 (parse_sql.*)
     // ============================================================
 
-    #[I18nAttribute(zh: 'SQL文件不存在(含路径)', en: 'SQL file not found (with path)')]
+    #[I18nAttribute(zh: 'SQL:{sqlPath} 文件不存在', en: 'SQL file: {sqlPath} not found')]
     public const string PARSE_SQL_FILE_NOT_FOUND_WITH_PATH = 'parse_sql.file_not_found_with_path';
 
     // ============================================================

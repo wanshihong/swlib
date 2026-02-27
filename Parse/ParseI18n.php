@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Swlib\Parse;
 
-use Generate\DatabaseConnect;
 use ReflectionClass;
 use Swlib\Attribute\I18nAttribute;
+use Swlib\Connect\PoolMysqli;
 use Swlib\Controller\Language\Interface\LanguageInterface;
 use Swlib\Utils\DataConverter;
 use Swlib\Utils\File;
@@ -123,7 +123,7 @@ class ParseI18n
         $time = time();
 
         // 先检查 key 是否存在
-        $existing = DatabaseConnect::query("SELECT * FROM `language` WHERE `key` = '$keyEscaped' LIMIT 1")->fetch_assoc();
+        $existing = PoolMysqli::query("SELECT * FROM `language` WHERE `key` = '$keyEscaped' LIMIT 1")->fetch_assoc();
 
         try {
             if (empty($existing)) {
@@ -138,7 +138,7 @@ class ParseI18n
                 }
 
                 $sql = "INSERT INTO `language` (" . implode(', ', $insertFields) . ") VALUES (" . implode(', ', $insertValues) . ")";
-                $result = DatabaseConnect::query($sql);
+                $result = PoolMysqli::query($sql);
 
                 if ($result) {
                     $stats['inserted']++;
@@ -161,7 +161,7 @@ class ParseI18n
                     $updateFields[] = "`use_time` = $time";
                     $id = (int)$existing['id'];
                     $sql = "UPDATE `language` SET " . implode(', ', $updateFields) . " WHERE `id` = $id";
-                    DatabaseConnect::query($sql);
+                    PoolMysqli::query($sql);
                     $stats['updated']++;
                 }
             }
@@ -235,7 +235,7 @@ class ParseI18n
      * 生成 LanguageMap 静态文件
      * @param array $mapData ['zh' => ['key' => '翻译'], 'en' => ['key' => 'translation']]
      */
-    private static function generateLanguageMapFile(array $mapData): void
+    public static function generateLanguageMapFile(array $mapData): void
     {
         $content = "<?php\n\nnamespace Generate;\n\n";
         $content .= "/**\n";
@@ -250,7 +250,6 @@ class ParseI18n
         $content .= "}\n";
 
         File::save(ROOT_DIR . "runtime/Generate/LanguageMap.php", $content);
-        echo "LanguageMap 文件已生成: " . ROOT_DIR . "runtime/Generate/LanguageMap.php" . PHP_EOL;
     }
 
 }
