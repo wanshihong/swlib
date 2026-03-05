@@ -25,9 +25,14 @@ class Language
 
         // 2. 如果没有，从请求中获取
         if (empty($lang)) {
-            $lang = Request::getHeader('lang');
-            if (empty($lang)) {
-                $lang = Request::get('lang', 'en');
+            $request = CtxEnum::Request->get();
+            if ($request !== null) {
+                $lang = Request::getHeader('lang');
+                if (empty($lang)) {
+                    $lang = Request::get('lang', 'en');
+                }
+            } else {
+                $lang = 'en';
             }
         }
 
@@ -107,6 +112,7 @@ class Language
         $classes = [
             LanguageEnum::class,
             \App\Enum\LanguageEnum::class,
+            \App\I18n\I18n::class,
         ];
 
         foreach ($classes as $class) {

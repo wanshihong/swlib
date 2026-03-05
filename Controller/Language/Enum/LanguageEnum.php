@@ -140,7 +140,7 @@ class LanguageEnum implements LanguageInterface
     #[I18nAttribute(zh: '别名字段不存在', en: 'Alias field not found')]
     public const string DB_FIELD_NOT_FOUND_IN_ALIAS = 'db.field_not_found_in_alias';
 
-    #[I18nAttribute(zh: '定义字段不存在', en: 'Definition field not found')]
+    #[I18nAttribute(zh: '字段 {field} 不存在', en: 'field {field} not found')]
     public const string DB_FIELD_NOT_FOUND_IN_DEFINITION = 'db.field_not_found_in_definition';
 
     #[I18nAttribute(zh: '上下文无写入数据', en: 'Context has no write data')]
@@ -412,7 +412,7 @@ class LanguageEnum implements LanguageInterface
     // 表单模块 (form.*)
     // ============================================================
 
-    #[I18nAttribute(zh: '类不存在(含类名)', en: 'Class does not exist (with class name)')]
+    #[I18nAttribute(zh: '{class}类不存在', en: '{class}Class does not exist')]
     public const string FORM_CLASS_NOT_EXIST_WITH_NAME = 'form.class_not_exist_with_name';
 
     // ============================================================

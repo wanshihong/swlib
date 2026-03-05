@@ -36,8 +36,7 @@ class CrontabScheduler
                     $scheduler = new CrontabScheduler();
                     $scheduler->start($server);
                 } catch (Throwable $e) {
-                    fwrite(STDERR, "[crontab] " . $e->getMessage() . PHP_EOL);
-                    fwrite(STDERR, $e->getTraceAsString() . PHP_EOL);
+                    ConsoleColor::writeErrorToStderr('[crontab] ' . $e->getMessage(), $e);
                     exit(1);
                 }
             },
@@ -53,7 +52,7 @@ class CrontabScheduler
      */
     private function start($server): void
     {
-        ConsoleColor::write("CrontabScheduler started");
+        ConsoleColor::writeInfo('CrontabScheduler started');
         while (true) {
             try {
                 $now = new DateTime();
@@ -148,4 +147,3 @@ class CrontabScheduler
         }
     }
 }
-

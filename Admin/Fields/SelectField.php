@@ -90,11 +90,11 @@ class SelectField extends AbstractField
     public function setRelation(string $tableName, string $idField, string $textField, string $url = '', string $dbName = 'default'): static
     {
         if (!class_exists($tableName)) {
-            throw new AppException(LanguageEnum::FORM_CLASS_NOT_EXIST_WITH_NAME, $tableName);
+            throw new AppException(LanguageEnum::FORM_CLASS_NOT_EXIST_WITH_NAME, ['class' => $tableName]);
         }
         $this->table = $tableName;
         $this->idField = $idField;
-        $this->idFieldOriginalName = explode('.', Db::getFieldNameByAs($idField, $dbName))[1];
+        $this->idFieldOriginalName = Db::getFieldNameByAs(fieldAs: $idField, dbName: $dbName, onlyField: true);
         $this->textField = $textField;
 
         if ($url === '') {

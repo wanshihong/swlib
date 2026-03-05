@@ -9,7 +9,7 @@ class AppException extends Exception
 {
     /**
      * @param string $message 翻译 key
-     * @param array<string, mixed> $params 参数数组，如 ['bizType' => 'withdraw']
+     * @param array<string, string|number> $params 参数数组，如 ['bizType' => 'withdraw']
      * @throws AppException
      */
     public function __construct(string $message = "", array $params = [])

@@ -94,6 +94,13 @@ class Request
     public static function get(string $key, string $errTip = '', mixed $def = null): mixed
     {
         $request = CtxEnum::Request->get();
+        if (!$request) {
+            if ($def === null) {
+                throw new AppException($errTip ?: LanguageEnum::PARAM_ERROR);
+            }
+            return $def;
+        }
+
         $get = $request->get ?: [];
         if (isset($get[$key])) {
             return $get[$key];
@@ -119,6 +126,13 @@ class Request
     public static function post(string $key, string $errTip = '', mixed $def = null): mixed
     {
         $request = CtxEnum::Request->get();
+        if (!$request) {
+            if ($def === null) {
+                throw new AppException($errTip ?: LanguageEnum::PARAM_ERROR);
+            }
+            return $def;
+        }
+
         $post = $request->post;
         if (empty($post)) {
             $post = json_decode($request->getContent(), true);
@@ -144,6 +158,10 @@ class Request
     public static function getHeader(string $key, mixed $def = null): mixed
     {
         $request = CtxEnum::Request->get();
+        if (!$request) {
+            return $def;
+        }
+
         $header = $request->header ?: [];
         if (isset($header[$key])) {
             return $request->header[$key];
@@ -153,4 +171,3 @@ class Request
     }
 
 }
-

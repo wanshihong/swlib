@@ -275,22 +275,7 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
         $table = new $this->pageConfig->tableName();
 
         $priName = $table->getPrimaryKey();
-        $idName = $table->getPrimaryKeyOriginal();
-        $method = $this->request->getMethod();
-
-        if ($method === 'POST') {
-            try {
-                $priValue = $this->post($priName);
-            } catch (Throwable) {
-                $priValue = $this->post($idName);
-            }
-        } else {
-            try {
-                $priValue = $this->get($priName);
-            } catch (Throwable) {
-                $priValue = $this->get($idName);
-            }
-        }
+        $priValue = $this->get($table->getPrimaryKeyOriginal());
 
         list($fields, $queryFields) = $this->fieldsConfig->frameworkGetFormFields();
 
@@ -299,7 +284,7 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
         $this->join($query);
         $this->editQuery($query);
         $findDto = $query->selectOne();
-
+        $method = $this->request->getMethod();
         if ($method === 'POST') {
             /** @var TableInterface $table */
             $table = new $this->pageConfig->tableName();

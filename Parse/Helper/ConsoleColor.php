@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Swlib\Parse\Helper;
 
+use Generate\ConfigEnum;
 use Throwable;
 
 /**
@@ -63,6 +64,10 @@ class ConsoleColor
      */
     public static function write(string $text, string $color = '', bool $newline = true): void
     {
+        if (!self::shouldOutputNormal()) {
+            return;
+        }
+
         if (self::isColorSupported() && !empty($color)) {
             echo $color . $text . self::COLOR_RESET;
         } else {
@@ -200,5 +205,14 @@ class ConsoleColor
         }
 
         fwrite(STDERR, $errorOutput);
+    }
+
+    private static function shouldOutputNormal(): bool
+    {
+        if (!class_exists(ConfigEnum::class)) {
+            return true;
+        }
+
+        return ConfigEnum::APP_PROD === false;
     }
 }

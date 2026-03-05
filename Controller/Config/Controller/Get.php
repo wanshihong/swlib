@@ -19,7 +19,6 @@ class Get extends AbstractController
     public function run(ConfigListsProto $request): ConfigListsProto
     {
         $arr = $request->getLists();
-        var_dump($arr);
         $nodes = [];
         foreach ($arr as $item) {
             $key = $item->getKey();

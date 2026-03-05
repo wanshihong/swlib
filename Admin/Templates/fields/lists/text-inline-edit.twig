@@ -1,11 +1,11 @@
 {% if getCurrentAction()=='lists' %}
-    <div class="input-group input-group-sm list-text-inline-wrap" style="min-width: 90px;">
+    <div class="input-group input-group-sm list-text-inline-wrap" style="min-width: 90px;max-width: 120px">
         <input type="text"
                class="form-control list-text-inline-input rounded-0"
                value="{{ value|default('') }}"
                data-original-value="{{ value|default('') }}"
                data-field="{{ field.field }}"
-               data-pri-field-name="{{ row.priFieldName }}"
+               data-pri-field-name="{{ field.getFieldByAs(row.priFieldName) }}"
                data-pri-field-value="{{ field.getValue('id') }}"
                data-url="{{ field.listInlineEditUrl }}"
         >

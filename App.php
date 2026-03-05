@@ -40,7 +40,7 @@ class App
     public function __construct()
     {
         // 解析配置文件
-        echo "正在解析配置文件..." . PHP_EOL;
+        ConsoleColor::writeInfo('正在解析配置文件...');
         $stepStartTime = microtime(true);
 
         run(fn: function () {
@@ -48,17 +48,17 @@ class App
             new ValidationDatabaseConfig();
         });
 
-        echo "解析配置文件完成，耗时: " . round(microtime(true) - $stepStartTime, 4) . "秒" . PHP_EOL;
+        ConsoleColor::writeSuccess('解析配置文件完成，耗时: ' . round(microtime(true) - $stepStartTime, 4) . '秒');
 
         // 验证配置
-        echo "正在验证配置..." . PHP_EOL;
+        ConsoleColor::writeInfo('正在验证配置...');
         $stepStartTime = microtime(true);
 
         run(fn: function () {
             ConfigValidator::validate();
         });
 
-        echo "配置验证完成，耗时: " . round(microtime(true) - $stepStartTime, 4) . "秒" . PHP_EOL;
+        ConsoleColor::writeSuccess('配置验证完成，耗时: ' . round(microtime(true) - $stepStartTime, 4) . '秒');
 
 
         // 创建运行目录
@@ -160,8 +160,7 @@ class App
                     $this->parseInProcess();
                 });
             } catch (Throwable $e) {
-                fwrite(STDERR, "[parse] " . $e->getMessage() . PHP_EOL);
-                fwrite(STDERR, $e->getTraceAsString() . PHP_EOL);
+                ConsoleColor::writeErrorToStderr('[parse] ' . $e->getMessage(), $e);
                 exit(1);
             }
         });
@@ -172,7 +171,7 @@ class App
         // 等待解析进程完成
         $parseResult = \Swoole\Process::wait();
         if ($parseResult['code'] !== 0) {
-            echo "解析进程执行失败，退出码：{$parseResult['code']}" . PHP_EOL;
+            ConsoleColor::writeErrorToStderr("解析进程执行失败，退出码：{$parseResult['code']}");
             exit($parseResult['code']);
         }
 
@@ -204,4 +203,3 @@ class App
 
 
 }
-

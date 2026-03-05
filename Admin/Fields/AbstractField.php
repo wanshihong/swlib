@@ -2,6 +2,7 @@
 
 namespace Swlib\Admin\Fields;
 
+use Exception;
 use Swlib\Admin\Interface\PermissionInterface;
 use Swlib\Admin\Trait\AttrTrait;
 use Swlib\Admin\Trait\Field\FieldFrameworkTrait;
@@ -254,7 +255,15 @@ abstract class AbstractField implements PermissionInterface
         }
 
         return array_find($this->row, fn($v, $k) => $k == $field);
+    }
 
+    /**
+     * 根据别名获取到数据字段名称
+     * @throws Exception
+     */
+    public function getFieldByAs(string $asName): string
+    {
+        return Db::getFieldNameByAs(fieldAs: $asName, onlyField: true);
     }
 
 }

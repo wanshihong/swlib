@@ -35,7 +35,7 @@ trait FuncTrait
      */
     public function getPrimaryKeyOriginal(): string
     {
-        return explode('.', Db::getFieldNameByAs(static::PRI_KEY, self::DATABASES))[1];
+        return Db::getFieldNameByAs(fieldAs: static::PRI_KEY, dbName: self::DATABASES, onlyField: true);
     }
 
     /**

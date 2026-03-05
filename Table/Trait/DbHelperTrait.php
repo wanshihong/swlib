@@ -8,39 +8,40 @@ use Swlib\Connect\PoolMysqli;
 use Swlib\Controller\Language\Enum\LanguageEnum;
 use Swlib\Exception\AppException;
 use Swlib\Table\Expression;
-use Throwable;
 
 trait DbHelperTrait
 {
 
     /**
      * 根据数据库字段别名获取字段名称
-     * @param string $fieldAs
-     * @param string $dbName
+     * @param string $fieldAs 字段别名
+     * @param string $dbName 数据库名称
+     * @param bool $onlyField 是否只返回字段名称,不包含数据库名称,默认是返回 table.field  为 true 就只返回 field
      * @return string
-     * @throws Exception
+     * @throws AppException
      */
-    public static function getFieldNameByAs(string $fieldAs, string $dbName = 'default'): string
+    public static function getFieldNameByAs(string $fieldAs, string $dbName = 'default', bool $onlyField = false): string
     {
-        try {
-            // 优先进行查找返回，因为这个频率是最高的
-            return self::_getFieldNameByAs($fieldAs, $dbName);
-        } catch (Throwable) {
-            // 没有找到，证明有特殊的操作
-            throw new AppException(LanguageEnum::DB_FIELD_NOT_FOUND_IN_ALIAS . ": $fieldAs");
+        $field = self::_getFieldNameByAs($fieldAs, $dbName);
+        if ($onlyField) {
+            if (str_contains($field, '.')) {
+                $field = explode('.', $field);
+                return end($field);
+            }
         }
+        return $field;
 
     }
 
     /**
      * 根据字段别名获取 数据库字段名
-     * @throws Exception
+     * @throws AppException
      */
     private static function _getFieldNameByAs(string $fieldAs, string $dbName = 'default'): string
     {
         $dbName = PoolMysqli::getDbName($dbName);
         if (!isset(TableFieldMap::maps[$dbName][$fieldAs])) {
-            throw new AppException(LanguageEnum::DB_FIELD_NOT_FOUND_IN_DEFINITION . ": $fieldAs");
+            throw new AppException(LanguageEnum::DB_FIELD_NOT_FOUND_IN_DEFINITION ,['field' => $fieldAs]);
         }
         return TableFieldMap::maps[$dbName][$fieldAs];
     }

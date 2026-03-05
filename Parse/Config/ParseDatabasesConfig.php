@@ -21,7 +21,6 @@ class ParseDatabasesConfig
     public function __construct()
     {
         self::generateConfigMapFromDb();
-        echo "ConfigMap 文件已生成: " . ROOT_DIR . "runtime/Generate/ConfigMap.php" . PHP_EOL;
     }
 
     /**
