@@ -1,0 +1,35 @@
+<div class="row mb-3">
+    <label for="{{ field.elemId }}"
+           class="col-sm-2 col-form-label text-end {% for class in field.classes %}{{ class }}{% endfor %}">
+        {{ field.label }}
+    </label>
+    <div class="col-sm-10">
+        <input type="hidden"
+               id="{{ field.elemId }}"
+               name="{{ field.field }}"
+               value="{{ field.value.start }},{{ field.value.end }}"
+               data-range-hidden="1">
+        <div class="row g-2" data-range-field="{{ field.elemId }}">
+            <div class="col-sm-6">
+                <input type="number"
+                       class="form-control rounded-0"
+                       value="{{ field.value.start }}"
+                       placeholder="{{ lang('请输入') }}{{ field.label }}{{ lang('开始值') }}"
+                       data-range-part="start">
+            </div>
+            <div class="col-sm-6">
+                <input type="number"
+                       class="form-control rounded-0"
+                       value="{{ field.value.end }}"
+                       placeholder="{{ lang('请输入') }}{{ field.label }}{{ lang('结束值') }}"
+                       data-range-part="end">
+            </div>
+        </div>
+        <div class="invalid-feedback">
+            {{ lang('请输入') }}{{ field.label }}
+        </div>
+        {% if field.helpText %}
+            <div class="form-text">{{ field.helpText|raw }}</div>
+        {% endif %}
+    </div>
+</div>

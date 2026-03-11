@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Swlib\Admin\Action;
 
+use ReflectionClass;
 use Swlib\Admin\Action\Attribute\ActionButton;
 use Swlib\Admin\Action\Attribute\BatchAction;
 use Swlib\Admin\Config\PageConfig;
@@ -39,13 +40,9 @@ class BatchActionCollector
         $currentClassName = $reflectionClass->getName();
 
 
-        // 收集控制器类上的 BatchAction 注解
-        $classAttributes = $reflectionClass->getAttributes(BatchAction::class);
-        foreach ($classAttributes as $attribute) {
-            /** @var BatchAction $batchAction */
-            $batchAction = $attribute->newInstance();
+        // 收集控制器类及父类上的 BatchAction 注解，子类同 URL 优先
+        foreach (self::collectClassLevelAttributes($reflectionClass, BatchAction::class) as $batchAction) {
             if ($batchAction->enable && AdminUserManager::hasPermissions($batchAction->allowRoles)) {
-                // 类级别的注解，URL 作为唯一标识，需要格式化 URL 以便比较
                 $normalizedUrl = self::normalizeUrl($batchAction->url);
                 if (!isset($urlMap[$normalizedUrl])) {
                     $urlMap[$normalizedUrl] = [
@@ -111,6 +108,40 @@ class BatchActionCollector
     }
 
     /**
+     * 沿继承链收集类级别注解，子类优先，同 URL 去重
+     *
+     * @template T of object
+     * @param ReflectionClass $reflectionClass
+     * @param class-string<T> $attributeClass
+     * @return array<int, T>
+     */
+    private static function collectClassLevelAttributes(ReflectionClass $reflectionClass, string $attributeClass): array
+    {
+        $attributes = [];
+        $urlMap = [];
+        $current = $reflectionClass;
+
+        while ($current !== false) {
+            foreach ($current->getAttributes($attributeClass) as $attribute) {
+                $instance = $attribute->newInstance();
+                $normalizedUrl = self::normalizeUrl($instance->url ?? '');
+                if (!isset($urlMap[$normalizedUrl])) {
+                    $urlMap[$normalizedUrl] = true;
+                    $attributes[] = $instance;
+                }
+            }
+
+            $current = $current->getParentClass();
+        }
+
+        usort($attributes, static function ($a, $b) {
+            return $a->sort <=> $b->sort;
+        });
+
+        return $attributes;
+    }
+
+    /**
      * 判断 $childClass 是否是 $parentClass 的子类
      *
      * @param string $childClass 子类名称
@@ -158,4 +189,3 @@ class BatchActionCollector
     }
 
 }
-

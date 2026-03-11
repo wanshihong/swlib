@@ -4,6 +4,8 @@ namespace Swlib\Admin\Controller;
 
 use Generate\Tables\Main\ConfigTable;
 use Generate\TablesDto\Main\ConfigTableDto;
+use Swlib\Admin\Action\Attribute\ActionButton;
+use Swlib\Admin\Action\Enum\ActionPosEnum;
 use Swlib\Admin\Config\PageConfig;
 use Swlib\Admin\Config\PageFieldsConfig;
 use Swlib\Admin\Controller\Abstract\AbstractAdmin;
@@ -12,6 +14,7 @@ use Swlib\Admin\Fields\ColorField;
 use Swlib\Admin\Fields\ImageField;
 use Swlib\Admin\Fields\Int2TimeField;
 use Swlib\Admin\Fields\NumberField;
+use Swlib\Admin\Fields\RangeField;
 use Swlib\Admin\Fields\SelectField;
 use Swlib\Admin\Fields\SwitchField;
 use Swlib\Admin\Fields\TextareaField;
@@ -22,9 +25,15 @@ use Swlib\Controller\Config\Service\ConfigService;
 use Swlib\Table\Interface\TableInterface;
 use Throwable;
 
+
+#[ActionButton(
+    label: '编辑2',
+    url: 'edit',
+    params: [ConfigTable::VALUE_TYPE => '%' . ConfigTable::VALUE_TYPE],
+    showOn: [ActionPosEnum::LISTS_PAGE_ROW],
+)]
 class ConfigAdmin extends AbstractAdmin
 {
-
 
 
     protected function configPage(PageConfig $config): void
@@ -50,15 +59,17 @@ class ConfigAdmin extends AbstractAdmin
     protected function configField(PageFieldsConfig $fields): void
     {
         $valueType = $this->get(ConfigTable::VALUE_TYPE, '', 'txt');
-        if ($valueType === 'txt') {
+        if ($valueType === ConfigService::VALUE_TYPE_TXT) {
             $valueConfig = new TextareaField(field: ConfigTable::VALUE, label: '配置')->hideOnFilter();
-        } elseif ($valueType === 'time') {
+        } elseif ($valueType === ConfigService::VALUE_TYPE_TIME) {
             $valueConfig = new Int2TimeField(field: ConfigTable::VALUE, label: '配置')->hideOnFilter();
-        } elseif ($valueType === 'number') {
+        } elseif ($valueType === ConfigService::VALUE_TYPE_NUMBER) {
             $valueConfig = new NumberField(field: ConfigTable::VALUE, label: '配置')->hideOnFilter();
-        } elseif ($valueType === 'url') {
+        } elseif ($valueType === ConfigService::VALUE_TYPE_RANGE) {
+            $valueConfig = new RangeField(field: ConfigTable::VALUE, label: '配置')->hideOnFilter();
+        } elseif ($valueType === ConfigService::VALUE_TYPE_URL) {
             $valueConfig = new UrlField(field: ConfigTable::VALUE, label: '配置')->hideOnFilter();
-        } elseif ($valueType === 'color') {
+        } elseif ($valueType === ConfigService::VALUE_TYPE_COLOR) {
             $valueConfig = new ColorField(field: ConfigTable::VALUE, label: '配置')->hideOnFilter();
         } else {
             $valueConfig = new ImageField(field: ConfigTable::VALUE, label: '配置')->hideOnFilter();
@@ -69,6 +80,7 @@ class ConfigAdmin extends AbstractAdmin
         $typeField = new SelectField(field: ConfigTable::VALUE_TYPE, label: '配置类型')->hideOnFilter()->setOptions(
             new OptionManager('txt', '文本'),
             new OptionManager('number', '数字'),
+            new OptionManager('range', '范围'),
             new OptionManager('url', '链接'),
             new OptionManager('image', '图片'),
             new OptionManager('time', '时间'),
@@ -100,7 +112,7 @@ class ConfigAdmin extends AbstractAdmin
      */
     public function insertUpdateAfter(ConfigTableDto $dto): void
     {
-        ConfigService::clearCache($dto->key);
+        ConfigService::clearCache();
     }
 
 

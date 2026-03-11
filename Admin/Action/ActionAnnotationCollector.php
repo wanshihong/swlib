@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Swlib\Admin\Action;
 
+use ReflectionClass;
 use Swlib\Admin\Action\Attribute\ActionButton;
 use Swlib\Admin\Action\Enum\ActionPosEnum;
 use Swlib\Admin\Config\PageConfig;
@@ -41,13 +42,9 @@ class ActionAnnotationCollector
         $reflectionClass = ReflectionManager::getClass($controllerInstance);
         $currentClassName = $reflectionClass->getName();
 
-        // 收集控制器类上的 ActionButton 注解
-        $classAttributes = $reflectionClass->getAttributes(ActionButton::class);
-        foreach ($classAttributes as $attribute) {
-            /** @var ActionButton $actionButton */
-            $actionButton = $attribute->newInstance();
+        // 收集控制器类及父类上的 ActionButton 注解，子类同 URL 优先
+        foreach (self::collectClassLevelAttributes($reflectionClass, ActionButton::class) as $actionButton) {
             if ($actionButton->enable && in_array($pos, $actionButton->showOn) && AdminUserManager::hasPermissions($actionButton->allowRoles)) {
-                // 类级别的注解，URL 作为唯一标识，需要格式化 URL 以便比较
                 $normalizedUrl = self::normalizeUrl($actionButton->url);
                 if (!isset($urlMap[$normalizedUrl])) {
                     $urlMap[$normalizedUrl] = [
@@ -123,6 +120,40 @@ class ActionAnnotationCollector
         self::addStaticFilesToPage($controllerInstance->pageConfig, $actions);
 
         return $actions;
+    }
+
+    /**
+     * 沿继承链收集类级别注解，子类优先，同 URL 去重
+     *
+     * @template T of object
+     * @param ReflectionClass $reflectionClass
+     * @param class-string<T> $attributeClass
+     * @return array<int, T>
+     */
+    private static function collectClassLevelAttributes(ReflectionClass $reflectionClass, string $attributeClass): array
+    {
+        $attributes = [];
+        $urlMap = [];
+        $current = $reflectionClass;
+
+        while ($current !== false) {
+            foreach ($current->getAttributes($attributeClass) as $attribute) {
+                $instance = $attribute->newInstance();
+                $normalizedUrl = self::normalizeUrl($instance->url ?? '');
+                if (!isset($urlMap[$normalizedUrl])) {
+                    $urlMap[$normalizedUrl] = true;
+                    $attributes[] = $instance;
+                }
+            }
+
+            $current = $current->getParentClass();
+        }
+
+        usort($attributes, static function ($a, $b) {
+            return $a->sort <=> $b->sort;
+        });
+
+        return $attributes;
     }
 
     /**

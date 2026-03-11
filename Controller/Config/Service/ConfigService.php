@@ -14,6 +14,14 @@ use Throwable;
 
 class ConfigService
 {
+    public const string VALUE_TYPE_TXT = 'txt';
+    public const string VALUE_TYPE_NUMBER = 'number';
+    public const string VALUE_TYPE_URL = 'url';
+    public const string VALUE_TYPE_IMAGE = 'image';
+    public const string VALUE_TYPE_TIME = 'time';
+    public const string VALUE_TYPE_COLOR = 'color';
+    public const string VALUE_TYPE_RANGE = 'range';
+
     /**
      * 监听到配置发生改变，重新生成静态文件
      */
@@ -54,8 +62,11 @@ class ConfigService
             } elseif ($checkEnable && $config['is_enable'] != 1) {
                 $ret[$k] = $default;
             } else {
-                $value = $config['value'];
-                $ret[$k] = is_numeric($value) ? $value : (empty($value) ? $default : $value);
+                $ret[$k] = self::parseValueByType(
+                    value: $config['value'] ?? null,
+                    valueType: (string)($config['value_type'] ?? self::VALUE_TYPE_TXT),
+                    default: $default
+                );
             }
         }
 
@@ -75,6 +86,26 @@ class ConfigService
     public static function clearCache(): void
     {
         ConfigMap::$configs = [];
+        new ParseDatabasesConfig();
+    }
+
+    public static function parseValueByType(mixed $value, string $valueType, mixed $default = null): mixed
+    {
+        return match ($valueType) {
+            self::VALUE_TYPE_NUMBER => self::parseNumberValue($value, $default),
+            self::VALUE_TYPE_RANGE => self::parseRangeValue($value, $default),
+            default => self::parseDefaultValue($value, $default),
+        };
+    }
+
+    public static function parseRowValue(array|object $row, mixed $default = null): mixed
+    {
+        $value = is_array($row) ? ($row['value'] ?? null) : ($row->value ?? null);
+        $valueType = is_array($row)
+            ? (string)($row['value_type'] ?? $row['valueType'] ?? self::VALUE_TYPE_TXT)
+            : (string)($row->valueType ?? $row->value_type ?? self::VALUE_TYPE_TXT);
+
+        return self::parseValueByType($value, $valueType, $default);
     }
 
     /**
@@ -112,10 +143,81 @@ class ConfigService
         new ParseDatabasesConfig();
 
         if ($config->isEnable == 1) {
-            $ret = $config->value;
-            return is_numeric($ret) ? $ret : (empty($ret) ? $default : $ret);
+            return self::parseValueByType(
+                value: $config->value,
+                valueType: (string)$config->valueType,
+                default: $default
+            );
         }
 
         return $default;
+    }
+
+    private static function parseDefaultValue(mixed $value, mixed $default): mixed
+    {
+        if (is_numeric($value)) {
+            return self::parseNumberString((string)$value);
+        }
+
+        return empty($value) ? $default : $value;
+    }
+
+    private static function parseNumberValue(mixed $value, mixed $default): mixed
+    {
+        if (!is_numeric($value)) {
+            return $default;
+        }
+
+        return self::parseNumberString((string)$value);
+    }
+
+    private static function parseRangeValue(mixed $value, mixed $default): mixed
+    {
+        if (is_array($value) && count($value) === 2) {
+            $parts = array_values($value);
+        } else {
+            $raw = trim((string)$value);
+            if ($raw === '') {
+                return self::normalizeRangeDefault($default);
+            }
+
+            $parts = preg_split('/\s*,\s*/', $raw);
+        }
+
+        if (!is_array($parts) || count($parts) !== 2) {
+            return self::normalizeRangeDefault($default);
+        }
+
+        [$startRaw, $endRaw] = $parts;
+        if (!is_numeric($startRaw) || !is_numeric($endRaw)) {
+            return self::normalizeRangeDefault($default);
+        }
+
+        $start = self::parseNumberString((string)$startRaw);
+        $end = self::parseNumberString((string)$endRaw);
+
+        return $start <= $end ? [$start, $end] : [$end, $start];
+    }
+
+    private static function normalizeRangeDefault(mixed $default): mixed
+    {
+        if (!is_array($default) || count($default) !== 2) {
+            return $default;
+        }
+
+        [$startRaw, $endRaw] = array_values($default);
+        if (!is_numeric($startRaw) || !is_numeric($endRaw)) {
+            return $default;
+        }
+
+        $start = self::parseNumberString((string)$startRaw);
+        $end = self::parseNumberString((string)$endRaw);
+
+        return $start <= $end ? [$start, $end] : [$end, $start];
+    }
+
+    private static function parseNumberString(string $value): int|float
+    {
+        return str_contains($value, '.') ? (float)$value : (int)$value;
     }
 }

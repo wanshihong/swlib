@@ -32,7 +32,7 @@ use Swlib\Admin\Manager\AdminUserManager;
  *     return JsonResponse::success();
  * }
  */
-#[Attribute(Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 class BatchAction
 {
     /**
@@ -67,4 +67,3 @@ class BatchAction
         $this->jsFiles[] = '/admin/js/batch-action.js';
     }
 }
-
