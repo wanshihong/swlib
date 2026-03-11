@@ -2,6 +2,28 @@
 
 SWLib 框架深度集成了 Google Protocol Buffers (Protobuf)，用于高效的 API 数据序列化。框架会根据数据库表结构自动生成 Protobuf 定义文件（.proto）并编译为 PHP 类。
 
+### 快速入口
+
+- 理解生成机制：看 `17.2`
+- 字段映射与扩展：看 `17.3` 到 `17.5`
+- 控制器里返回 protobuf：看 `17.6`
+
+### 常见误用
+
+- 频繁变更字段编号造成兼容问题
+- 直接改编译产物而非源 proto
+
+### 关联源码
+
+- `Swlib/Response/ProtobufResponse.php`
+- `Swlib/Router/Router.php`
+- `Swlib/Parse/Table/ParseTableProtoc.php`
+
+### 排障索引
+
+- 请求解析失败：检查 content-type 与消息定义匹配
+- 前端解码异常：检查 proto 版本与字段类型一致性
+
 ### 17.1 概述
 
 #### 什么是 Protobuf

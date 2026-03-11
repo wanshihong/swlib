@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SWLib 单页手册</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #202437;
+      --muted: #6f778a;
+      --line: #e5e8f0;
+      --brand: #2962ff;
+      --code-bg: #111827;
+      --code-text: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      max-height: 100vh;
+      overflow: auto;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      padding: 18px 16px 24px;
+    }
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 12px;
+    }
+    .search {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .nav-group {
+      margin: 14px 0 6px;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .nav-link {
+      display: block;
+      text-decoration: none;
+      color: var(--text);
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin: 1px 0;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: #edf2ff;
+      color: var(--brand);
+    }
+    .main {
+      padding: 28px 40px 90px;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 16px;
+    }
+    .doc-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 0 0 20px;
+    }
+    .doc-card h1 {
+      margin-top: 0;
+      font-size: 26px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+    }
+    .doc-card h2, .doc-card h3, .doc-card h4 {
+      margin-top: 22px;
+      margin-bottom: 10px;
+    }
+    p, li { line-height: 1.7; }
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 12px;
+      border-radius: 8px;
+      overflow: auto;
+      white-space: pre;
+    }
+    code {
+      background: #eef1f8;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      font-size: 12px;
+      color: inherit;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 12px 0;
+      font-size: 14px;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      text-align: left;
+      padding: 8px 10px;
+      vertical-align: top;
+    }
+    blockquote {
+      margin: 14px 0;
+      border-left: 4px solid #d6defa;
+      padding: 4px 0 4px 12px;
+      color: #4e5a78;
+      background: #f8faff;
+    }
+    .top-btn {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(31, 45, 61, 0.08);
+    }
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+        max-height: none;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .main {
+        padding: 20px 14px 80px;
+      }
+      .doc-card {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h1 class="title">SWLib 手册</h1>
+      <input id="searchInput" class="search" placeholder="搜索标题..." />
+      <div id="nav"></div>
+    </aside>
+    <main class="main">
+      <p class="meta" id="meta"></p>
+      <div id="content"></div>
+    </main>
+  </div>
+  <button class="top-btn" id="topBtn">返回顶部</button>
+
+  <script id="payload" type="application/json">__DOC_PAYLOAD__</script>
+  <script>
+    const payload = JSON.parse(document.getElementById("payload").textContent);
+    const nav = document.getElementById("nav");
+    const content = document.getElementById("content");
+    const searchInput = document.getElementById("searchInput");
+    const meta = document.getElementById("meta");
+
+    meta.textContent = `生成时间: ${payload.generated_at}  文档数: ${payload.docs.length}`;
+
+    function escHtml(s) {
+      return s
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function inline(text) {
+      return text
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+    }
+
+    function slugify(text) {
+      return text
+        .toLowerCase()
+        .replace(/<[^>]*>/g, "")
+        .replace(/[^\u4e00-\u9fa5a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .replace(/-+/g, "-");
+    }
+
+    function renderTable(lines, i) {
+      if (i + 1 >= lines.length) return null;
+      const head = lines[i];
+      const sep = lines[i + 1];
+      if (!/\|/.test(head) || !/^\s*\|?[\s:-]+\|[\s|:-]*$/.test(sep)) return null;
+      let j = i + 2;
+      const rows = [];
+      while (j < lines.length && /\|/.test(lines[j])) {
+        rows.push(lines[j]);
+        j += 1;
+      }
+      const cells = line => line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(x => x.trim());
+      const th = cells(head).map(x => `<th>${inline(escHtml(x))}</th>`).join("");
+      const tb = rows.map(r => `<tr>${cells(r).map(x => `<td>${inline(escHtml(x))}</td>`).join("")}</tr>`).join("");
+      return { html: `<table><thead><tr>${th}</tr></thead><tbody>${tb}</tbody></table>`, next: j };
+    }
+
+    function renderMarkdown(md, sectionId) {
+      const lines = md.replace(/\r\n/g, "\n").split("\n");
+      const out = [];
+      let i = 0;
+      let inCode = false;
+      let listType = null;
+      let usedIds = new Map();
+
+      function closeList() {
+        if (listType === "ul") out.push("</ul>");
+        if (listType === "ol") out.push("</ol>");
+        listType = null;
+      }
+
+      function nextId(base) {
+        const n = (usedIds.get(base) || 0) + 1;
+        usedIds.set(base, n);
+        return n === 1 ? base : `${base}-${n}`;
+      }
+
+      while (i < lines.length) {
+        const line = lines[i];
+
+        if (line.startsWith("```")) {
+          closeList();
+          if (!inCode) {
+            inCode = true;
+            out.push("<pre><code>");
+          } else {
+            inCode = false;
+            out.push("</code></pre>");
+          }
+          i += 1;
+          continue;
+        }
+
+        if (inCode) {
+          out.push(escHtml(line) + "\n");
+          i += 1;
+          continue;
+        }
+
+        const table = renderTable(lines, i);
+        if (table) {
+          closeList();
+          out.push(table.html);
+          i = table.next;
+          continue;
+        }
+
+        const hm = line.match(/^(#{1,6})\s+(.*)$/);
+        if (hm) {
+          closeList();
+          const level = hm[1].length;
+          const text = inline(escHtml(hm[2].trim()));
+          const id = nextId(`${sectionId}-${slugify(hm[2]) || "section"}`);
+          out.push(`<h${level} id="${id}">${text}</h${level}>`);
+          i += 1;
+          continue;
+        }
+
+        if (/^\s*[-*]\s+/.test(line)) {
+          const item = line.replace(/^\s*[-*]\s+/, "");
+          if (listType !== "ul") {
+            closeList();
+            listType = "ul";
+            out.push("<ul>");
+          }
+          out.push(`<li>${inline(escHtml(item))}</li>`);
+          i += 1;
+          continue;
+        }
+
+        if (/^\s*\d+\.\s+/.test(line)) {
+          const item = line.replace(/^\s*\d+\.\s+/, "");
+          if (listType !== "ol") {
+            closeList();
+            listType = "ol";
+            out.push("<ol>");
+          }
+          out.push(`<li>${inline(escHtml(item))}</li>`);
+          i += 1;
+          continue;
+        }
+
+        if (line.startsWith("> ")) {
+          closeList();
+          out.push(`<blockquote>${inline(escHtml(line.slice(2)))}</blockquote>`);
+          i += 1;
+          continue;
+        }
+
+        if (/^\s*---+\s*$/.test(line)) {
+          closeList();
+          out.push("<hr>");
+          i += 1;
+          continue;
+        }
+
+        if (line.trim() === "") {
+          closeList();
+          i += 1;
+          continue;
+        }
+
+        closeList();
+        out.push(`<p>${inline(escHtml(line))}</p>`);
+        i += 1;
+      }
+      closeList();
+      return out.join("\n");
+    }
+
+    function build() {
+      const navLinks = [];
+      let currentGroup = "";
+      let body = "";
+      for (const doc of payload.docs) {
+        if (doc.group !== currentGroup) {
+          currentGroup = doc.group;
+          navLinks.push(`<div class="nav-group">${doc.group}</div>`);
+        }
+        const sid = `doc-${slugify(doc.file.replace(/\.md$/, ""))}`;
+        navLinks.push(`<a class="nav-link" data-title="${doc.title}" href="#${sid}">${doc.title}</a>`);
+        body += `<section class="doc-card" id="${sid}">${renderMarkdown(doc.markdown, sid)}</section>`;
+      }
+      nav.innerHTML = navLinks.join("\n");
+      content.innerHTML = body;
+    }
+
+    function bindSearch() {
+      const links = Array.from(document.querySelectorAll(".nav-link"));
+      searchInput.addEventListener("input", () => {
+        const q = searchInput.value.trim().toLowerCase();
+        for (const link of links) {
+          const txt = (link.dataset.title || "").toLowerCase();
+          link.style.display = q === "" || txt.includes(q) ? "block" : "none";
+        }
+      });
+    }
+
+    function bindActive() {
+      const links = Array.from(document.querySelectorAll(".nav-link"));
+      window.addEventListener("scroll", () => {
+        let current = null;
+        for (const link of links) {
+          const id = link.getAttribute("href").slice(1);
+          const el = document.getElementById(id);
+          if (!el) continue;
+          const top = el.getBoundingClientRect().top;
+          if (top <= 140) current = link;
+        }
+        for (const l of links) l.classList.remove("active");
+        if (current) current.classList.add("active");
+      }, { passive: true });
+    }
+
+    document.getElementById("topBtn").addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    build();
+    bindSearch();
+    bindActive();
+  </script>
+</body>
+</html>

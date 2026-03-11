@@ -2,6 +2,28 @@
 
 SWLib 提供了强大的 ORM 系统，支持自动代码生成、类型安全、复杂查询等特性。
 
+### 快速入口
+
+- 查单表查询语法：看 `3.2`、`3.3`
+- 处理事务：看 `3.6`
+- 处理慢 SQL / 缓存：看 `3.7` 与 `13-连接池管理.md`
+
+### 常见误用
+
+- 在事务中跨数据库执行查询（会触发跨库异常）
+- 在列表场景无节制 `selectAll()` 大字段导致内存飙升
+
+### 关联源码
+
+- `Swlib/Table/Db.php`
+- `Swlib/Table/Trait/TransactionTrait.php`
+- `Swlib/Table/QueryBuild.php`
+
+### 排障索引
+
+- 报错 `DB_TRANSACTION_CROSS_DB`：事务内查询库名不一致
+- 参数绑定异常：检查 `where` 条件结构与占位符匹配
+
 ### 3.1 核心概念
 
 #### Table 类
