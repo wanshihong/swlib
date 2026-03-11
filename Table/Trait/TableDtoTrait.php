@@ -68,7 +68,11 @@ trait TableDtoTrait
         $result = [];
 
         foreach ($this->__row as $asName => $value) {
-            $propertyName = Db::getFieldNameByAs($asName, self::TABLE_CLASS::DATABASES);
+            try {
+                $propertyName = Db::getFieldNameByAs($asName, self::TABLE_CLASS::DATABASES);
+            } catch (Throwable) {
+                $propertyName = $asName;
+            }
             $result[$propertyName] = $value;
         }
 

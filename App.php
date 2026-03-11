@@ -21,10 +21,12 @@ use Swlib\Parse\ParseDevTool;
 use Swlib\Parse\ParseEvent;
 use Swlib\Parse\ParseI18n;
 use Swlib\Parse\ParseProcess;
+use Swlib\Parse\ParseProjectInit;
 use Swlib\Parse\Router\ParseRouter;
 use Swlib\Parse\Table\ParseTable;
 use Swlib\Parse\Table\TableBack;
 use Swlib\Process\Process;
+use Swlib\ProjectInit\ProjectInitRunner;
 use Swlib\ServerEvents\ServerEventManager;
 use Swlib\Utils\DevSslCert;
 use Swlib\Utils\File;
@@ -114,6 +116,7 @@ class App
             ['name' => '复制 Proto 文件', 'action' => static fn() => new CopyProtoFile()],
             ['name' => '解析自定义进程', 'action' => static fn() => new ParseProcess()],
             ['name' => '解析定时任务', 'action' => static fn() => new ParseCrontab()],
+            ['name' => '解析项目启动初始化', 'action' => static fn() => new ParseProjectInit()],
             ['name' => '解析事件管理器', 'action' => static fn() => new ParseEvent()],
             ['name' => '编译 AOP/Transaction 代理类', 'action' => static fn() => new AstCompiler()],
             ['name' => '备份数据库', 'action' => static fn() => new TableBack()],
@@ -197,6 +200,7 @@ class App
         // 添加 Crontab 调度器进程（独立的 Crontab 功能）
         CrontabScheduler::run($server);
 
+        ProjectInitRunner::run();
 
         $server->start();
     }

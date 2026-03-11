@@ -26,8 +26,10 @@ trait PageFrameworkTrait
         $fields = [];
         foreach ($this->fields as $item) {
             if (!$item->fieldShowList) continue;
-            $queryFields[] = $item->field;
             $fields[] = $item;
+            if ($item->frameworkShouldQueryField()) {
+                $queryFields[] = $item->field;
+            }
         }
 
         // 添加主键 到查询

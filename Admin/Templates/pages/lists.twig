@@ -3,7 +3,8 @@
 {% block pageTitle %}{{ pageConfig.pageName|striptags }}{% endblock %}
 
 {% block content %}
-    <form class="row">
+    <form class="row" action="{{ listRefreshUrl }}">
+        <input type="hidden" name="page" value="1">
 
         {% include 'pages/lists-filters.twig' %}
 

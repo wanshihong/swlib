@@ -10,6 +10,15 @@ use Throwable;
 
 trait FieldFrameworkTrait
 {
+    public function frameworkShouldQueryField(): bool
+    {
+        return true;
+    }
+
+    public function frameworkIsVirtualField(): bool
+    {
+        return false;
+    }
 
     /**
      * 表单编辑的时候，设置字段的值

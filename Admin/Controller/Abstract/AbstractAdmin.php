@@ -14,6 +14,7 @@ use Swlib\Admin\Controller\Helper\ControllerHelper;
 use Swlib\Admin\Controller\Interface\AdminControllerInterface;
 use Swlib\Admin\Fields\AbstractField;
 use Swlib\Admin\Fields\SelectField;
+use Swlib\Admin\Fields\VirtualField;
 use Swlib\Admin\Manager\ListRowManager;
 use Swlib\Admin\Middleware\AdminInitMiddleware;
 use Swlib\Admin\Middleware\PermissionsMiddleware;
@@ -160,12 +161,14 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
         $countQuery = clone $query;
         $total = $countQuery->count();
         $totalPage = ceil($total / $querySize);
+        $queryPage = self::resolveValidQueryPage($queryPage, $total, (int)$totalPage);
 
         // 查询出来数据
         $dbAll = $query->page($queryPage, $querySize)->selectAll();
 
         // 把 selectField 的列表查询提前，不然会导致 selectField 的每行一个查询
         ControllerHelper::selectFieldBeforeQuery($this->fieldsConfig->fields, $dbAll);
+        $this->resolveVirtualFields($dbAll, $query, $fields);
 
         // 收集列表页面的按钮
         $listsAction = ActionAnnotationCollector::collectFromPos($this, ActionPosEnum::LISTS_PAGE);
@@ -201,6 +204,128 @@ abstract class  AbstractAdmin extends AbstractController implements AdminControl
             'listRefreshUrl' => $this->listRefreshUrl,
             'batchActions' => $batchActions,
         ]);
+    }
+
+    /**
+     * @param AbstractField[] $fields
+     * @throws Throwable
+     */
+    private function resolveVirtualFields(TableDtoInterface $rows, TableInterface $query, array $fields): void
+    {
+        $virtualFields = array_values(array_filter(
+            $fields,
+            static fn(AbstractField $field): bool => $field->frameworkIsVirtualField()
+        ));
+
+        if ($virtualFields === []) {
+            return;
+        }
+
+        $this->resolveSimpleVirtualFields($rows, $virtualFields, $query);
+        $this->resolveGroupedVirtualFields($rows, $virtualFields, $query);
+    }
+
+    private static function resolveValidQueryPage(int $queryPage, int $total, int $totalPage): int
+    {
+        if ($total > 0 && $queryPage > $totalPage) {
+            return max(1, $totalPage);
+        }
+
+        return max(1, $queryPage);
+    }
+
+    /**
+     * @param AbstractField[] $virtualFields
+     * @throws Throwable
+     */
+    private function resolveSimpleVirtualFields(TableDtoInterface $rows, array $virtualFields, TableInterface $query): void
+    {
+        $simpleFields = array_values(array_filter(
+            $virtualFields,
+            static fn(AbstractField $field): bool => $field instanceof VirtualField
+                && $field->batchValueResolver !== null
+                && $field->batchLoader === null
+                && $field->batchRowValueResolver === null
+        ));
+
+        if ($simpleFields === []) {
+            return;
+        }
+
+        $rowTables = $rows->getRows();
+        $rowMaps = $this->normalizeVirtualFieldRows($rows->getDbFieldNameKeyRows());
+        $primaryKey = $query->getPrimaryKeyOriginal();
+
+        foreach ($simpleFields as $field) {
+            $resolvedValues = $field->resolveBatchValues($rowMaps, $this);
+            foreach ($rowTables as $index => $rowTable) {
+                $primaryValue = $rowMaps[$index][$primaryKey] ?? null;
+                $value = $resolvedValues[$primaryValue] ?? $field->default;
+                $rowTable->setByField($field->field, $value, false);
+            }
+        }
+    }
+
+    /**
+     * @param AbstractField[] $virtualFields
+     * @throws Throwable
+     */
+    private function resolveGroupedVirtualFields(TableDtoInterface $rows, array $virtualFields, TableInterface $query): void
+    {
+        $groupedFields = [];
+        foreach ($virtualFields as $field) {
+            if (!$field instanceof VirtualField) {
+                continue;
+            }
+            if ($field->batchLoader === null || $field->batchRowValueResolver === null) {
+                continue;
+            }
+            $groupedFields[$field->batchKey][] = $field;
+        }
+
+        if ($groupedFields === []) {
+            return;
+        }
+
+        $rowTables = $rows->getRows();
+        $rowMaps = $this->normalizeVirtualFieldRows($rows->getDbFieldNameKeyRows());
+
+        foreach ($groupedFields as $fieldsInGroup) {
+            /** @var VirtualField $firstField */
+            $firstField = $fieldsInGroup[0];
+            $loadedData = call_user_func($firstField->batchLoader, $rowMaps, $this);
+
+            foreach ($fieldsInGroup as $field) {
+                foreach ($rowTables as $index => $rowTable) {
+                    $rowMap = $rowMaps[$index] ?? [];
+                    $value = call_user_func($field->batchRowValueResolver, $rowMap, $loadedData, $this);
+                    $rowTable->setByField($field->field, $value ?? $field->default, false);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $rowMaps
+     * @return array<int,array<string,mixed>>
+     */
+    private function normalizeVirtualFieldRows(array $rowMaps): array
+    {
+        foreach ($rowMaps as $index => $rowMap) {
+            foreach ($rowMap as $key => $value) {
+                if (!str_contains($key, '.')) {
+                    continue;
+                }
+
+                $parts = explode('.', $key);
+                $shortKey = end($parts);
+                if (!array_key_exists($shortKey, $rowMaps[$index])) {
+                    $rowMaps[$index][$shortKey] = $value;
+                }
+            }
+        }
+
+        return $rowMaps;
     }
 
 

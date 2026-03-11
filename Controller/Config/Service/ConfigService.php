@@ -39,38 +39,21 @@ class ConfigService
 
     /**
      * 获取配置值
-     * @param string|array $key 配置键名，可以是单个字符串或者字符串数组
+     * @param string $key 配置键名
      * @param mixed $default 默认值
-     * @param bool $checkEnable 是否检查启用状态（默认 true）
-     * @param string $desc 默认说明（仅在未提供 descMap 时使用）
-     * @param array<string,string> $descMap 每个 key 对应的说明
-     * @return mixed 如果$key是字符串，返回单个配置值；如果$key是数组，返回关联数组[key=>value]
+     * @param string $desc 默认说明
+     * @param string $valueType 默认值类型
+     * @return mixed
      * @throws Throwable
      */
-    public static function get(string|array $key, mixed $default = null, bool $checkEnable = true, string $desc = '', array $descMap = []): mixed
+    public static function get(
+        string $key,
+        mixed $default = null,
+        string $desc = '',
+        string $valueType = self::VALUE_TYPE_TXT
+    ): mixed
     {
-        $keys = is_string($key) ? [$key] : $key;
-        $ret = [];
-
-        foreach ($keys as $k) {
-            $config = ConfigMap::$configs[$k] ?? null;
-
-            if ($config === null) {
-                // 静态文件不存在，尝试从数据库创建
-                $descForKey = $descMap[$k] ?? $desc;
-                $ret[$k] = self::createConfigFromDb($k, $default, $descForKey);
-            } elseif ($checkEnable && $config['is_enable'] != 1) {
-                $ret[$k] = $default;
-            } else {
-                $ret[$k] = self::parseValueByType(
-                    value: $config['value'] ?? null,
-                    valueType: (string)($config['value_type'] ?? self::VALUE_TYPE_TXT),
-                    default: $default
-                );
-            }
-        }
-
-        return is_string($key) ? $ret[$key] : $ret;
+        return self::getOne($key, $default, $desc, $valueType);
     }
 
     /**
@@ -108,16 +91,56 @@ class ConfigService
         return self::parseValueByType($value, $valueType, $default);
     }
 
+    public static function formatValueForStorage(mixed $value, string $valueType = self::VALUE_TYPE_TXT): mixed
+    {
+        return match ($valueType) {
+            self::VALUE_TYPE_RANGE => self::formatRangeValueForStorage($value),
+            default => $value,
+        };
+    }
+
+    /**
+     * @throws Throwable
+     */
+    private static function getOne(
+        string $key,
+        mixed $default = null,
+        string $desc = '',
+        string $valueType = self::VALUE_TYPE_TXT
+    ): mixed {
+        $config = ConfigMap::$configs[$key] ?? null;
+
+        if ($config === null) {
+            return self::createConfigFromDb($key, $default, $desc, $valueType);
+        }
+
+        if ($config['is_enable'] != 1) {
+            return $default;
+        }
+
+        return self::parseValueByType(
+            value: $config['value'] ?? null,
+            valueType: (string)($config['value_type'] ?? self::VALUE_TYPE_TXT),
+            default: $default
+        );
+    }
+
     /**
      * 从数据库创建配置并重新生成静态文件
      * @param string $key 配置键名
      * @param mixed $default 默认值
      * @param string $desc
+     * @param string $valueType
      * @return mixed
      * @throws Throwable
      */
     #[RedisLockAttribute]
-    private static function createConfigFromDb(string $key, mixed $default, string $desc = ''): mixed
+    private static function createConfigFromDb(
+        string $key,
+        mixed $default,
+        string $desc = '',
+        string $valueType = self::VALUE_TYPE_TXT
+    ): mixed
     {
         $config = new ConfigTable()->where([ConfigTable::KEY => $key])->selectOne();
 
@@ -125,11 +148,11 @@ class ConfigService
             try {
                 new ConfigTable()->insert([
                     ConfigTable::KEY => $key,
-                    ConfigTable::VALUE => $default,
+                    ConfigTable::VALUE => self::formatValueForStorage($default, $valueType),
                     ConfigTable::IS_ENABLE => 1,
                     ConfigTable::DESC => $desc ?: '自动创建的配置项',
                     ConfigTable::ALLOW_QUERY => 0,
-                    ConfigTable::VALUE_TYPE => 'txt',
+                    ConfigTable::VALUE_TYPE => $valueType,
                 ]);
             } catch (Throwable $e) {
                 Log::save("Failed to create config: key=$key, error: " . $e->getMessage(), 'config_error');
@@ -214,6 +237,16 @@ class ConfigService
         $end = self::parseNumberString((string)$endRaw);
 
         return $start <= $end ? [$start, $end] : [$end, $start];
+    }
+
+    private static function formatRangeValueForStorage(mixed $value): mixed
+    {
+        $normalized = self::normalizeRangeDefault(self::parseValueByType($value, self::VALUE_TYPE_RANGE, $value));
+        if (!is_array($normalized) || count($normalized) !== 2) {
+            return $value;
+        }
+
+        return $normalized[0] . ',' . $normalized[1];
     }
 
     private static function parseNumberString(string $value): int|float

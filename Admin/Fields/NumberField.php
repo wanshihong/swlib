@@ -13,16 +13,16 @@ class NumberField extends TextField
     // 列表页面自定义模板
     public string $templateForm = "fields/form/number.twig";
 
-    private ?int $min = null;
-    private ?int $max = null;
+    private ?float $min = null;
+    private ?float $max = null;
 
-    public function __construct(string $field, string $label, string $dbName = 'default')
+    public function __construct(string $field, string $label)
     {
-        parent::__construct($field, $label, $dbName);
+        parent::__construct($field, $label);
         $this->addJsFile('/admin/js/field-number.js');
     }
 
-    public function setMin(int $min): static
+    public function setMin(float $min): static
     {
         if ($this->max !== null && $min > $this->max) {
             throw new InvalidArgumentException('Minimum value cannot be greater than the current maximum value.');
@@ -33,7 +33,7 @@ class NumberField extends TextField
         return $this;
     }
 
-    public function setMax(int $max): static
+    public function setMax(float $max): static
     {
         if ($this->min !== null && $max < $this->min) {
             throw new InvalidArgumentException('Maximum value cannot be less than the current minimum value.');
