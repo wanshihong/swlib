@@ -196,8 +196,22 @@
         .replaceAll(">", "&gt;");
     }
 
-    function inline(text) {
+    function inline(text, refs = new Map()) {
+      const refCode = (m, prefix, num) => {
+        const id = refs.get(num);
+        if (!id) return m;
+        return `${prefix}<a href="#${id}"><code>${num}</code></a>`;
+      };
+
       return text
+        .replace(/(看\s+)`(\d+(?:\.\d+)+)`/g, refCode)
+        .replace(/(见\s+)`(\d+(?:\.\d+)+)`/g, refCode)
+        .replace(/(参考\s+)`(\d+(?:\.\d+)+)`/g, refCode)
+        .replace(/`(\d+(?:\.\d+)+)`/g, (m, num) => {
+          const id = refs.get(num);
+          if (!id) return `<code>${num}</code>`;
+          return `<a href="#${id}"><code>${num}</code></a>`;
+        })
         .replace(/`([^`]+)`/g, "<code>$1</code>")
         .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
         .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
@@ -229,24 +243,44 @@
       return { html: `<table><thead><tr>${th}</tr></thead><tbody>${tb}</tbody></table>`, next: j };
     }
 
-    function renderMarkdown(md, sectionId) {
-      const lines = md.replace(/\r\n/g, "\n").split("\n");
-      const out = [];
-      let i = 0;
-      let inCode = false;
-      let listType = null;
-      let usedIds = new Map();
-
-      function closeList() {
-        if (listType === "ul") out.push("</ul>");
-        if (listType === "ol") out.push("</ol>");
-        listType = null;
-      }
+    function collectHeadingMeta(lines, sectionId) {
+      const idByLine = new Map();
+      const refToId = new Map();
+      const usedIds = new Map();
 
       function nextId(base) {
         const n = (usedIds.get(base) || 0) + 1;
         usedIds.set(base, n);
         return n === 1 ? base : `${base}-${n}`;
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const hm = lines[i].match(/^(#{1,6})\s+(.*)$/);
+        if (!hm) continue;
+        const raw = hm[2].trim();
+        const id = nextId(`${sectionId}-${slugify(raw) || "section"}`);
+        idByLine.set(i, id);
+
+        const match = raw.match(/^(\d+(?:\.\d+)+)\b/);
+        if (match && !refToId.has(match[1])) {
+          refToId.set(match[1], id);
+        }
+      }
+
+      return { idByLine, refToId };
+    }
+
+    function renderMarkdown(md, sectionId) {
+      const lines = md.replace(/\r\n/g, "\n").split("\n");
+      const meta = collectHeadingMeta(lines, sectionId);
+      const out = [];
+      let i = 0;
+      let inCode = false;
+      let listType = null;
+      function closeList() {
+        if (listType === "ul") out.push("</ul>");
+        if (listType === "ol") out.push("</ol>");
+        listType = null;
       }
 
       while (i < lines.length) {
@@ -283,8 +317,8 @@
         if (hm) {
           closeList();
           const level = hm[1].length;
-          const text = inline(escHtml(hm[2].trim()));
-          const id = nextId(`${sectionId}-${slugify(hm[2]) || "section"}`);
+          const text = inline(escHtml(hm[2].trim()), meta.refToId);
+          const id = meta.idByLine.get(i) || `${sectionId}-section-${i}`;
           out.push(`<h${level} id="${id}">${text}</h${level}>`);
           i += 1;
           continue;
@@ -297,7 +331,7 @@
             listType = "ul";
             out.push("<ul>");
           }
-          out.push(`<li>${inline(escHtml(item))}</li>`);
+          out.push(`<li>${inline(escHtml(item), meta.refToId)}</li>`);
           i += 1;
           continue;
         }
@@ -309,14 +343,14 @@
             listType = "ol";
             out.push("<ol>");
           }
-          out.push(`<li>${inline(escHtml(item))}</li>`);
+          out.push(`<li>${inline(escHtml(item), meta.refToId)}</li>`);
           i += 1;
           continue;
         }
 
         if (line.startsWith("> ")) {
           closeList();
-          out.push(`<blockquote>${inline(escHtml(line.slice(2)))}</blockquote>`);
+          out.push(`<blockquote>${inline(escHtml(line.slice(2)), meta.refToId)}</blockquote>`);
           i += 1;
           continue;
         }
@@ -335,7 +369,7 @@
         }
 
         closeList();
-        out.push(`<p>${inline(escHtml(line))}</p>`);
+        out.push(`<p>${inline(escHtml(line), meta.refToId)}</p>`);
         i += 1;
       }
       closeList();
