@@ -27,10 +27,11 @@ use Throwable;
 
 
 #[ActionButton(
-    label: '编辑2',
+    label: '编辑',
     url: 'edit',
     params: [ConfigTable::VALUE_TYPE => '%' . ConfigTable::VALUE_TYPE],
     showOn: [ActionPosEnum::LISTS_PAGE_ROW],
+    icon: 'bi bi-pencil',
 )]
 class ConfigAdmin extends AbstractAdmin
 {
